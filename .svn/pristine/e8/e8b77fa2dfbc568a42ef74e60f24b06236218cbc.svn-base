@@ -1,0 +1,85 @@
+package web.fr.display.service;
+
+import java.util.List;
+import java.util.Map;
+
+public interface ProductDisplayService {
+
+   
+    /**
+     * <pre>
+     * 1. MethodName : selectCategroyListByBestProduct
+     * 2. ClassName  : ProductDisplayService.java
+     * 3. Comment    : 프론트 > 베스트 랭킹 > 카테고리 목록
+     * 4. 작성자       : eric 
+     * 5. 작성일       : 2022. 2. 21.
+     * </pre>
+     *
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectCategroyListByBestProduct(String code) throws Exception;
+    
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayList
+     * 2. ClassName  : ProductDisplayService.java
+     * 3. Comment    : 프론트 > 베스트 랭킹 > 전시 상품 > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectProductDisplayList(Map<String, Object> commandMap) throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayListByCode
+     * 2. ClassName  : ProductDisplayService.java
+     * 3. Comment    : 프론트 > 메인 > 전시 상품 > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 17.
+     * </pre>
+     *
+     * @param cmmComIdx
+     * @param nTimes
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectProductDisplayListByCode(String cmmComIdx, Integer nTimes) throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayList
+     * 2. ClassName  : ProductDisplayService.java
+     * 3. Comment    : 프론트 > 메인 > 전시 상품 > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectProductDisplayListByCode(String Code, Integer limit, boolean random) throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayCategoryList
+     * 2. ClassName  : ProductDisplayService.java
+     * 3. Comment    : 지원금 별 대상 카테고리 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 8.
+     * </pre>
+     *
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectProductDisplayCategoryList() throws Exception;
+
+}

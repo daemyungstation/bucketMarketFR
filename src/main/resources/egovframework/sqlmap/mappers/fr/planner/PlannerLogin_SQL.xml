@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlannerLogin">
+
+    <!-- 조건절 -->
+    <sql id="plannerLoginWhere">
+    </sql>
+    
+    <!-- resultMap -->
+    <resultMap id="resultPlanner" type="common.model.Planner">
+        <result property="RDP_MST_IDX" column="RDP_MST_IDX"/> <!-- 레디플래너IDX -->
+        <result property="RDP_MST_NO" column="RDP_MST_NO"/> <!-- 레디플래너번호 -->
+        <result property="RDP_MST_ID" column="RDP_MST_ID"/> <!-- 레디플레너아이디 -->
+        <result property="RDP_MST_MEM_NM" column="RDP_MST_MEM_NM"/> <!-- 이름 -->
+        <result property="RDP_MST_BUSI_CLS" column="RDP_MST_BUSI_CLS"/> <!-- 사업자유형 -->
+        <result property="RDP_MST_DM_YN" column="RDP_MST_DM_YN"/> <!-- 소속 -->
+        <result property="RDP_MST_DM_NO" column="RDP_MST_DM_NO"/> <!-- 사번 -->
+        <result property="RDP_MST_MAIL" column="RDP_MST_MAIL"/> <!-- E-MAIL -->
+        <result property="RDP_MST_HP1" column="RDP_MST_HP1"/> <!-- 휴대폰번호1 -->
+        <result property="RDP_MST_HP2" column="RDP_MST_HP2"/> <!-- 휴대폰번호2 -->
+        <result property="RDP_MST_HP3" column="RDP_MST_HP3"/> <!-- 휴대폰번호3 -->
+        <result property="RDP_MST_CI" column="RDP_MST_CI"/> <!-- CI -->
+        <result property="RDP_MST_PROFILE_IMAGE" column="RDP_MST_PROFILE_IMAGE"/> <!-- 플래너 프로필 이미지 -->
+    </resultMap>
+    
+    <!-- 플래너 기본 정보 조회 for 세션 -->
+    <select id="selectPlannerInfoForSession" parameterType="HashMap" resultMap="resultPlanner">
+        /* PlannerLogin.selectPlannerInfoForSession */
+        SELECT
+            TRM.*,
+            (SELECT TCF.CMM_FLE_ATT_PATH || TCF.CMM_FLE_SYS_NM FROM T_CMM_FLE TCF WHERE TCF.CMM_FLE_TB_NM = 'T_RDP_MST' AND TCF.CMM_FLE_USE_YN = 'Y' AND TCF.CMM_FLE_TB_PK = TRM.RDP_MST_IDX AND TCF.CMM_FLE_TB_TYPE = 'I' AND ROWNUM <![CDATA[<=]]> 1) AS RDP_MST_PROFILE_IMAGE
+        FROM 
+            T_RDP_MST TRM
+        WHERE
+            TRM.RDP_MST_IDX = #{RDP_MST_IDX}
+    </select>
+    
+    <!-- 로그인 이력 추가 -->
+    <insert id="insertLoginHistory" parameterType="HashMap">
+        <selectKey keyProperty="RDP_HIS_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_RDP_HIS_IDX.NEXTVAL AS RDP_HIS_IDX FROM DUAL
+        </selectKey> 
+        /* PlannerLogin.insertLoginHistory */
+        INSERT INTO T_RDP_HIS (
+            RDP_HIS_IDX,
+            RDP_MST_IDX,
+            RDP_HIS_REG_DT,
+            RDP_HIS_REG_IP,
+            RDP_HIS_REG_ID
+        ) VALUES (
+            #{RDP_HIS_IDX},
+            #{RDP_MST_IDX},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{RDP_HIS_REG_IP},
+            #{RDP_MST_IDX}
+        )
+    </insert>
+    
+    <!-- 자동 로그인 정보 조회 -->
+    <select id="selectAutoLogin" parameterType="HashMap" resultType="HashMap">
+        /* PlannerLogin.selectAutoLogin */
+        SELECT
+            RDP_MST_IDX
+        FROM 
+            T_RDP_LGN RL, T_RDP_MST RM
+        WHERE 
+            RL.RDP_MST_ID = RM.RDP_MST_ID
+            AND RL.RDP_LGN_CKE = #{RDP_LGN_CKE}
+            AND TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') <![CDATA[<]]> RL.RDP_HIS_REG_DT
+    </select>
+    
+    <!-- 자동 로그인 정보 추가 -->
+    <insert id="insertAutoLogin" parameterType="HashMap">
+        <selectKey keyProperty="RDP_LGN_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_RDP_LGN_IDX.NEXTVAL AS RDP_LGN_IDX FROM DUAL
+        </selectKey> 
+        /* PlannerLogin.insertAutoLogin */
+        INSERT INTO T_RDP_LGN (
+            RDP_LGN_IDX,
+            RDP_MST_ID,
+            RDP_HIS_REG_DT,
+            RDP_LGN_CKE
+        ) VALUES (
+            #{RDP_LGN_IDX},
+            #{RDP_MST_ID},
+            TO_CHAR(SYSDATE + #{EXPIRE_DAYS}, 'YYYYMMDDHH24MISS'),
+            #{RDP_LGN_CKE}
+        )
+    </insert>
+    
+    <!-- 자동 로그인 정보 삭제 -->
+    <delete id="deleteAutoLogin" parameterType="HashMap">
+        /* PlannerLogin.deleteAutoLogin */
+        DELETE FROM T_RDP_LGN WHERE RDP_LGN_CKE = #{RDP_LGN_CKE}
+    </delete>
+    
+</mapper>

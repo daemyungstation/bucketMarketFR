@@ -1,0 +1,244 @@
+package web.sci.oneself.service.impl;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import common.code.Const;
+import common.dao.CommonDefaultDAO;
+import common.model.OneSelfCheck;
+import common.model.Request;
+import common.model.User;
+import common.session.SessionsPlanner;
+import common.session.SessionsSci;
+import common.session.SessionsUser;
+import common.util.DateUtil;
+import common.util.DeviceUtil;
+import common.util.StringUtil;
+import egovframework.rte.fdl.property.EgovPropertyService;
+import lombok.extern.log4j.Log4j2;
+import web.fr.contract.service.ContractService;
+import web.fr.dlcc.service.DlccService;
+import web.sci.oneself.model.SciOneselfCheckResult;
+import web.sci.oneself.model.SciOneselfCheckResult.RESULT;
+import web.sci.oneself.service.SciOneselfCheckService;
+
+@Log4j2
+@Service("sciOneselfCheckService")
+public class SciOneselfCheckServiceImpl implements SciOneselfCheckService {
+
+    @Resource(name = "defaultDAO")
+    private CommonDefaultDAO defaultDAO;
+
+    @Resource(name = "dlccService")
+    private DlccService dlccService;
+
+    @Resource(name = "contractService")
+    private ContractService contractService;
+
+    @Resource(name = "sciPropertiesService")
+    private EgovPropertyService properties;
+
+    @Value("#{resource['front.ssl.domain']}")
+    private String pcDomain;
+
+    @Value("#{resource['mobile.ssl.domain']}")
+    private String mobileDomain;
+    
+    @Value("#{sci['sci.oneself.check.service.number.pc.popup']}")
+    private String pcSrvNo;
+    
+    @Value("#{sci['sci.oneself.check.service.number.mobile.popup']}")
+    private String mobileSrvNo;
+    
+    @Value("#{url['common.oneself.result']}")
+    private String oneselfRetUrl;
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectSciOneselfCheckReqNum
+     * 2. ClassName  : SciOneselfCheckServiceImpl.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 요청번호 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @return
+     * @throws Exception
+     */
+    public String selectSciOneselfCheckReqNum() throws Exception {
+        return defaultDAO.selectStr("SciOneselfCheck.selectSciOneselfCheckReqNum", null);
+    }
+
+    private int insertSciOneselfCheck(SciOneselfCheckResult sciOneselfCheckResult) throws Exception {
+        return defaultDAO.insert("SciOneselfCheck.insertSciOneselfCheck", sciOneselfCheckResult);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : makeOneselfCheckParam
+     * 2. ClassName  : SciOneselfCheckServiceImpl.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 요청 파라메터 작성
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @see web.sci.oneself.service.SciOneselfCheckService#makeOneselfCheckParam(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> makeOneselfCheckParam(Map<String, Object> commandMap) throws Exception {
+        // 01. 암호화 모듈 선언
+        com.sci.v2.pccv2.secu.SciSecuManager seed = new com.sci.v2.pccv2.secu.SciSecuManager();
+
+        String id = this.properties.getString("sci.oneself.check.service.id");
+        String key = this.properties.getString("sci.oneself.check.service.key");
+        String reqNum = StringUtil.getString(commandMap, "reqNum", "");
+        String srvNo = DeviceUtil.isNormal() ? this.pcSrvNo : this.mobileSrvNo;
+        String certDate = DateUtil.getCurrentDateTime();
+        String certGb = "H";
+        String addVar = StringUtil.getString(commandMap, "addVar", "");
+        String exVar = "0000000000000000";
+
+        log.debug("============================================================== 요청 정보 ==============================================================");
+        log.debug("id[{}], key[{}], srvNo[{}], reqNum[{}], certDate[{}], certGb[{}], addVar[{}], exVar[{}]", id, key, srvNo, reqNum, certDate, certGb, addVar, exVar);
+        log.debug("===================================================================================================================================");
+
+        // 02. 1차 암호화
+        String encStr = "";
+        String reqInfo = id + "^" + srvNo + "^" + reqNum + "^" + certDate + "^" + certGb + "^" + addVar + "^" + exVar; // 데이터 암호화
+        seed.setInfoPublic(id, key); // 회원사 ID 및 PWD 셋팅 패스워드는 16자리 필수 영문 무관
+        encStr = seed.getEncPublic(reqInfo);
+        log.debug("============================================================== 인코딩 정보 ==============================================================");
+        log.debug("encStr[{}]", encStr);
+        log.debug("====================================================================================================================================");
+        // 03. 위변조 검증 값 생성
+        String hmacMsg = seed.getEncReq(encStr, "HMAC");
+        // 03. 2차 암호화
+        reqInfo = seed.getEncPublic(encStr + "^" + hmacMsg + "^" + exVar); //2차암호화
+        // 04. 회원사 ID 처리를 위한 암호화
+        reqInfo = seed.EncPublic(reqInfo + "^" + id + "^" + "00000000");
+        log.debug("============================================================== req info ==============================================================");
+        log.debug("reqInfo[{}]", reqInfo);
+        log.debug("======================================================================================================================================");
+        commandMap.clear();
+        Map<String, Object> returnMap = new HashMap<>();
+        returnMap.put("reqNum", reqNum);
+        returnMap.put("srvNo", srvNo);
+        returnMap.put("reqInfo", reqInfo);
+        returnMap.put("reqUrl", this.properties.getString("sci.oneself.check.url"));
+        returnMap.put("retUrl", (DeviceUtil.isNormal() ? this.pcDomain : this.mobileDomain) + this.oneselfRetUrl);
+        return returnMap;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : oneselfCheck
+     * 2. ClassName  : SciOneselfCheckServiceImpl.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 결과
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @see web.sci.oneself.service.SciOneselfCheckService#oneselfCheck(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public SciOneselfCheckResult oneselfCheck(Map<String, Object> commandMap) throws Exception {
+        SciOneselfCheckResult sciOneselfCheckResult = new SciOneselfCheckResult();
+        try {
+            String id = this.properties.getString("sci.oneself.check.service.id");
+            String key = this.properties.getString("sci.oneself.check.service.key");
+            String reqNum = StringUtil.getString(commandMap, "reqNum");
+            String srvNo = DeviceUtil.isNormal() ? this.pcSrvNo : this.mobileSrvNo;
+            String retInfo = StringUtil.getString(commandMap, "retInfo", "").trim();
+            
+            log.debug("============================================================== 결과 정보 ==============================================================");
+            log.debug("id[{}], key[{}], srvNo[{}], reqNum[{}], retInfo[{}]", id, key, srvNo, reqNum, retInfo);
+            log.debug("===================================================================================================================================");
+            
+            // 1. 암호화 모듈 (jar) Loading
+            com.sci.v2.pccv2.secu.SciSecuManager sciSecuMg = new com.sci.v2.pccv2.secu.SciSecuManager();
+            sciSecuMg.setInfoPublic(id, key); //패스워드는 16자리 필수 영문 무관
+
+            // 3. 1차 파싱---------------------------------------------------------------------
+            retInfo = sciSecuMg.getDec(retInfo, reqNum);
+
+            // 4. 요청결과 복호화
+            String[] aRetInfo1 = retInfo.split("\\^");
+            String encPara = aRetInfo1[0]; // 암호화된 통합 파라미터
+            String encMsg = aRetInfo1[1]; // 암호화된 통합 파라미터의 Hash값
+
+            String encMsg2 = sciSecuMg.getMsg(encPara);
+            // 5. 위/변조 검증 ------------------------------------------------------------------
+            if (!encMsg2.equals(encMsg)) {
+                SessionsSci.setSessionSciReqNumClear();
+                SessionsSci.setSessionSciSrvNoClear();
+                throw new Exception("FALSIFICATION");
+            }
+
+            // 복호화 및 위/변조 검증 ---------------------------------------------------------------
+            retInfo = sciSecuMg.getDec(encPara, reqNum);
+            String[] aRetInfo = retInfo.split("\\^");
+            sciOneselfCheckResult.setName(aRetInfo[0]);
+            sciOneselfCheckResult.setBirYMD(aRetInfo[1]);
+            sciOneselfCheckResult.setSex(aRetInfo[2].equals("M") ? Const.MAN : Const.FEMALE);
+            sciOneselfCheckResult.setFgnGbn(aRetInfo[3]);
+            sciOneselfCheckResult.setDi(aRetInfo[4]);
+            sciOneselfCheckResult.setCi1(aRetInfo[5]);
+            sciOneselfCheckResult.setCi2(aRetInfo[6]);
+            sciOneselfCheckResult.setCiversion(aRetInfo[7]);
+            sciOneselfCheckResult.setReqNum(aRetInfo[8]);
+            sciOneselfCheckResult.setCertGb(aRetInfo[10]);
+            sciOneselfCheckResult.setCellNo(aRetInfo[11]);
+            sciOneselfCheckResult.setCellCorp(aRetInfo[12]);
+            sciOneselfCheckResult.setCertDate(aRetInfo[13]);
+            sciOneselfCheckResult.setAddVar(aRetInfo[14]);
+            sciOneselfCheckResult.setSrvNo(srvNo);
+            // 이력 DB 등록
+            this.insertSciOneselfCheck(sciOneselfCheckResult);
+            // 본인확인 결과
+            RESULT result = RESULT.getResult(aRetInfo[9]);
+            sciOneselfCheckResult.setResultCode(result.getCode());
+            sciOneselfCheckResult.setResultMessage(result.getMessage());
+            sciOneselfCheckResult.setSuccess(result.isSuccess());
+            if (result.isSuccess()) {
+
+                // 버킷마켓 사용자
+                User user = SessionsUser.getSessionUser(Request.getCurrentRequest());
+                user.setUSER_CI(sciOneselfCheckResult.getCi1());
+                user.setUSER_NM(sciOneselfCheckResult.getName());
+                user.setUSER_HP(sciOneselfCheckResult.getCellNo());
+                user.setUSER_BIRTHDAY(sciOneselfCheckResult.getBirYMD());
+                user.setUSER_SEX(sciOneselfCheckResult.getSex());
+                SessionsUser.setSessionUser(Request.getCurrentRequest(), user);
+
+                // DLCC 상세납입
+                this.dlccService.doJob05(this.contractService.selectContractUserAccountNoList());
+
+                // 본인확인 정보
+                OneSelfCheck oneSelfCheck = new OneSelfCheck();
+                oneSelfCheck.setONE_SELF_CI(sciOneselfCheckResult.getCi1());
+                oneSelfCheck.setONE_SELF_NM(sciOneselfCheckResult.getName());
+                oneSelfCheck.setONE_SELF_HP(sciOneselfCheckResult.getCellNo());
+                oneSelfCheck.setONE_SELF_SEX(sciOneselfCheckResult.getSex());
+                SessionsPlanner.setOneSelfCheck(Request.getCurrentRequest(), oneSelfCheck);
+
+                SessionsSci.setSessionSciReqNumClear();
+                SessionsSci.setSessionSciSrvNoClear();
+            }
+        } catch (Exception e) {
+            RESULT result = RESULT.getResult(e.getMessage());
+            sciOneselfCheckResult.setResultCode(result.getCode());
+            sciOneselfCheckResult.setResultMessage(result.getMessage());
+            sciOneselfCheckResult.setSuccess(result.isSuccess());
+        }
+        return sciOneselfCheckResult;
+    }
+}

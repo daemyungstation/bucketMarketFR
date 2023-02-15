@@ -1,0 +1,300 @@
+package web.fr.common.controller;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.annotation.CommandMap;
+import common.session.SessionsBoardUser;
+import common.support.ControllerSupport;
+import common.util.StringUtil;
+import common.util.renderer.UrlRender;
+import common.viewer.JSON;
+import egovframework.rte.fdl.property.EgovPropertyService;
+import web.dozn.bank.service.DoznBankingService;
+import web.dozn.signature.service.DoznSignatureService;
+import web.fr.common.service.CommonService;
+import web.sci.name.model.SciNameCheckRequest;
+import web.sci.name.model.SciNameCheckResult;
+import web.sci.name.service.SciNameCheckService;
+import web.sci.oneself.model.SciOneselfCheckResult;
+import web.sci.oneself.service.SciOneselfCheckService;
+
+@Controller
+public class CommonController extends ControllerSupport {
+
+    @Autowired
+    private UrlRender urlrender;
+
+    @Resource(name = "commonService")
+    private CommonService commonService;
+
+    @Resource(name = "doznBankingService")
+    private DoznBankingService doznBankingService;
+
+    @Resource(name = "doznSignatureService")
+    private DoznSignatureService doznSignatureService;
+    
+    @Resource(name = "sciNameCheckService")
+    private SciNameCheckService sciNameCheckService;
+
+    @Resource(name = "sciPropertiesService")
+    private EgovPropertyService sciPropertiesService;
+
+    @Resource(name="sciOneselfCheckService")
+    private SciOneselfCheckService sciOneselfCheckService;
+    
+    /**
+     * <pre>
+     * 1. MethodName : urlListAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : url mapping
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.url.list.ajax}", method = RequestMethod.POST)
+    public JSON urlListAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("list", urlrender.renderUrl());
+        return json;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : boardLogin
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 게시판 로그인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.board.login.ajax}", method = RequestMethod.POST)
+    public JSON boardLogin(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        commonService.boardLogin(commandMap);
+        json.put("isSuccess", SessionsBoardUser.isLogin(request));
+        return json;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : boardLogout
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 게시판 로그아웃
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.board.logout.ajax}", method = RequestMethod.POST)
+    public JSON boardLogout(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        SessionsBoardUser.setSessionBoardUserClear(request);
+        json.put("isSuccess", !SessionsBoardUser.isLogin(request));
+        return json;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : checkBankAccountAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 계좌 확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 8.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.check.bank.account.ajax}")
+    public JSON checkBankAccountAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        Map<String, Object> result = doznBankingService.inquireDepositor(commandMap);
+        json.addObject("isSuccess", result.get("result"));
+        json.addObject("depositor", result.get("depositor"));
+        json.addObject("message", result.get("message"));
+        return json;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : checkSsnAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 실명확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 8.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.check.ssn.ajax}")
+    public JSON checkSsnAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+
+        // 실명확인 파라미터
+        SciNameCheckRequest reqVo = new SciNameCheckRequest();
+        reqVo.setSrvNo(StringUtil.getString(commandMap, "srvNo")); // 서비스 번호
+        reqVo.setJumin1(StringUtil.getString(commandMap, "jumin1"));
+        reqVo.setJumin2(StringUtil.getString(commandMap, "jumin2"));
+        reqVo.setName(StringUtil.getString(commandMap, "name"));
+
+        // 실명확인
+        SciNameCheckResult result = this.sciNameCheckService.nameCheck(request, reqVo);
+
+        json.addObject("isSuccess", result.isSuccess());
+        json.addObject("message", result.getMessage());
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : oneselfReqNumAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 요청번호 생성 (ajax)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 7. 24.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.oneself.req.num.ajax}", method = RequestMethod.POST)
+    public JSON oneselfReqNumAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("reqNum", sciOneselfCheckService.selectSciOneselfCheckReqNum());
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : oneselfReqAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 인증 요청 파라메터 생성 (ajax)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 7. 15.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.oneself.req.ajax}", method = RequestMethod.POST)
+    public JSON oneselfReqAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("params", sciOneselfCheckService.makeOneselfCheckParam(commandMap));
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : oneselfPopup
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 인증 완료 (랜딩 페이지)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 15.
+     * </pre>
+     * 
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${common.oneself.result}")
+    public ModelAndView oneselfResult(@CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.oneself.result");
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : oneselfPopup
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 프론트 > SCI > 본인인증 > 인증 완료 (Ajax)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 15.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${common.oneself.result.ajax}", method = RequestMethod.POST)
+    public JSON oneselfResultAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        SciOneselfCheckResult result = sciOneselfCheckService.oneselfCheck(commandMap);
+        json.put("isSuccess", result.isSuccess());
+        json.put("resultCode", result.getResultCode());
+        json.put("resultMessage", result.getResultMessage());
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : signatureRequestAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 프론트 > 카카오 전자서명 > 요청
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 18.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${common.signature.request.ajax}", method = RequestMethod.POST)
+    public JSON signatureRequestAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("result", this.doznSignatureService.signRequest(commandMap));
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : signatureStatusAjax
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 프론트 > 카카오 전자서명 > 상태 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 18.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${common.signature.status.ajax}", method = RequestMethod.POST)
+    public JSON signatureStatusAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("result", this.doznSignatureService.signStatus(commandMap));
+        return json;
+    }
+}

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProductQnA">
+    
+    <!-- 프론트 > 상품상세 > QNA > 조건절 -->
+    <sql id="productQnAWhere">
+        <where>
+            <if test="searchPrdMstNo != null and searchPrdMstNo != ''">
+                AND PRD_MST_NO = #{searchPrdMstNo}
+            </if>
+            <if test="searchPrdQnADspYn != null and searchPrdQnADspYn != ''">
+                AND PRD_QNA_DSP_YN = #{searchPrdQnADspYn}
+            </if>
+            <if test="searchPrdQnARplYn != null and searchPrdQnARplYn != ''">
+                AND PRD_QNA_RPL_YN = #{searchPrdQnARplYn}
+            </if>
+            <if test="searchPrdQnAMemNm != null and searchPrdQnAMemNm != ''">
+                AND PRD_QNA_MEM_NM = #{searchPrdQnAMemNm}
+            </if>
+            <if test="searchPrdQnAMemPw != null and searchPrdQnAMemPw != ''">
+                AND PRD_QNA_MEM_PW = #{searchPrdQnAMemPw}
+            </if>
+        </where>
+    </sql>
+    
+    <!-- 프론트 > 상품상세 > QNA > 목록 개수 -->
+    <select id="selectProductQnAListCount" parameterType="HashMap" resultType="Integer">
+        /* ProductQnA.selectProductQnAListCount */
+        SELECT COUNT(PRD_QNA_IDX)
+        FROM T_PRD_QNA
+        <include refid="productQnAWhere"/>
+    </select>
+    
+    <!-- 프론트 > 상품상세 > QNA > 목록 -->
+    <resultMap id="resultProductQnAList" type="HashMap">
+        <result property="PRD_QNA_MEM_NM" column="PRD_QNA_MEM_NM"/>
+        <result property="PRD_QNA_MEM_PW" column="PRD_QNA_MEM_PW"/>
+        <result property="PRD_QNA_REG_DT" column="PRD_QNA_REG_DT"/>
+        <result property="PRD_QNA_CTS" column="PRD_QNA_CTS"/>
+        <result property="PRD_QNA_RPL_YN" column="PRD_QNA_RPL_YN"/>
+        <result property="PRD_QNA_RPL_CTS" column="PRD_QNA_RPL_CTS" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_QNA_UPD_DT" column="PRD_QNA_UPD_DT"/>
+        <result property="PRD_QNA_UPD_ID" column="PRD_QNA_UPD_ID"/>
+        <result property="AUT_MST_VDR_YN" column="AUT_MST_VDR_YN"/>
+        <result property="PRD_QNA_DSP_YN" column="PRD_QNA_DSP_YN"/>
+    </resultMap>
+    <select id="selectProductQnAList" parameterType="HashMap" resultMap="resultProductQnAList">
+        /* ProductQnA.selectProductQnAList */
+        SELECT
+            FN_MASKING('USER_NM', S2.PRD_QNA_MEM_NM) AS PRD_QNA_MEM_NM,
+            S2.PRD_QNA_MEM_PW,
+            S2.PRD_QNA_REG_DT,
+            S2.PRD_QNA_CTS,
+            S2.PRD_QNA_RPL_YN,
+            S2.PRD_QNA_RPL_CTS,
+            S2.PRD_QNA_UPD_DT,
+            S2.PRD_QNA_UPD_ID,
+            NVL((
+                SELECT AUT_MST_VDR_YN
+                FROM T_ADM_MST ADM, T_AUT_MST AUT
+                WHERE ADM.ADM_MST_ID = S2.PRD_QNA_UPD_ID
+                    AND ADM.AUT_MST_IDX = AUT.AUT_MST_IDX
+                    AND AUT.AUT_MST_VDR_YN = 'Y'
+            ), 'N') AS AUT_MST_VDR_YN,
+            CASE 
+                WHEN S2.PRD_QNA_MEM_NM = #{searchPrdQnAMemNm} AND S2.PRD_QNA_MEM_PW = #{searchPrdQnAMemPw} THEN 'Y'
+                WHEN S2.PRD_QNA_DSP_YN = 'Y' THEN 'Y'
+                ELSE 'N'
+            END PRD_QNA_DSP_YN
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    PRD_QNA_MEM_NM,
+                    PRD_QNA_MEM_PW,
+                    PRD_QNA_REG_DT,
+                    PRD_QNA_CTS,
+                    PRD_QNA_DSP_YN,
+                    PRD_QNA_RPL_YN,
+                    PRD_QNA_RPL_CTS,
+                    PRD_QNA_UPD_DT,
+                    PRD_QNA_UPD_ID
+                FROM T_PRD_QNA
+                <include refid="productQnAWhere"/>
+                ORDER BY PRD_QNA_REG_DT DESC
+            ) S1
+            WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+        ) S2
+        WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+    </select>
+    
+    <!-- 프론트 > 상품상세 > QNA > 등록 -->
+    <insert id="insertProductQnA" parameterType="HashMap">
+        /* ProductQnA.insertProductQnA */
+        <selectKey keyProperty="PRD_QNA_IDX" keyColumn="PRD_QNA_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_PRD_QNA_IDX.NEXTVAL AS PRD_QNA_IDX FROM DUAL
+        </selectKey>
+        INSERT INTO T_PRD_QNA (
+            PRD_QNA_IDX,
+            PRD_MST_NO,
+            PRD_QNA_MEM_NM,
+            PRD_QNA_MEM_PW,
+            PRD_QNA_CTS,
+            PRD_QNA_DSP_YN,
+            PRD_QNA_SMS_YN,
+            <if test="PRD_QNA_SMS_YN != null and PRD_QNA_SMS_YN.equals('Y'.toString())">
+                PRD_QNA_HP1,
+                PRD_QNA_HP2,
+                PRD_QNA_HP3,
+            </if>
+            PRD_QNA_RPL_YN,
+            PRD_QNA_REG_DT,
+            PRD_QNA_REG_IP
+        ) VALUES (
+            #{PRD_QNA_IDX},
+            #{PRD_MST_NO},
+            #{PRD_QNA_MEM_NM},
+            #{PRD_QNA_MEM_PW},
+            #{PRD_QNA_CTS},
+            NVL(#{PRD_QNA_DSP_YN}, 'Y'),
+            NVL(#{PRD_QNA_SMS_YN}, 'N'),
+            <if test="PRD_QNA_SMS_YN != null and PRD_QNA_SMS_YN.equals('Y'.toString())">
+                SUBSTR(REPLACE(#{PRD_QNA_HP}, '-', ''), 1, 3),
+                SUBSTR(REPLACE(#{PRD_QNA_HP}, '-', ''), 4, DECODE(LENGTH(REPLACE(#{PRD_QNA_HP}, '-', '')), 11, 4, 3)),
+                SUBSTR(REPLACE(#{PRD_QNA_HP}, '-', ''), -4),
+            </if>
+            'N',
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{PRD_QNA_REG_IP}
+        )
+    </insert>
+</mapper>

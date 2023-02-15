@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MyPlannerPerformance">
+
+    <!-- 조건절 -->
+    <sql id="myPlannerPerformanceWhere">
+    </sql>
+    
+    <!-- 마이플래너 > 실적 > 일별 실적 -->
+    <select id="selectPerformanceByDaily" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_RECEIPT" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* MyPlannerPerformance.selectPerformanceByDaily */
+        SELECT
+            TO_CHAR(TO_DATE(S1.BASE_DT, 'YYYYMMDD'), 'MM.DD') AS BASE_DT,
+            SUM(DECODE(S1.JOIN_STATE, 1, 1, 0)) AS TOTAL_RECEIPT,
+            SUM(DECODE(S1.JOIN_STATE, 2, 1, 0)) AS TOTAL_WAITING_TO_JOIN,
+            SUM(DECODE(S1.JOIN_STATE, 3, 1, 0)) AS TOTAL_JOIN,
+            SUM(NVL(S1.EXPECTED_RETURN, 0)) AS TOTAL_EXPECTED_RETURN
+        FROM (
+            SELECT 
+                TOM.ORD_MST_IDX,
+                CASE WHEN VOM.KSTBIT IS NULL THEN 1 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 2 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN 3 -- 가입
+                     ELSE 0 
+                END AS JOIN_STATE, -- 상태
+                CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(TOM.ORD_MST_REG_DT, 0, 8) -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN SUBSTR(VOM.REG_DM, 0, 8) -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN VOM.JOIN_DT -- 가입
+                     ELSE '' 
+                END AS BASE_DT, -- 기준일
+                CASE WHEN VOM.KSTBIT IS NULL THEN 0 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 0 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN (
+                         SELECT 
+                            SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT) 
+                         FROM 
+                            V_B2B_MST VBM,
+                            V_RMT_BASIC VRB
+                         WHERE 
+                            VBM.COM_CD = TOD.SALE_TYPE 
+                            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+                            AND VRB.PROD_CD = TOD.PROD_CD 
+                            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE 
+                            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+                     ) -- 가입
+                     ELSE 0
+                END AS EXPECTED_RETURN -- 예상수익
+            FROM 
+                T_ORD_DLCC TOD,
+                T_ORD_MST TOM,
+                V_ORD_MST VOM
+            WHERE
+                TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                AND TOD.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                AND TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+        ) S1
+        WHERE
+            S1.BASE_DT BETWEEN REPLACE(#{searchStartDate}, '-', '') AND REPLACE(#{searchEndDate}, '-', '')
+        GROUP BY 
+            S1.BASE_DT
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 월별 실적 -->
+    <select id="selectPerformanceByMonthly" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_RECEIPT" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* MyPlannerPerformance.selectPerformanceByMonthly */
+        SELECT
+            TO_CHAR(TO_DATE(S1.BASE_DT, 'YYYYMM'), 'MM') AS BASE_DT,
+            SUM(DECODE(S1.JOIN_STATE, 1, 1, 0)) AS TOTAL_RECEIPT,
+            SUM(DECODE(S1.JOIN_STATE, 2, 1, 0)) AS TOTAL_WAITING_TO_JOIN,
+            SUM(DECODE(S1.JOIN_STATE, 3, 1, 0)) AS TOTAL_JOIN,
+            SUM(NVL(S1.EXPECTED_RETURN, 0)) AS TOTAL_EXPECTED_RETURN
+        FROM (
+            SELECT 
+                TOM.ORD_MST_IDX,
+                CASE WHEN VOM.KSTBIT IS NULL THEN 1 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 2 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN 3 -- 가입
+                     ELSE 0 
+                END AS JOIN_STATE, -- 상태
+                CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(TOM.ORD_MST_REG_DT, 0, 6) -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN SUBSTR(VOM.REG_DM, 0, 6) -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN SUBSTR(VOM.JOIN_DT, 0, 6) -- 가입
+                     ELSE '' 
+                END AS BASE_DT, -- 기준일
+                CASE WHEN VOM.KSTBIT IS NULL THEN 0 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 0 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN (
+                         SELECT 
+                            SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT)
+                         FROM 
+                            V_B2B_MST VBM,
+                            V_RMT_BASIC VRB
+                         WHERE 
+                            VBM.COM_CD = TOD.SALE_TYPE 
+                            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+                            AND VRB.PROD_CD = TOD.PROD_CD 
+                            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE 
+                            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+                     ) -- 가입
+                     ELSE 0
+                END AS EXPECTED_RETURN -- 예상수익
+            FROM 
+                T_ORD_DLCC TOD,
+                T_ORD_MST TOM,
+                V_ORD_MST VOM
+            WHERE
+                TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                AND TOD.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                AND TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+        ) S1
+        WHERE
+            S1.BASE_DT BETWEEN #{searchYear} || '01' AND #{searchYear} ||'12'
+        GROUP BY 
+            S1.BASE_DT
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 상품별 실적 -->
+    <select id="selectPerformanceByProduct" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_RECEIPT" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* MyPlannerPerformance.selectPerformanceByMonthly */
+        SELECT
+            S1.PRD_MST_NM,
+            SUM(DECODE(S1.JOIN_STATE, 1, 1, 0)) AS TOTAL_RECEIPT,
+            SUM(DECODE(S1.JOIN_STATE, 2, 1, 0)) AS TOTAL_WAITING_TO_JOIN,
+            SUM(DECODE(S1.JOIN_STATE, 3, 1, 0)) AS TOTAL_JOIN,
+            SUM(NVL(S1.EXPECTED_RETURN, 0)) AS TOTAL_EXPECTED_RETURN
+        FROM (
+            SELECT 
+                CPM.PRD_MST_NM,
+                CASE WHEN VOM.KSTBIT IS NULL THEN 1 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 2 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN 3 -- 가입
+                     ELSE 0 
+                END AS JOIN_STATE, -- 상태
+                CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(TOM.ORD_MST_REG_DT, 0, 8) -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN SUBSTR(VOM.REG_DM, 0, 8) -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN VOM.JOIN_DT -- 가입
+                     ELSE '' 
+                END AS BASE_DT, -- 기준일
+                CASE WHEN VOM.KSTBIT IS NULL THEN 0 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 0 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN (
+                         SELECT 
+                            SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT) 
+                         FROM 
+                            V_B2B_MST VBM,
+                            V_RMT_BASIC VRB
+                         WHERE 
+                            VBM.COM_CD = TOD.SALE_TYPE 
+                            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+                            AND VRB.PROD_CD = TOD.PROD_CD 
+                            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE 
+                            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+                     ) -- 가입
+                     ELSE 0
+                END AS EXPECTED_RETURN -- 예상수익
+            FROM 
+                T_ORD_DLCC TOD,
+                T_ORD_MST TOM,
+                C_PRD_MST CPM,
+                V_ORD_MST VOM
+            WHERE
+                TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                AND CPM.PRD_MST_NO = TOM.PRD_MST_NO 
+                AND TOD.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                AND TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+        ) S1
+        WHERE
+            S1.BASE_DT BETWEEN REPLACE(#{searchStartDate}, '-', '') AND REPLACE(#{searchEndDate}, '-', '')
+        GROUP BY 
+            S1.PRD_MST_NM
+    </select>
+    
+</mapper>

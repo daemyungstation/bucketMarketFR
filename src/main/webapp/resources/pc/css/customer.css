@@ -1,0 +1,148 @@
+@charset "utf-8";
+
+/* 안내box */
+.box-guide {border:1px solid #d9d9d9; margin-bottom:30px;}
+.guide01 {padding: 44px 64px; display: table; font-size:20px;}
+.guide01::before {content:'';display:inline-block;margin:0 40px 0 0;width:61px;height:63px;background:url(../images/icon_guide01.png) no-repeat left top;background-size:61px auto;}
+.guide01 span {display: table-cell; vertical-align: middle;}
+
+/* 자주하는질문(FAQ)-search */
+.box-faq-head {margin: 0 0 30px 0; padding: 30px 0 35px; border:1px solid #d9d9d9;}
+.box-faq-search {width:420px; height:36px; border-bottom:1px solid #000; margin: 0 auto;}
+.box-faq-search .title {width:100px; font-size:16px; line-height:30px; float:left;}
+.box-faq-search label {width:275px; float:left; margin-bottom:0px;}
+.box-faq-search input {border:none; height:30px; line-height:30px; font-weight:normal; }
+.box-faq-search input::value {font-weight:normal;}
+.box-faq-search button {float:right; width:30px; height:30px; text-indent: -1000px; overflow: hidden; background:url(../images/img_head_search.png) no-repeat 50%; background-size:30px auto; margin-top: 3px;}
+.faq-number {display:block; font-size: 14px; color: #999; margin:30px 0 0 0; padding-bottom:20px; }
+.faq-number span{font-size: 14px; color: #222;}
+
+/* 자주하는질문(FAQ)-list */
+.box-faq {margin: 20px 0 30px 0; border-top:1px solid #eaeaea;} /* 공통사용 */
+.box-faq dt {cursor:pointer; position: relative;} /* 공통사용 */
+.box-faq dl {border-bottom:1px solid #eaeaea;} /* 공통사용 */
+.box-faq dd {height:0; margin:0; padding:0; overflow:hidden; -webkit-transition: all 0.2s ease-in-out; -moz-transition: all 0.2s ease-in-out; transition: all 0.2s ease-in-out; background: #fcfcfc;} /* 공통사용 */
+.box-faq.type2 {margin: 0 0 30px 0;}
+.box-faq-question {display: table; width: 80%; padding: 13px 0; line-height: 28px; font-size:16px;}
+.box-faq.type2 dt::before {content:'Q.';}
+.box-faq.type2 dd::before {content:'A.'; color: #fd5490; margin: 20px 0 0 30px !important;}
+.box-faq.type2 dt::before,
+.box-faq.type2 dd::before {display:block; float: left; clear: left; width:24px; height:24px; text-align: center; border-radius: 100%; margin:12px 0 0 30px;  line-height: 28px; font-size: 16px;}
+.box-faq.type2 dd {background: #f8f8f8;}
+.box-faq-content {display: table; font-size:16px; line-height: 28px; width:80%; padding:20px 30px 30px 10px; color: #777;}
+.box-faq dt::after {content:''; display:inline-block; width:25px; height:25px; background:url(../images/img_faq_off.png) no-repeat left top; background-size:100%; vertical-align: middle; position: absolute; right:25px; top:50%; margin-top:-13px;}
+.box-faq .on dt::after {background:url(../images/img_faq_on.png); background-size: 100%;}
+.form-checkbox {display: block; text-align: right;}
+
+/* 자주하는질문(FAQ)-검색결과 */
+.box-faq-empty {margin:20px 0 40px 0; padding:48px 0 59px;text-align: center; border-top:1px solid #eaeaea; border-bottom:1px solid #eaeaea;}
+.search_empty {font-size:14px; color: #999;}
+.search_empty::before {content:'';display:block;margin:0 auto 6px auto;width:62px;height:62px;background:url(../images/img_search_empty.png) no-repeat left top;background-size:53px auto;}
+
+/* 1:1문의-form */
+/* .box-tab-head {position: relative; width:100%;} */
+.box-inquiry-form {margin:20px 0 60px 0;}
+.box-inquiry {margin: 0 0 20px 0; width:100%; overflow: hidden;}
+.box-inquiry .form {margin-bottom:10px;}
+.box-inquiry-title {height:40px; line-height:40px; font-size:16px; padding-left: 30px; margin-bottom: 10px; border-top:1px solid #222; background: #fcfcfc;}
+.box-inquiry-title.necessary::after {content:'*';display:inline-block;margin:0 0 0 4px;vertical-align:middle;color:#fd5490;}
+.box-inquiry > dl {margin-bottom: 20px;}
+.box-inquiry .form-textarea textarea {height:200px;}
+.form-select > select {font-size:16px; color:#999;}
+.box-form.addi > dd > input {position: relative; padding-right: 50px;}
+.box-form.addi > dd > i {display:block;position:absolute;right:15px;bottom:10px;font-style:normal;font-size:12px;color:#999;}
+.box-form.addi > dd > input+i {top:18px;}
+.box-inquiry.type2 .box-form dt,
+.box-inquiry.type2 .box-form dd {float:left;}
+.box-inquiry.type2 .box-form dt {width: 200px; font-size:16px; line-height:1.5; margin:0px; min-height: 44px; padding:8px 30px; box-sizing:border-box;}
+.box-inquiry.type2 .box-form dd {width: 835px;}
+.box-inquiry.type2 .form-addbutton {width:400px;}
+.box-inquiry.type2 .form-radio-type {display: block; margin-top: 8px;}
+.box-inquiry.type2 .form-radio-type label {display: inline-block; margin-right:20px; font-size:16px; line-height: 1.5;}
+.form-w300 {display: block; width:300px !important;}
+.form-provision {display:block; height:200px; font-size:16px; margin:10px 0; padding: 22px 30px; color: #999; border:1px solid #d9d9d9; overflow-y: auto; box-sizing: border-box; line-height: 28px;}
+
+/* 1:1문의-상품검색(레이어팝업) */
+.layer-popup1 .layer-inner {padding:30px 0 0 0;}
+.contain-inquiry-search {margin: 0; padding: 0 15px;}
+.box-inquiry-result {margin:30px 0; border-top:1px solid #222;}
+.box-inquiry-result li {border-bottom:1px solid #f0f0f0; padding:15px 0;}
+.box-inquiry-result li a {font-size:16px; line-height:25px; font-weight:500; color: #222;}
+
+/* 1:1문의-접수완료 */
+.box-inquiry-complete {margin:20px 0 0 0; border-top:1px solid #eaeaea; border-bottom:1px solid #eaeaea; padding: 30px 0px 60px 0;}
+.box-inquiry-complete .text-information-type1 {font-size:18px;}
+
+/* 나의 문의내역-패스워드입력 */
+.box-password {border-top:1px solid #eaeaea; border-bottom:1px solid #eaeaea; padding: 40px 0; margin:20px 0 40px 0;}
+.inquiry-password {width: 355px; margin:0 auto;}
+.inquiry-password .box-form dt {font-size:16px; line-height:130%;}
+.inquiry-password .text-title {font-size:18px; margin-bottom: 35px;}
+.inquiry-password .box-form:last-of-type {margin:0px; margin: 10px 0 0 0;}
+
+/* 나의 문의내역(FAQ)-list */
+.box-myfaq-question {padding: 10px 25px 10px 30px;}
+.box-myfaq-question .state {display: inline-block; width:70px; height:30px; line-height:28px; text-align: center; color: #fff; border-radius: 5px;font-size:14px; margin-right:15px; vertical-align: top;}
+.box-myfaq-question .subject {display: inline-block; font-size:16px; width: 600px; margin-top: 2px; line-height:150%;}
+.box-myfaq-question .date {float:right; display: inline-block; color:#999;     margin: 6px 60px 0 0;}
+.box-myfaq-answer {padding: 20px 30px; border-top:1px solid #eaeaea;}
+.box-myfaq-answer span.q,
+.box-myfaq-answer span.a {font-size: 16px; font-weight:400; color: #777; line-height: 1.64;}
+.box-myfaq-answer > span > span {display: table; font-size:16px;}
+.box-myfaq-answer span.q::before,
+.box-myfaq-answer span.a::before {content:''; display:block; float: left; clear: left; width:23px; height:23px; font-size:12px; color: #fff; text-align: center; border-radius: 100%; margin-right:10px; line-height: 21px;}
+.box-myfaq-answer span.q::before {content:'Q'; background-color: #364d8e;}
+.box-myfaq-answer span.a::before {content:'A'; background-color: #fd5490;}
+.box-myfaq-answer span.a {color: #364d8e;}
+.box-myfaq-answer .faq-con {color: #777; font-size:16px; margin: 10px 0 25px 33px; display: table; line-height:150%;}
+.faq-stand {background: #fd5490;}
+.faq-end {background: #364d8e;}
+.faq-con.type2 {color: #364d8e;}
+.box-myfaq-answer hr {background: #d9d9d9; margin-bottom:20px;}
+
+/* 제휴문의 */
+.contain-partner {position: relative; margin-bottom:50px;}
+.contain-partner .text-notice-type2.form2 {position: absolute; right:0; top:0;}
+.contain-partner .text-notice-type3 {font-size:13px; padding:0px; margin-bottom:10px;}
+
+/* 제휴문의-접수완료 */
+.box-partner-complete {border-top:1px solid #eaeaea; border-bottom:1px solid #eaeaea; padding: 30px 0px 20px 0; margin-top:20px; width:100%; overflow: hidden;}
+.box-partner-complete .text-information-type1 {font-size:18px;}
+
+/* 베스트가입후기 */
+.box-latter-body {margin: 0 0 30px 0; border-top:1px solid #eaeaea;}
+.area-inner.latter .box-latter-body {margin-bottom:0;}
+.layer-popup1 .box-latter-body {margin: 20px 15px;}
+.box-latter-view {position:relative; overflow: hidden; margin:0; padding: 30px 0px; border-bottom:1px solid #eaeaea;}
+.latter-best {position:absolute;left:0;top:35px;padding:0 3px;height:16px;line-height:18px;font-size:11px;color:#fff;background:#fd5490;}
+.latter-view-profile {width:230px; float:left;}
+.latter-view-content {width:540px; float:left;}
+.latter-profile {left:0px; top:30px; width:48px; height: 48px;}
+.latter-profile img {width:100%; height:100%; border-radius: 100%;}
+.latter-star {float:right; width: calc(100% - 60px); height:auto; margin:5px 0 2px; padding:0px;}
+.star-gray {display: inline-block; width: 100px; height: 20px; background: url(../images/img_star_gray.png) left top no-repeat; background-size: 100% auto;}
+.star-red {display: inline-block; height: 20px; background: url(../images/img_star_red.png) left top no-repeat; background-size: auto 100%;}
+.latter-name {color: #999; width: calc(100% - 62px); float:right; margin:0px; font-size:12px; padding:0px;}
+.latter-day {position:absolute;right:0;font-size:12px; color: #999; top:30px;}
+.latter-content {margin:0 0 20px 0px; font-size:14px; line-height: 140%;}
+.latter-product {text-align: left; margin:0px;}
+.latter-product .text-point1 {display:inline-block; width:auto; max-width: 70%; margin:0 10px 0 0; font-size:12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;}
+.latter-product .btn-small-box1 {clear: both; float:none; margin-top:-4px;height:23px; background:#fff; border:1px solid #444; display: inline-block;}
+.latter-product .btn-small-box1 a,
+.latter-product .btn-small-box1 button {display: block; color:#444; font-size:12px; letter-spacing: -0.6px; padding:0 6px; line-height:23px;}
+.latter-photo {margin: 0 0 15px 0; text-align: left;}
+.latter-photo img {width:100%; height:auto;}
+
+
+.box-latter-body .box-latter-answer {border-bottom:1px solid #eaeaea;/* border-top:1px solid #f0f0f0; padding:20px 0 0 0; margin-top:20px; */}
+.box-latter-body .box-answer {position:relative;padding:30px; line-height: 160%; font-size:15px;background:#f8f8f8; /* border-bottom:1px solid #eaeaea; */}
+.box-latter-body .box-answer::before {content:'';display:block;position:absolute;left:26px;top:26px;width:24px;height:24px;background:url(../images/img_icon_answer.png) no-repeat 50%;background-size:24px auto;}
+.box-latter-body .box-answer .title {margin: 0 30px 8px 30px;font-size:13px;color:#fd5490;}
+.box-latter-body .box-answer .title span {margin: 0 5px;}
+.layer-popup1 .box-answer {font-size:13px; line-height:18px; padding:20px;}
+.layer-popup1 .box-answer::before {left:16px;top:16px;}
+.layer-popup1 .box-answer .title {margin: 0 20px 8px 20px;}
+
+
+
+

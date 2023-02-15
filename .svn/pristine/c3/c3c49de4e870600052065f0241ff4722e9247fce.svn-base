@@ -1,0 +1,237 @@
+package web.fr.myplanner.controller;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.annotation.AccessPlannerRole;
+import common.annotation.CommandMap;
+import common.model.Planner;
+import common.model.Planner.ROLE_PLANNER;
+import common.session.SessionsPlanner;
+import common.support.ControllerSupport;
+import common.util.DeviceUtil;
+import common.viewer.JSON;
+import web.fr.common.service.CommonService;
+import web.fr.display.service.BannerDisplayService;
+import web.fr.myplanner.service.MyPlannerNoticeService;
+import web.fr.planner.service.PlannerCommonService;
+
+/**
+ * <pre>
+ * &#64;PackageName: web.fr.myplanner.controller
+ * &#64;FileName : MyPlannerMainController.java
+ * &#64;Date : 2020. 5. 14.
+ * &#64;프로그램 설명 : 플래너 메인
+ * &#64;author upleat
+ * </pre>
+ */
+@Controller
+public class MyPlannerMainController extends ControllerSupport {
+
+    @Resource(name = "commonService")
+    private CommonService commonService;
+
+    @Resource(name = "plannerCommonService")
+    private PlannerCommonService plannerCommonService;
+
+    @Resource(name = "myPlannerNoticeService")
+    private MyPlannerNoticeService myPlannerNoticeService;
+
+    @Resource(name = "bannerDisplayService")
+    private BannerDisplayService bannerDisplayService;
+
+    /**
+     * <pre>
+     * 1. MethodName : mainView
+     * 2. ClassName  : MyPlannerMainController.java
+     * 3. Comment    : 마이플래너 메인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${myplanner.main.view}")
+    public ModelAndView mainView(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+
+        // PC 의 경우 메인 페이지 없음. 캠페인 생성 페이지로 이동
+        if (DeviceUtil.isNormal()) {
+            setRedirectView(mv, "myplanner.campaign.product.list");
+            return mv;
+        }
+
+        // 사용자 정지 여부를 확인하기 위해 메인 페이지에서는 사용자 정보를 항상 조회한다.
+        Planner planner = SessionsPlanner.getSessionPlanner(request);
+        if (planner != null && StringUtils.isNotBlank(planner.getRDP_MST_IDX())) {
+
+            // 플래너 정보
+            mv.addObject("planner", planner);
+
+            // 플래너 상태
+            mv.addObject("info", this.plannerCommonService.selectPlannerInfoByPlanner(SessionsPlanner.getSessionPlanner(request)));
+
+            // 예상수익 조회
+            mv.addObject("expectedIncomingProfits", this.plannerCommonService.selectPlannerExpectedProfits());
+
+            // 공지사항 조회
+            commandMap.put("RDP_NTS_TOP_YN", "");
+            commandMap.put("startNum", 1);
+            commandMap.put("endNum", 1);
+            mv.addObject("noticeList", this.myPlannerNoticeService.selectNoticeList(commandMap));
+        }
+
+        // 배너
+        mv.addObject("banner", this.bannerDisplayService.selectBannerDisplayList("BANNER_READY_PLANNER"));
+
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "myplanner.main.view");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : releaseRequestFormLayer
+     * 2. ClassName  : MyPlannerMainController.java
+     * 3. Comment    : 해제 요청 레이어
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @AccessPlannerRole(ROLE_PLANNER.planner)
+    @RequestMapping(value = "${myplanner.release.request.form.layer}", method = RequestMethod.POST)
+    public ModelAndView releaseRequestFormLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+
+        // 플래너 상태 확인
+        mv.addObject("info", this.plannerCommonService.selectPlannerInfoByPlanner(SessionsPlanner.getSessionPlanner(request)));
+
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "myplanner.release.request.form.layer");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : releaseRequestFormAjax
+     * 2. ClassName  : MyPlannerMainController.java
+     * 3. Comment    : 해제 요청
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @AccessPlannerRole(ROLE_PLANNER.planner)
+    @RequestMapping(value = "${myplanner.release.request.form.ajax}", method = RequestMethod.POST)
+    public JSON releaseRequestFormAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("isSuccess", this.plannerCommonService.updatePlannerReleaseRequest(request, commandMap) > 0);
+        return json;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : useTermView
+     * 2. ClassName  : MyPlannerMainController.java
+     * 3. Comment    : 이용약관
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 10.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${myplanner.use.term.view}")
+    public ModelAndView useTermView(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+
+        // 배너
+        mv.addObject("banner", this.bannerDisplayService.selectBannerDisplayList("BANNER_READY_PLANNER"));
+
+        // 약관 조회
+        commandMap.put("AGR_MST_TYPE", "2948");
+        mv.addObject("term", this.commonService.selectCommonTermInfo(commandMap).get("term"));
+
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "myplanner.use.term.view");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : manageTermView
+     * 2. ClassName  : MyPlannerMainController.java
+     * 3. Comment    : 운영 정책
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 10.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${myplanner.manage.term.view}")
+    public ModelAndView manageTermView(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+
+        // 배너
+        mv.addObject("banner", this.bannerDisplayService.selectBannerDisplayList("BANNER_READY_PLANNER"));
+
+        // 약관 조회
+        commandMap.put("AGR_MST_TYPE", "2948");
+        mv.addObject("term", this.commonService.selectCommonTermInfo(commandMap).get("term"));
+
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "myplanner.manage.term.view");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : introduce
+     * 2. ClassName  : MyPlannerMainController.java
+     * 3. Comment    : 레디플래너 소개
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 10.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${myplanner.introduce.view}")
+    public ModelAndView introduceView(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+
+        // 배너
+        mv.addObject("banner", this.bannerDisplayService.selectBannerDisplayList("BANNER_READY_PLANNER"));
+
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "myplanner.introduce.view");
+        return mv;
+    }
+}

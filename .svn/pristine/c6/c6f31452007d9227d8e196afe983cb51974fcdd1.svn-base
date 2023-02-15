@@ -1,0 +1,21 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko" class="no-js is-sm">
+<head>
+    <%@ include file="/WEB-INF/jsp/mo/include/head.jsp"%>
+</head>
+<body style="background:#000;">
+    <%@ include file="/WEB-INF/jsp/common/include/loading.jsp"%>
+    <%@ include file="/WEB-INF/jsp/mo/include/script.jsp"%>
+    
+    <script>
+    $(document).ready(function(){
+        fbq('track', 'AddToCart');
+        var _nao={};
+        _nao["cnv"] = wcs.cnv("3","10");
+        wcs_do(_nao);
+        location.href = $.action.contract.join.step2.form() + "?<c:out value="${TEMP_REDIRECT_PARAM }"/>".replace(/&amp;/g, '&');
+    });
+    </script>
+</body>
+</html>

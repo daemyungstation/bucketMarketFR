@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ContactUsBoard">
+    <!-- 프론트 > 고객센터 > 제휴문의 > 등록 -->
+    <insert id="insertContactUsBoard" parameterType="HashMap">
+        <selectKey keyProperty="CTT_US_IDX" keyColumn="CTT_US_IDX" order="BEFORE" resultType="Integer">
+            SELECT SEQ_CTT_US_IDX.NEXTVAL AS CTT_US_IDX FROM DUAL 
+        </selectKey>
+        /* ContactUsBoard.insertContactUsBoard */
+        INSERT INTO T_CTT_US (
+            CTT_US_IDX,
+            CTT_US_NM,
+            CTT_US_CPN,
+            CTT_US_CPN_DIV,
+            CTT_US_HP1,
+            CTT_US_HP2,
+            CTT_US_HP3,
+            CTT_US_REP_YN,
+            CTT_US_TITLE,
+            CTT_US_CONTENTS,
+            CTT_US_REG_DT,
+            CTT_US_REG_IP
+        ) VALUES (
+            #{CTT_US_IDX},
+            #{CTT_US_NM},
+            #{CTT_US_CPN},
+            #{CTT_US_CPN_DIV},
+            SUBSTR(REPLACE(#{CTT_US_HP}, '-', ''), 1, 3),
+            SUBSTR(REPLACE(#{CTT_US_HP}, '-', ''), 4, DECODE(LENGTH(REPLACE(#{CTT_US_HP}, '-', '')), 11, 4, 3)),
+            SUBSTR(REPLACE(#{CTT_US_HP}, '-', ''), -4),
+            'N',
+            #{CTT_US_TITLE},
+            #{CTT_US_CONTENTS},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{CTT_US_REG_IP}
+        )
+    </insert>
+</mapper>

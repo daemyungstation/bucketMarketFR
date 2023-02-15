@@ -1,0 +1,158 @@
+package web.fr.common.controller;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.annotation.CommandMap;
+import common.support.ControllerSupport;
+import web.fr.common.service.CommonService;
+
+@Controller
+public class CommonLayerController extends ControllerSupport {
+
+    @Resource(name = "commonService")
+    private CommonService commonService;
+    
+    /**
+     * <pre>
+     * 1. MethodName : loginFormLayer
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 로그인 폼 Layer (상품 QnA/이벤트 댓글/기획전 댓글)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.login.form.layer}", method = RequestMethod.POST)
+    public ModelAndView loginFormLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.login.form.layer");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : snsShareViewLayer
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : SNS 공유 상세 Layer
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.sns.view.layer}", method = RequestMethod.POST)
+    public ModelAndView snsShareViewLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        System.out.println(commandMap);
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.sns.view.layer");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : zipCodeListLayer
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 우편번호 검색 목록 Layer
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.zipcode.list.layer}", method = RequestMethod.POST)
+    public ModelAndView zipCodeListLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.zipcode.list.layer");
+        return mv;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : termViewLayer
+     * 2. ClassName  : CommonController.java
+     * 3. Comment    : 약관 Layer
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.term.view.layer}", method = RequestMethod.POST)
+    public ModelAndView termViewLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        // 약관 조회
+
+        mv.addAllObjects(this.commonService.selectCommonTermInfo(commandMap));
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.term.view.layer");
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : ftcViewLayer
+     * 2. ClassName  : CommonLayerController.java
+     * 3. Comment    : 사업자 정보확인 (layer)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 22.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.ftc.view.layer}", method = RequestMethod.POST)
+    public ModelAndView ftcViewLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.ftc.view.layer");
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : basicProductSearchLayer
+     * 2. ClassName  : CommonLayerController.java
+     * 3. Comment    : 상품 검색 Layer
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "${common.product.search.layer}", method = RequestMethod.POST)
+    public ModelAndView basicProductSearchLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "common.product.search.layer");
+        return mv;
+    }
+}

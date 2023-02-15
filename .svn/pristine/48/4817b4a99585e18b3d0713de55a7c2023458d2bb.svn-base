@@ -1,0 +1,179 @@
+package common.code;
+
+/**
+ * @Package Name : common.code
+ * @Class Name : Code.java
+ * @author : upleat
+ * @Date : 2018. 9. 10.
+ * @Description : 공통코드를 모음
+ */
+public class Code {
+    /**************************************************************************
+     * 01. 공통 관련 코드 그룹
+     **************************************************************************/
+    
+    /**************************************************************************
+     * 02. 상품 관련 코드 그룹
+     **************************************************************************/
+    static public final int PRODUCT_TYPE_CODE = 3188; // 상품유형 코드
+    static public final int PRODUCT_TYPE_MONTHLY_SUPPORT = 3200; // 상품 유형 > 월지원
+    static public final int PRODUCT_TYPE_IMMEDIATELY_ISSUE = 3201; // 상품 유형 > 즉발
+    static public final int PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN = 3202; // 상품 유형 > 장기할부
+    static public final int PRODUCT_TYPE_RENTAL = 3203; // 상품 유형 > 렌탈
+    
+    static public final int LIFE_SERVICE_INTERDEPENDENCE = 3190; // 라이프서비스 > 상조
+    static public final int LIFE_SERVICE_TRAVEL = 3205; // 라이프서비스 > 해외여행
+    static public final int LIFE_SERVICE_CRUISE = 3191; // 라이프서비스 > 크루즈
+    static public final int LIFE_SERVICE_GOLF = 3192; // 라이프서비스 > 골프
+    static public final int LIFE_SERVICE_LANGUAGE_STUDY_ABROAD = 3193; // 라이프서비스 > 어학연수
+    static public final int LIFE_SERVICE_WEDDING = 3194; // 라이프서비스 > 웨딩
+    static public final int LIFE_SERVICE_JEWALRY = 3213; // 라이프서비스 > 주얼리
+    /**************************************************************************
+     * 03. 계약 관련 코드 그룹
+     **************************************************************************/
+    static public final int PAY_TYPE = 3143; // 결제유형
+    static public final int PAY_TYPE_CARD = 3221; // 결제유형 - 카드
+    static public final int PAY_TYPE_CMS = 3220; // 결제유형 - CMS
+    static public final int INICIS_CARD_CODE = 3221; // INICIS 신용카드
+    static public final int INICIS_BANK_CODE = 3220; // INICIS 은행 코드
+    static public final int CONTRACT_STATUS_RECEIPT = 3224; // 계약 상태 - 접수
+    static public final int CONTRACT_STATUS_WAITING_TO_JOIN = 3225; // 계약 상태 - 가입대기
+    static public final int CONTRACT_STATUS_JOIN = 3226; // 계약 상태 - 가입
+    static public final int CONTRACT_STATUS_CANCEL = 3227; // 계약 상태 - 해약
+    static public final int CONTRACT_STATUS_USE = 3228; // 계약 상태 - 행사
+    static public final int HAPP_CALL = 3241; // 계약 > 해피콜 시간대
+    
+    /**************************************************************************
+     * 04. 전시 관련 코드 그룹
+     **************************************************************************/
+    static public final int DISPLAY_PRODUCT_AREA_CODE = 2994; // 전시 상품 영역
+    static public final int DISPLAY_PRODUCT_BEST_AREA_CODE = 3338; // 전시 상품 영역 > 베스트 랭킹
+    static public final int DISPLAY_PRODUCT_BEST_AREA_DEFAULT = 3330; // 전시 상품 영역 > 베스트 랭킹 > 기본 코드 값
+    
+    static public final int DISPLAY_PRODUCT_BEST_TOP = 3330; // 전시 상품 영역 > 베스트 랭킹 > TOP10 
+    static public final int DISPLAY_PRODUCT_BEST_ITEM1 = 3331; // 전시 상품 영역 > 베스트 랭킹 > 가전렌탈
+    static public final int DISPLAY_PRODUCT_BEST_ITEM2 = 3332; // 전시 상품 영역 > 베스트 랭킹 > 통신
+    static public final int DISPLAY_PRODUCT_BEST_ITEM3 = 3333; // 전시 상품 영역 > 베스트 랭킹 > 생활쇼핑
+    static public final int DISPLAY_PRODUCT_BEST_ITEM4 = 3336; // 전시 상품 영역 > 베스트 랭킹 > 소형가전
+    static public final int DISPLAY_PRODUCT_BEST_ITEM5 = 3334; // 전시 상품 영역 > 베스트 랭킹 > 유아동용품
+    static public final int DISPLAY_PRODUCT_BEST_ITEM6 = 3335; // 전시 상품 영역 > 베스트 랭킹 > 이미용용품
+    static public final int DISPLAY_PRODUCT_BEST_ITEM7 = 3337; // 전시 상품 영역 > 베스트 랭킹 > 라이프스타일
+    
+    
+    static public final int BANNER_PRODUCT_LIST = 3206; // 전시배너 > 상품 목록
+    static public final int BANNER_PRODUCT_VIEW = 3204; // 전시배너 > 상품 상세
+    
+    static public final int BANNER_MAIN_TOP = 3256; // 전시배너 > 메인 > TOP 배너
+    static public final int BANNER_MAIN_PROMOTION = 3257; // 전시배너 > 메인 > 프로모션 배너
+    static public final int BANNER_MAIN_QUICK = 3258; // 전시배너 > 메인 > 퀵 배너
+    static public final int BANNER_MAIN_EXHIBITION = 3259; // 전시배너 > 메인 > 기획전 배너
+    static public final int BANNER_MAIN_MIDDLE = 3260; // 전시배너 > 메인 > 중단 배너
+    static public final int BANNER_MAIN_BOTTOM = 3261; // 전시배너 > 메인 > 하단 배너
+    static public final int BANNER_MY_CONTRACT = 3263; // 전시배너 > MY 계약 > MY 계약 배너
+    static public final int BANNER_READY_PLANNER = 3265; // 전시배너 > 레디플래너 > 레디플래너 배너
+    
+    static public final int PRODUCT_MAIN_BEST = 3279; // 메인 > 베스트 상품
+    static public final int PRODUCT_MAIN_KEYWORD = 3280; // 메인 > 키워드 상품
+    static public final int PRODUCT_MAIN_RECOMMEND_GROUP = 3281; // 메인 > 추천 상품 그룹
+    
+    static public final int DISPLAY_SKYSCRAPER = 3340; // PC 전용 > 스카이스크랩퍼
+    
+    /**************************************************************************
+     * 05. 고객센터 관련 코드 그룹
+     **************************************************************************/
+    static public final int QUESTION_TYPE_CODE = 2981; // FAQ, 1:1 문의 유형 코드
+    static public final int QUESTION_TYPE_PLANNER = 3349; // FAQ, 1:1 문의 유형 > 레디플레너
+    static public final int QUESTION_TYPE_PRODUCT_CODE = 2983; // FAQ, 1:1 문의 유형 코드 > 상품가입
+    /**************************************************************************
+     * 06. 약관 관련 코드 그룹
+     **************************************************************************/
+    static public final int TERM_CODE = 2941; // 약관 코드
+    static public final int TEMR_PERSONAL_INFORMATION_HANDLING = 2973; // 약관 > 개인정보 > 개인정보 처리방침
+    static public final int TERM_PERSONAL_INFORMATION_USE = 2974; // 약관 > 개인정보 > 개인정보 수집 및 이용(계약)
+    static public final int TERM_PERSONAL_INFORMATION_USE_BASIC = 3354; // 약관 > 개인정보 > 개인정보 수집 및 이용(일반)
+    static public final int TERM_PERSONAL_INFORMATION_TRUST = 2975; // 약관 > 개인정보 > 개인정보 제3자 제공 및 처리 위탁
+    static public final int TERM_CARD_WITHDRAWAL = 2976; // 약관 > 개인정보 > 카드출금 이체약관 
+    
+    static public final int TERM_MARKETING = 2949; // 약관 > 마케팅 활용 동의
+    static public final int TERM_IMPORTANT_NOTICE = 2944; // 약관 > 중요 고지
+    static public final int TERM_LAW_NOTICE = 2945; // 약관 > 법적 고지
+    
+    static public final int TERM_CONTRACT_CODE = 2946; // 약관 > 계약 약관
+    static public final int TERM_CONTRACT_CONFIRM_FIRST_A = 2977; // 약관 > 계약 약관 > 상품인지동의1 월지원/렌탈(비채권)
+    static public final int TERM_CONTRACT_CONFIRM_FIRST_B = 2978; // 약관 > 계약 약관 > 상품인지동의1 할부지원(채권)
+    static public final int TERM_CONTRACT_CONFIRM_FIRST_C = 2979; // 약관 > 계약 약관 > 상품인지동의1 즉발(채권)
+    static public final int TERM_CONTRACT_CONFIRM_FIRST_D = 2980; // 약관 > 계약 약관 > 상품인지동의1 즉발(비채권)
+    static public final int TERM_CONTRACT_CONFIRM_SECOND = 3180; // 약관 > 계약 약관 > 인지동의 2
+    static public final int TERM_CONTRACT_LIFE_SERVICE = 3184; // 약관 > 계약 약관 > 라이프서비스
+
+    static public final int TERM_CONTRACT_POINT1 = 3181; // 약관 > 계약 약관 > 포인트 구매 계약 1
+    static public final int TERM_CONTRACT_POINT2 = 3182; // 약관 > 계약 약관 > 포인트 구매 계약 2
+    static public final int TERM_CONTRACT_HOME_APPLIANCES = 3183; // 약관 > 계약 약관 > 가전판매 계약
+
+    static public final int TERM_BUCKET_MARKET_USE = 2942; // 약관 > 버킷마켓 이용 약관
+    
+    static public final int TERM_READY_PLANNER_CODE = 2948; // 약관 > 레디플래너 약관
+    static public final int TERM_READY_PLANNER_USE = 3341; // 약관 > 레디플래너 이용약관
+    static public final int TERM_READY_PLANNER_SERVICE = 3342; // 약관 > 레디플래너 운영정책
+    static public final int TERM_READY_PLANNER_PERSONAL_INFORMATION_TRUST = 3351; // 약관 > 레디플래너 개인정보 처리 방침
+    
+    /**************************************************************************
+     * 07. 클레임 상담 조회 관련 코드 그룹
+     **************************************************************************/
+    static public final int CLAIM_PROGRESS_APPLY = 3021; // 접수
+    static public final int CLAIM_PROGRESS_COMPLETED = 3022; // 처리 완료 
+    
+    static public final int CLAIM_PAYMENT_METHOD_PAY_DT = 3230; // 납부일자
+    
+    /**************************************************************************
+     * 08. 레디플래너 관련 코드 그룹
+     **************************************************************************/
+    static public final int PLANNER_STATE = 3005; // 사용상태 그룹
+    static public final int PLANNER_STATE_APPLY = 3006; // 신청 - 승인 대기
+    static public final int PLANNER_STATE_REJECT = 3007; // 반려 - 승인 반려
+    static public final int PLANNER_STATE_APPROVAL = 3008; // 승인 - 활동대기, 추가정보 입력
+    static public final int PLANNER_STATE_INACTIVE = 3009; // 활동대기 - 활동대기, 교육이수 입력
+    static public final int PLANNER_STATE_ACTIVE = 3010; // 정상
+    static public final int PLANNER_STATE_STOP = 3011; // 정지 - 이용제한
+    static public final int PLANNER_STATE_REQUEST_RELEASE = 3156; // 해제요청 - 이용제한 해제 요청
+    static public final int PLANNER_BUSINESS_CLASS = 3152; // 사업자 유형 그룹
+    static public final int PLANNER_BUSINESS_CLASS_PRIVATE = 3153; // 개인
+    static public final int PLANNER_BUSINESS_CLASS_NATURAL_PERSON = 3154; // 개인사업자
+    static public final int PLANNER_BUSINESS_CLASS_LEGAL_PERSON = 3155; // 법인사업자
+    static public final int PLANNER_GRADE_TERM = 3176; // 등급산정 기준
+    static public final int PLANNER_SUBJECT = 3023; // 홍보사이트 주제
+    
+    /**************************************************************************
+     * 10. 템플릿 관련 코드 그룹
+     **************************************************************************/
+    static public final int TEMPLATE_CODE = 3186; // 템플릿 코드
+    static public final int LIFE_SERVICE = 3187; // 템플릿  > 라이프 서비스
+    static public final int PRODUCT_TYPE = 3188; // 템플릿 > 상품 유형
+    static public final int MEMBERSHIP = 3189;// 템플릿 > 멤버쉽
+    
+    /**************************************************************************
+     * 11. 배송 관련 코드 그룹
+     **************************************************************************/
+    static public final int DELIVERY = 3208; // 배송 그룹 코드
+    static public final int DELIVERY_READY = 3209; // 배송준비 코드
+    static public final int DELIVERY_ING = 3210; // 배송중 코드    
+    static public final int DELIVERY_COMPLETE = 3211; // 배송완료 코드
+    static public final int DELIVERY_HOLD = 3212; // 배송보류 코드    
+
+    /**************************************************************************
+     * 13. DLCC 납입 방법 코드 그룹
+     **************************************************************************/
+    static public final int PAYMENT_TYPE = 3219; // 납입방법 그룹 코드
+    
+    /**************************************************************************
+     * 14. 제휴사 렌탈승인 코드 그룹
+     **************************************************************************/
+    static public final int SCM_RENTAL = 3248; // 렌탈승인 그룹 코드        
+    static public final int RENTAL_TM = 3249; // 통화대기
+    static public final int RENTAL_READY = 3250; // 렌탈대기
+    static public final int RENTAL_APPROVAL = 3251; // 렌탈승인
+    static public final int RENTAL_CANCEL = 3252; // 렌탈취소
+    static public final int RENTAL_REJECT = 3253; // 렌탈불가
+    static public final int RENTAL_NO = 3254; // 해당없음
+    
+}

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>대명 아임레디</title>
+    <link rel='stylesheet' type='text/css' href='../css/common.css'>
+    <link rel='stylesheet' type='text/css' href='../css/lib.css'>
+    <link rel='stylesheet' type='text/css' href='../css/main.css'>
+    <script src="../js/lib.js"></script>
+    <script src="../js/style.js"></script>
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="../images/favicon.png" type="image/x-icon" />  
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="대명아임레디">
+    <link rel="apple-touch-icon-precomposed" href="../images/ios-favicon.png"> 
+</head>
+<body>
+
+<!-- 메인 배너 -->
+<div class="banner-main-top">
+    <a href=""><img src="../images/img_temp_banner.png" alt=""></a>
+    <span class="btn-close"><button>닫기</button></span>
+</div>
+<!-- //메인 배너 -->
+
+<!-- 헤더 -->
+<header class="area-header">
+    <div class="area-inner">
+        <span class="logo"><button>버킷마켓</button></span>
+        <span class="btn-search"><button>검색</button></span>
+    </div>
+</header>
+<!-- //헤더 -->
+
+<!-- 본문 -->
+<div class="area-content">
+    <div class="area-inner">
+
+        <section class="contain-main1">
+            <!-- 탭 헤더 : 고정 -->
+            <div class="box-tab-head2">
+                <span class="on"><button>버킷마켓</button></span>
+                <span><button>레디플래너</button></span>
+            </div>
+            <!-- //탭 헤더 : 고정 -->
+            <!-- 탭 내용 -->
+            <div class="box-tab-body tab1 on">
+                <div class="bukkitmarket swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="../images/img_main_section1_1.png" alt="" ></div>
+                        <div class="swiper-slide"><img src="../images/img_main_section1_1.png" alt="" ></div>
+                        <div class="swiper-slide"><img src="../images/img_main_section1_1.png" alt="" ></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+            <div class="box-tab-body tab2">
+                <div class="readyplaner swiper-container">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="../images/img_main_section1_1.png" alt="" ></div>
+                        <div class="swiper-slide"><img src="../images/img_main_section1_1.png" alt="" ></div>
+                        <div class="swiper-slide"><img src="../images/img_main_section1_1.png" alt="" ></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div>
+        </section>
+        <section class="contain-main2">
+            <div class="box-links">
+                <span class="btn-link link1"><a href=""><img src="../images/img_main_temp1.png" alt="나를 위한 상품 추천" ></a></span>
+                <span class="btn-link link2"><a href=""><img src="../images/img_main_temp2.png" alt="금주의 대박 PICK" ></a></span>
+                <span class="btn-link link3"><a href=""><img src="../images/img_main_temp3.png" alt="버킷마켓 소개" ></a></span>
+                <span class="btn-link link4"><a href=""><img src="../images/img_main_temp4.png" alt="공지사항 고객센터" ></a></span>
+            </div>
+        </section>
+        <section class="contain-main3">
+            <h1 class="title">꿈꾸던 삶을 위한 <br >특별 기획전</h1>
+
+            <div class="contain-event-basis">
+                <div class="box-basis-list">
+                    <a href="#">
+                        <img src="../images/img_main_event1.png" alt="기획전1" >
+                    </a>
+                </div>
+                <div class="box-basis-list">
+                    <a href="#">
+                        <img src="../images/img_main_event2.png" alt="기획전2" >
+                    </a>
+                </div>
+            </div>
+
+            <span class="btn-more"><a href="">더 보기</a></span>
+        </section>
+        <section class="contain-main4">
+            <h1 class="title">놓치면 후회 각 <br >베스트 상품</h1>
+
+            <div class="contain-item swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase"></dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원1 </dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원2</dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail"></dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원4</dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원5</dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원6</dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원7</dd>
+                        </dl>
+                        </a>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+
+            <span class="btn-more"><a href="">더 보기</a></span>
+        </section>
+        <section class="contain-main5">
+            <div class="box-links">
+                <span class="btn-link"><a href=""><img src="../images/가전렌탈.png" alt="가전렌탈">가전렌탈</a></span>
+                <span class="btn-link"><a href=""><img src="../images/생활쇼핑.png" alt="생활쇼핑">생활쇼핑</a></span>
+                <span class="btn-link"><a href=""><img src="../images/통신.png" alt="통신">통신</a></span>
+                <span class="btn-link"><a href=""><img src="../images/소형가전.png" alt="소형가전">소형가전</a></span>
+                <span class="btn-link"><a href=""><img src="../images/유아동용품.png" alt="유아동용품">유아동용품</a></span>
+                <span class="btn-link"><a href=""><img src="../images/이미용.png" alt="이미용">이미용용품</a></span>
+                <span class="btn-link"><a href=""><img src="../images/라이프스타일.png" alt="이미용">라이프스타일</a></span>
+            </div>
+        </section>
+        <section class="contain-main6">
+            <h1 class="title"><span class="tag">#공기청정기</span>오늘의 버킷 리스트</h1>
+
+            <div class="contain-item swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase"></dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원1</dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail"></dd>
+                        </dl>
+                        </a>
+                    </div>
+                    <div class="box-item swiper-slide">
+                        <a href="#">
+                        <dl class="detail-product-type1">
+                            <dd class="image"><img src="../images/img_photo_sample2.png" alt=""><span class="ribbon-type1">40만원 지원</span></dd>
+                            <dt class="catchphrase">프리미엄 주방가전의 시작</dt>
+                            <dd class="detail">LG전자 공기청정기 40만원 지원3</dd>
+                        </dl>
+                        </a>
+                    </div>
+                </div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+            </div>
+
+            <div class="box-tag">
+                <span><a href="">#하이브리드서비스</a></span>
+                <span><a href="">#하이브리드서비스</a></span>
+                <span><a href="">#하이브리드서비스</a></span>
+                <span><a href="">#하이브리드서비스</a></span>
+            </div>
+
+        </section>
+        <section class="contain-main7">
+            <div class="banner1 swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="../images/img_main_banner1.png" alt="" ></div>
+                    <div class="swiper-slide"><img src="../images/img_main_banner1.png" alt="" ></div>
+                    <div class="swiper-slide"><img src="../images/img_main_banner1.png" alt="" ></div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+        <section class="contain-main8">
+            <div class="main-category-more">
+                <button class="btn-category">월 10만원 지원</button>
+                <div class="main-category-inner">
+                    <span><label class="form-radio-category checked"><input type="radio" name="name1" checked="checked">월 10만원 지원</label></span>
+                    <span><label class="form-radio-category"><input type="radio" name="name1">월 20만원 지원</label></span>
+                    <span><label class="form-radio-category"><input type="radio" name="name1">월 30만원 지원</label></span>
+                    <span><label class="form-radio-category"><input type="radio" name="name1">월 40만원 지원</label></span>
+                </div>
+            </div>
+            <h1 class="title">혜택 뚝딱! 쓱싹!</h1>
+
+            <ul class="box-links">
+                <li><a href=""><img src="../images/img_photo_sample.png" alt="" ><span>밀리의 서재밀리의 서재밀리의 서재밀리의 서재밀리의 서재밀리의 서재밀리의 서재</span></a></li>
+                <li><a href=""><img src="../images/img_photo_sample.png" alt="" ><span>밀리의 서재</span></a></li>
+                <li><a href=""><img src="../images/img_photo_sample.png" alt="" ><span>밀리의 서재</span></a></li>
+                <li><a href=""><img src="../images/img_photo_sample.png" alt="" ><span>밀리의 서재</span></a></li>
+                <li><a href=""><img src="../images/img_photo_sample.png" alt="" ><span>밀리의 서재</span></a></li>
+                <li><a href=""><img src="../images/img_photo_sample.png" alt="" ><span>밀리의 서재밀리의 서재밀리의 서재밀리의 서재밀리의 서재밀리의 서재밀리의 서재</span></a></li>
+            </ul>
+
+            <span class="btn-link"><a href="">새로운 추천 상품 보기</a></span>
+
+        </section>
+        <section class="contain-main9">
+            <div class="banner2 swiper-container">
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide"><img src="../images/img_main_banner2.png" alt="" ></div>
+                    <div class="swiper-slide"><img src="../images/img_main_banner2.png" alt="" ></div>
+                    <div class="swiper-slide"><img src="../images/img_main_banner2.png" alt="" ></div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+        <section class="contain-main10">
+            <h1 class="title">공지사항</h1>
+            <ul class="list-type-notice">
+                <li><a href="">공지사항을 입력해주세요.공지사항을 입력해주세요.공지사항을 입력해주세요.공지사항을 입력해주세요.공지사항을 입력해주세요.공지사항을 입력해주세요.공지사항을 입력해주세요.공지사항을 입력해주세요.</a></li>
+                <li><a href="">공지사항을 입력해주세요.</a></li>
+                <li><a href="">공지사항을 입력해주세요.</a></li>
+                <li><a href="">공지사항을 입력해주세요.</a></li>
+            </ul>
+            <div class="box-links">
+                <span class="btn-link"><a href="">자주하는 질문</a></span>
+                <span class="btn-link"><a href="">1:1 문의상담</a></span>
+            </div>
+            <span class="btn-more"><a href="">더 보기</a></span>
+        </section>
+
+    </div>
+</div>
+<!-- //본문 -->
+<!-- 사이드바 -->
+<aside class="area-aside left">
+    <div class="area-inner">
+        <header class="contain-header">
+            <h1 class="title">버킷마켓</h1>
+            <span class="btn-link-home"><a href="">HOME</a></span>
+            <span class="btn-sidebar-close"><button>닫기</button></span>
+        </header>
+        <div class="box-side1">
+            <dl>
+                <dt>CATEGORY</dt>
+                <dd>
+                    <span class="link1"><a href="">가전렌탈</a></span>
+                    <span class="link2"><a href="">생활쇼핑</a></span>
+                    <span class="link7"><a href="">통신</a></span>
+                    <span class="link3"><a href="">소형가전</a></span>
+                    <span class="link4"><a href="">유아동용품</a></span>
+                    <span class="link5"><a href="">이미용용품</a></span>
+                    <span class="link50"><a href="">라이프스타일</a></span>
+                </dd>
+            </dl>
+        </div>
+        <div class="box-side2">
+            <span class="link1"><a href="">기획전</a></span>
+            <span class="link2"><a href="">이벤트</a></span>
+            <span class="link3"><a href="">베스트랭킹</a></span>
+            <span class="link4"><a href="">가입후기</a></span>
+        </div>
+        <div class="box-side3">
+            <span class="link1"><a href="">최근본상품</a></span>
+            <span class="link2"><a href="">고객센터</a></span>
+        </div>
+
+    </div>
+</aside>
+<!-- //사이드바 -->
+<!-- 하단 탭바 -->
+<aside class="area-aside bottom">
+    <div class="area-inner">
+        <div class="contain-tabbar">
+            <span class="btn-tabbar1"><button>카테고리</button></span> <!-- 하단 탭바 활성화시 on추가 / ex) class="btn-tabbar1 on" -->
+            <span class="btn-tabbar2"><button>추천</button></span>
+            <span class="btn-tabbar3 on"><a href="">홈</a></span>
+            <span class="btn-tabbar4"><a href="">레디플래너</a></span>
+            <span class="btn-tabbar5"><a href="">My계약</a></span>
+        </div>
+    </div>
+</aside>
+<!-- //하단 탭바 -->
+<!-- 푸터 -->
+<footer class="area-footer">
+    <div class="area-inner">
+        <div class="box-footer-link">
+            <span><a href="#">APP 다운로드</a>
+            <!-- 구글 플레이 / 앱스토어 다운로드 추가 -->
+            </span>
+            <span class="on"><a href="https://www.daemyungimready.com/main/index.do"title="새창열림" target="_blank">대명아임레디</a></span>
+        </div>
+        <div class="box-footer-infolink">
+            <span><button>중요정보고시사항</button></span>
+            <span><button>법적고시</button></span>
+            <span><button><strong>개인정보처리방침</strong></button></span>
+            <span><button>이용약관</button></span>
+            <span class="btn-business">
+                <a href=“tel:전화번호” class="btn-customer">버킷마켓 고객센터 1644-8399</a>
+                <button>사업자정보확인</button>
+            </span>
+        </div>
+        <div class="box-footer-address">
+            <span>서울시 송파구 법원로 135 대명타워</span>
+            <span>(주)대명스테이션  대표이사 서준혁, 최성훈</span>
+            <span>사업자등록번호 220-88-09321  |  통신판매신고번호  제2016-서울송파-0669호</span>
+        </div>
+        <p class="text-copryright">COPYRIGHT DAEMYUNGSTATION.CO,.LTD. ALL RIGHTS RESERVED.</p>
+    </div>
+</footer>
+<!-- //푸터 -->
+
+<!-- 플로팅 버튼 -->
+<div class="area-floating">
+    <span class="btn-topancher"><button>TOP</button></span>
+    <span class="btn-favview"><button>최근 본 상품</button></span>
+    <span class="btn-chatbot"><button>챗봇</button></span>
+</div>
+<!-- //플로팅 버튼 -->
+
+<!-- 팝업 : APP안내 팝업  -->
+<div class="layer-popup2 layer-app active">
+    <div class="layer-inner">
+        <div class="contain-body">
+            
+            <div class="box-layer-app">
+                <p class="box-app-top">
+                    <img src="../images/img_logo_app.png" alt="버킷마켓" />
+                    <span class="app-title">
+                        꿈꾸던 삶을 담다
+                        <span class="app-text">이제 모바일 앱에서<br />
+                        <strong class="text-point1">버킷쇼핑</strong>하세요!
+                        </span>
+                    </span>
+                </p>
+                <span class="btn-app-view"><button>버킷마켓 앱으로 보기</button></span>
+                <span class="btn-web-view btn-close"><button>모바일 웹으로 보기</button></span>
+                <span class="btn-close"><button>닫기</button></span>
+            </div>
+
+        </div>        
+    </div>
+</div>
+<!-- //팝업 : APP안내 팝업  -->
+
+<script src="../js/dom.js"></script>
+
+</body>
+</html>

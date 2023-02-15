@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FaqBoard">
+
+    <sql id="faqBoardWhere">
+        WHERE BF.BRD_FAQ_USE_YN = 'Y'
+        <if test="searchWord != null and searchWord != ''">
+            AND DBMS_LOB.INSTR(BF.BRD_FAQ_TITLE || BF.BRD_FAQ_CONTENTS, #{searchWord}) > 0
+        </if>
+        <if test="searchBrdCmnComIdx != null and searchBrdCmnComIdx != ''">
+            AND BF.BRD_CMN_COM_IDX = #{searchBrdCmnComIdx}
+        </if>
+    </sql>
+
+    <!-- 프론트 > 고객센터 > FAQ > 목록 개수 -->
+    <select id="selectFaqBoardListCount" parameterType="HashMap" resultType="Integer">
+        /* FaqBoard.selectFaqBoardListCount */
+        SELECT COUNT(BF.BRD_FAQ_IDX)
+        FROM T_BRD_FAQ BF
+        <include refid="faqBoardWhere"/>
+    </select>
+
+    <!-- 프론트 > 고객센터 > FAQ > 목록 -->
+    <resultMap id="resultFaqBoardList" type="HashMap">
+        <result property="BRD_FAQ_IDX" column="BRD_FAQ_IDX"/>
+        <result property="BRD_FAQ_TITLE" column="BRD_FAQ_TITLE"/>
+        <result property="BRD_CMN_COM_IDX" column="BRD_CMN_COM_IDX"/>
+        <result property="BRD_FAQ_CONTENTS" column="BRD_FAQ_CONTENTS" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="CMN_COM_NM" column="CMN_COM_NM"/>
+    </resultMap>
+    <select id="selectFaqBoardList" parameterType="HashMap" resultMap="resultFaqBoardList">
+        /* FaqBoard.selectFaqBoardList */
+        SELECT S2.*,
+            (SELECT CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_IDX = S2.BRD_CMN_COM_IDX) AS CMN_COM_NM
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+            SELECT
+                BF.BRD_FAQ_IDX,
+                BF.BRD_FAQ_TITLE,
+                BF.BRD_FAQ_CONTENTS,
+                BF.BRD_CMN_COM_IDX
+            FROM T_BRD_FAQ BF
+            <include refid="faqBoardWhere"/>
+            ORDER BY BF.BRD_FAQ_SRT ASC, BF.BRD_FAQ_REG_DT DESC
+            ) S1
+            <if test="endNum != null and endNum != ''">
+                WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+            </if>
+        ) S2
+        <if test="startNum != null and startNum != ''">
+            WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+        </if>
+    </select>
+    <!-- 프론트 > 고객센터 > FAQ > 조회수 수정 -->
+    <update id="updateFaqBoardReadCount" parameterType="HashMap">
+        /* FaqBoard.updateFaqBoardReadCount */
+        UPDATE T_BRD_FAQ SET
+            BRD_FAQ_READ_CNT = NVL(BRD_FAQ_READ_CNT, 0) + 1
+        WHERE BRD_FAQ_IDX = #{BRD_FAQ_IDX}
+    </update>
+</mapper>

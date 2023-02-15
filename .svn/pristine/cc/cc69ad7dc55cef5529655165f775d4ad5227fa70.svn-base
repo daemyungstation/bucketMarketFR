@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MyPlannerPerformance">
+
+    <!-- 조건절 -->
+    <sql id="myPlannerPerformanceWhere">
+    </sql>
+    
+    <!-- 마이플래너 > 실적 > 일별 실적 -->
+    <select id="selectPerformanceByDaily" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_RECEIPT" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* MyPlannerPerformance.selectPerformanceByDaily */
+        SELECT
+            TO_CHAR(TO_DATE(S1.BASE_DT, 'YYYYMMDD'), 'MM.DD') AS BASE_DT,
+            SUM(DECODE(S1.JOIN_STATE, 1, 1, 0)) AS TOTAL_RECEIPT,
+            SUM(DECODE(S1.JOIN_STATE, 2, 1, 0)) AS TOTAL_WAITING_TO_JOIN,
+            SUM(DECODE(S1.JOIN_STATE, 3, 1, 0)) AS TOTAL_JOIN,
+            SUM(NVL(S1.EXPECTED_RETURN, 0)) AS TOTAL_EXPECTED_RETURN
+        FROM (
+            SELECT 
+                TOM.ORD_MST_IDX,
+                CASE WHEN VOM.KSTBIT IS NULL THEN 1 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 2 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN 3 -- 가입
+                     ELSE 0 
+                END AS JOIN_STATE, -- 상태
+                CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(TOM.ORD_MST_REG_DT, 0, 8) -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN SUBSTR(VOM.REG_DM, 0, 8) -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN VOM.JOIN_DT -- 가입
+                     ELSE '' 
+                END AS BASE_DT, -- 기준일
+                CASE WHEN VOM.KSTBIT IS NULL THEN 0 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 0 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN (
+                         SELECT 
+                            SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT) 
+                         FROM 
+                            V_B2B_MST VBM,
+                            V_RMT_BASIC VRB
+                         WHERE 
+                            VBM.COM_CD = TOD.SALE_TYPE 
+                            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+                            AND VRB.PROD_CD = TOD.PROD_CD 
+                            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE 
+                            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+                     ) -- 가입
+                     ELSE 0
+                END AS EXPECTED_RETURN -- 예상수익
+            FROM 
+                T_ORD_DLCC TOD,
+                T_ORD_MST TOM,
+                V_ORD_MST VOM
+            WHERE
+                TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                AND TOD.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                AND TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+        ) S1
+        WHERE
+            S1.BASE_DT BETWEEN REPLACE(#{searchStartDate}, '-', '') AND REPLACE(#{searchEndDate}, '-', '')
+        GROUP BY 
+            S1.BASE_DT
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 월별 실적 -->
+    <select id="selectPerformanceByMonthly" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_RECEIPT" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* MyPlannerPerformance.selectPerformanceByMonthly */
+        SELECT
+            TO_CHAR(TO_DATE(S1.BASE_DT, 'YYYYMM'), 'MM') AS BASE_DT,
+            SUM(DECODE(S1.JOIN_STATE, 1, 1, 0)) AS TOTAL_RECEIPT,
+            SUM(DECODE(S1.JOIN_STATE, 2, 1, 0)) AS TOTAL_WAITING_TO_JOIN,
+            SUM(DECODE(S1.JOIN_STATE, 3, 1, 0)) AS TOTAL_JOIN,
+            SUM(NVL(S1.EXPECTED_RETURN, 0)) AS TOTAL_EXPECTED_RETURN
+        FROM (
+            SELECT 
+                TOM.ORD_MST_IDX,
+                CASE WHEN VOM.KSTBIT IS NULL THEN 1 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 2 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN 3 -- 가입
+                     ELSE 0 
+                END AS JOIN_STATE, -- 상태
+                CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(TOM.ORD_MST_REG_DT, 0, 6) -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN SUBSTR(VOM.REG_DM, 0, 6) -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN SUBSTR(VOM.JOIN_DT, 0, 6) -- 가입
+                     ELSE '' 
+                END AS BASE_DT, -- 기준일
+                CASE WHEN VOM.KSTBIT IS NULL THEN 0 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 0 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN (
+                         SELECT 
+                            SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT)
+                         FROM 
+                            V_B2B_MST VBM,
+                            V_RMT_BASIC VRB
+                         WHERE 
+                            VBM.COM_CD = TOD.SALE_TYPE 
+                            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+                            AND VRB.PROD_CD = TOD.PROD_CD 
+                            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE 
+                            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+                     ) -- 가입
+                     ELSE 0
+                END AS EXPECTED_RETURN -- 예상수익
+            FROM 
+                T_ORD_DLCC TOD,
+                T_ORD_MST TOM,
+                V_ORD_MST VOM
+            WHERE
+                TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                AND TOD.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                AND TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+        ) S1
+        WHERE
+            S1.BASE_DT BETWEEN #{searchYear} || '01' AND #{searchYear} ||'12'
+        GROUP BY 
+            S1.BASE_DT
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 상품별 실적 -->
+    <select id="selectPerformanceByProduct" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_RECEIPT" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* MyPlannerPerformance.selectPerformanceByMonthly */
+        SELECT
+            S1.PRD_MST_NM,
+            SUM(DECODE(S1.JOIN_STATE, 1, 1, 0)) AS TOTAL_RECEIPT,
+            SUM(DECODE(S1.JOIN_STATE, 2, 1, 0)) AS TOTAL_WAITING_TO_JOIN,
+            SUM(DECODE(S1.JOIN_STATE, 3, 1, 0)) AS TOTAL_JOIN,
+            SUM(NVL(S1.EXPECTED_RETURN, 0)) AS TOTAL_EXPECTED_RETURN
+        FROM (
+            SELECT 
+                CPM.PRD_MST_NM,
+                CASE WHEN VOM.KSTBIT IS NULL THEN 1 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 2 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN 3 -- 가입
+                     ELSE 0 
+                END AS JOIN_STATE, -- 상태
+                CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(TOM.ORD_MST_REG_DT, 0, 8) -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN SUBSTR(VOM.REG_DM, 0, 8) -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN VOM.JOIN_DT -- 가입
+                     ELSE '' 
+                END AS BASE_DT, -- 기준일
+                CASE WHEN VOM.KSTBIT IS NULL THEN 0 -- 접수
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_RECEIPT} THEN 0 -- 가입대기
+                     WHEN VOM.KSTBIT = #{JOIN_STATE_JOIN} THEN (
+                         SELECT 
+                            SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT) 
+                         FROM 
+                            V_B2B_MST VBM,
+                            V_RMT_BASIC VRB
+                         WHERE 
+                            VBM.COM_CD = TOD.SALE_TYPE 
+                            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+                            AND VRB.PROD_CD = TOD.PROD_CD 
+                            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE 
+                            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+                     ) -- 가입
+                     ELSE 0
+                END AS EXPECTED_RETURN -- 예상수익
+            FROM 
+                T_ORD_DLCC TOD,
+                T_ORD_MST TOM,
+                C_PRD_MST CPM,
+                V_ORD_MST VOM
+            WHERE
+                TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                AND CPM.PRD_MST_NO = TOM.PRD_MST_NO 
+                AND TOD.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                AND TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+        ) S1
+        WHERE
+            S1.BASE_DT BETWEEN REPLACE(#{searchStartDate}, '-', '') AND REPLACE(#{searchEndDate}, '-', '')
+        GROUP BY 
+            S1.PRD_MST_NM
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 상품별 실적 히스토리-->
+    <select id="selectPerformanceByProductHistory" parameterType="HashMap" resultType="HashMap">
+        <bind name="CODE_WAITING_TO_JOIN" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="CODE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        <bind name="CODE_CANCEL" value="@common.code.Dlcc@JOIN_STATE_CANCEL"/>
+        <bind name="CODE_USE" value="@common.code.Dlcc@JOIN_STATE_USE"/>
+        <bind name="CONTRACT_STATUS_RECEIPT" value="@common.code.Code@CONTRACT_STATUS_RECEIPT"/>
+        <bind name="CONTRACT_STATUS_WAITING_TO_JOIN" value="@common.code.Code@CONTRACT_STATUS_WAITING_TO_JOIN"/>
+        <bind name="CONTRACT_STATUS_JOIN" value="@common.code.Code@CONTRACT_STATUS_JOIN"/>
+        <bind name="CONTRACT_STATUS_CANCEL" value="@common.code.Code@CONTRACT_STATUS_CANCEL"/>
+        <bind name="CONTRACT_STATUS_USE" value="@common.code.Code@CONTRACT_STATUS_USE"/>
+        /* PlannerStatus.selectPerformanceByProductHistory */
+        SELECT 
+            RNUM,
+            S2.*
+        FROM (
+            SELECT
+                ROWNUM AS RNUM,
+                S1.*,
+                (SELECT CMN_COM_NM FROM T_CMM_COM WHERE CMN_COM_IDX = S1.JOIN_STATE) AS JOIN_STATE_NM,
+                (SELECT COUNSELL_MEMO FROM V_CON_MST WHERE COUNSELL_IDX=(SELECT max(COUNSELL_IDX) FROM V_CON_MST WHERE ORD_MST_IDX=S1.ORD_MST_IDX)) COUNSELL_MEMO
+            FROM (
+            
+                SELECT
+                    X.*
+                FROM (
+                
+                    SELECT
+                        Y.ORD_MST_IDX,
+                        TRM.RDP_MST_IDX,
+                        CPM.PRD_MST_NM, -- 온라인 상품명
+                        CASE WHEN VOM.KSTBIT IS NULL THEN substr(Y.MEM_NM,1,1) || lpad('*',length(Y.MEM_NM )-2,'*') || substr(Y.MEM_NM,length(Y.MEM_NM), 1)
+                             ELSE substr(VOM.MEM_NM ,1,1) || lpad('*',length(VOM.MEM_NM )-2,'*') || substr(VOM.MEM_NM , length(VOM.MEM_NM), 1)
+                        END AS MEM_NM, -- 가입자명
+                        CASE WHEN VOM.KSTBIT IS NULL THEN substr(Y.CELL,1,3) || '-' || lpad('*',length(Y.CELL )-7,'*') || '-' || substr(Y.CELL,length(Y.CELL)-3, 4) 
+                             ELSE substr(VOM.CELL,1,3) || '-' || lpad('*',length(VOM.CELL )-7,'*') || '-' || substr(VOM.CELL,length(VOM.CELL)-3, 4)
+                        END AS CELL, -- 연락처
+                        CASE WHEN VOM.KSTBIT IS NULL THEN #{CONTRACT_STATUS_RECEIPT} -- 접수
+                             WHEN VOM.KSTBIT = #{CODE_WAITING_TO_JOIN} THEN #{CONTRACT_STATUS_WAITING_TO_JOIN} -- 가입대기
+                             WHEN VOM.KSTBIT = #{CODE_JOIN} THEN #{CONTRACT_STATUS_JOIN} -- 가입
+                             WHEN VOM.KSTBIT = #{CODE_CANCEL} THEN #{CONTRACT_STATUS_CANCEL} -- 해약
+                             WHEN VOM.KSTBIT = #{CODE_USE} THEN #{CONTRACT_STATUS_USE} -- 행사
+                             ELSE 0 
+                        END AS JOIN_STATE, -- 상태
+                        CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(Y.ORD_MST_REG_DT, 0, 6) -- 접수
+                             WHEN VOM.KSTBIT = #{CODE_WAITING_TO_JOIN} THEN SUBSTR(VOM.REG_DM, 0, 6) -- 가입대기
+                             WHEN VOM.KSTBIT = #{CODE_JOIN} THEN SUBSTR(VOM.JOIN_DT, 0, 6) -- 가입
+                             ELSE '' 
+                        END AS BASE_DT, -- 기준일
+                        SUBSTR(Y.ORD_MST_REG_DT, 0, 8) AS RECEIPT_DT, -- 접수일
+                        Y.ORD_MST_REG_DT, -- 접수일2
+                        SUBSTR(VOM.REG_DM, 0, 8) AS WAITING_TO_JOIN_DT, -- 가입대기일
+                        SUBSTR(VOM.JOIN_DT, 0, 8) AS JOIN_DT, -- 가입일
+                        SUBSTR(VOM.RESN_PROC_DAY, 0, 8) AS CANCEL_DT, -- 해약일
+                        SUBSTR(VOM.EVENT_COMP_DAY, 0, 8) AS USE_DT, -- 행사일
+                        Y.SELLER_NAME -- 영업사원
+                    FROM 
+                        T_RDP_MST TRM,
+                        C_PRD_MST CPM,
+                        (
+                            <if test="searchContractType != null and searchContractType == CONTRACT_STATUS_RECEIPT">
+                                SELECT 
+                                    TOD.RDP_MST_IDX,
+                                    TOD.SELLER_NAME,
+                                    TOD.ORD_MST_IDX,
+                                    TOD.MEM_NM,
+                                    TOD.CELL,
+                                    TOM.PRD_MST_NO,
+                                    TOM.ORD_MST_REG_DT
+                                FROM 
+                                    T_ORD_DLCC TOD,
+                                    T_ORD_MST TOM,
+                                    V_ORD_MST VOM
+                                WHERE 
+                                    TOD.RDP_MST_IDX IS NOT NULL 
+                                    AND TOD.ORD_MST_IDX = TOM.ORD_MST_IDX
+                                    AND TOM.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                                    AND VOM.REG_DM IS NULL
+                                    <!-- 기간 -->
+                                    <if test="searchStartDate != null and searchStartDate != ''">
+                                        AND TOM.ORD_MST_REG_DT <![CDATA[>=]]> REPLACE(#{searchStartDate}, '-', '') || '000000'
+                                    </if>
+                                    <if test="searchEndDate != null and searchEndDate != ''">
+                                        AND TOM.ORD_MST_REG_DT <![CDATA[<=]]> REPLACE(#{searchEndDate}, '-', '') || '235959'
+                                    </if>
+                            </if>
+                            
+                            <if test="searchContractType != null and searchContractType == CONTRACT_STATUS_WAITING_TO_JOIN">
+                                SELECT 
+                                    TOD.RDP_MST_IDX,
+                                    TOD.SELLER_NAME,
+                                    TOD.ORD_MST_IDX,
+                                    TOD.MEM_NM,
+                                    TOD.CELL,
+                                    TOM.PRD_MST_NO,
+                                    TOM.ORD_MST_REG_DT
+                                FROM 
+                                    T_ORD_DLCC TOD,
+                                    T_ORD_MST TOM,
+                                    V_ORD_MST VOM
+                                WHERE 
+                                    TOD.RDP_MST_IDX IS NOT NULL
+                                    AND TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                                    AND TOM.ORD_MST_IDX = VOM.ORD_MST_IDX 
+                                    AND VOM.REG_DM IS NOT NULL
+                                    AND VOM.JOIN_DT IS NULL
+                                
+                                    <!-- 기간 -->
+                                    <if test="searchStartDate != null and searchStartDate != ''">
+                                        AND VOM.REG_DM <![CDATA[>=]]> REPLACE(#{searchStartDate}, '-', '') || '000000'
+                                    </if>
+                                    <if test="searchEndDate != null and searchEndDate != ''">
+                                        AND VOM.REG_DM <![CDATA[<=]]> REPLACE(#{searchEndDate}, '-', '') || '235959'
+                                    </if>
+                            </if>
+                            
+                            <if test="searchContractType != null and searchContractType == CONTRACT_STATUS_JOIN">
+                                SELECT 
+                                    TOD.RDP_MST_IDX,
+                                    TOD.SELLER_NAME,
+                                    TOD.ORD_MST_IDX,
+                                    TOD.MEM_NM,
+                                    TOD.CELL,
+                                    TOM.PRD_MST_NO,
+                                    TOM.ORD_MST_REG_DT
+                                FROM 
+                                    T_ORD_DLCC TOD,
+                                    T_ORD_MST TOM,
+                                    V_ORD_MST VOM
+                                WHERE 
+                                    TOD.RDP_MST_IDX IS NOT NULL
+                                    AND TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                                    AND TOM.ORD_MST_IDX = VOM.ORD_MST_IDX 
+                                    AND VOM.JOIN_DT IS NOT NULL
+                            
+                                    <!-- 기간 -->
+                                    <if test="searchStartDate != null and searchStartDate != ''">
+                                        AND VOM.JOIN_DT <![CDATA[>=]]> REPLACE(#{searchStartDate}, '-', '')
+                                    </if>
+                                    <if test="searchEndDate != null and searchEndDate != ''">
+                                        AND VOM.JOIN_DT <![CDATA[<=]]> REPLACE(#{searchEndDate}, '-', '')
+                                    </if>
+                            </if>
+                            
+                            <if test="searchContractType != null and searchContractType == CONTRACT_STATUS_CANCEL">
+                                SELECT 
+                                    TOD.RDP_MST_IDX,
+                                    TOD.SELLER_NAME,
+                                    TOD.ORD_MST_IDX,
+                                    TOD.MEM_NM,
+                                    TOD.CELL,
+                                    TOM.PRD_MST_NO,
+                                    TOM.ORD_MST_REG_DT
+                                FROM 
+                                    T_ORD_DLCC TOD,
+                                    T_ORD_MST TOM,
+                                    V_ORD_MST VOM
+                                WHERE 
+                                    TOD.RDP_MST_IDX IS NOT NULL
+                                    AND TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                                    AND TOM.ORD_MST_IDX = VOM.ORD_MST_IDX 
+                                    AND VOM.RESN_PROC_DAY IS NOT NULL
+                                    AND VOM.RESN_PROC_YN = 'Y'
+                
+                                    <!-- 기간 -->
+                                    <if test="searchStartDate != null and searchStartDate != ''">
+                                        AND VOM.RESN_PROC_DAY <![CDATA[>=]]> REPLACE(#{searchStartDate}, '-', '')
+                                    </if>
+                                    <if test="searchEndDate != null and searchEndDate != ''">
+                                        AND VOM.RESN_PROC_DAY <![CDATA[<=]]> REPLACE(#{searchEndDate}, '-', '')
+                                    </if>
+                            </if>
+                        ) Y,
+                        V_ORD_MST VOM
+                    WHERE
+                        TRM.RDP_MST_IDX = Y.RDP_MST_IDX
+                        AND Y.PRD_MST_NO = CPM.PRD_MST_NO
+                        AND Y.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                        AND Y.RDP_MST_IDX = #{RDP_MST_IDX}
+                        <!-- 상품 -->
+                        <if test="searchPrdMstNm != null and searchPrdMstNm != ''">
+                            AND CPM.PRD_MST_NM = #{searchPrdMstNm}
+                        </if>
+                ) X
+                WHERE 1=1
+                ORDER BY
+                    X.ORD_MST_REG_DT DESC
+            ) S1
+        ) S2
+        WHERE 1=1
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 주문별 상담 내역-->
+    <select id="selectPerformanceByProductCounsel" parameterType="HashMap" resultType="HashMap">
+        SELECT 
+            ROWNUM AS RNUM, ACTP_ID, COUNSELL_MEMO, RPAD(TRIM(REG_DM), 14, '00')  AS REG_DM
+        FROM 
+            V_CON_MST 
+        WHERE 
+            ORD_MST_IDX =#{ordMstIdx} 
+        ORDER BY 
+            COUNSELL_IDX DESC
+    </select>
+    
+    <!-- 마이플래너 > 실적 > 상품별 실적 다운로드-->
+    <select id="selectPerformanceByProductDown" parameterType="HashMap" resultType="HashMap">
+        <bind name="CODE_WAITING_TO_JOIN" value="@common.code.Dlcc@JOIN_STATE_RECEIPT"/>
+        <bind name="CODE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        <bind name="CODE_CANCEL" value="@common.code.Dlcc@JOIN_STATE_CANCEL"/>
+        <bind name="CODE_USE" value="@common.code.Dlcc@JOIN_STATE_USE"/>
+        <bind name="CONTRACT_STATUS_RECEIPT" value="@common.code.Code@CONTRACT_STATUS_RECEIPT"/>
+        <bind name="CONTRACT_STATUS_WAITING_TO_JOIN" value="@common.code.Code@CONTRACT_STATUS_WAITING_TO_JOIN"/>
+        <bind name="CONTRACT_STATUS_JOIN" value="@common.code.Code@CONTRACT_STATUS_JOIN"/>
+        <bind name="CONTRACT_STATUS_CANCEL" value="@common.code.Code@CONTRACT_STATUS_CANCEL"/>
+        <bind name="CONTRACT_STATUS_USE" value="@common.code.Code@CONTRACT_STATUS_USE"/>
+        /* PlannerStatus.selectPerformanceByProductDown */
+        SELECT 
+            RNUM,
+            S2.*
+        FROM (
+            SELECT
+                ROWNUM AS RNUM,
+                S1.*,
+                (SELECT CMN_COM_NM FROM T_CMM_COM WHERE CMN_COM_IDX = S1.JOIN_STATE) AS JOIN_STATE_NM,
+                (SELECT COUNSELL_MEMO FROM V_CON_MST WHERE COUNSELL_IDX=(SELECT max(COUNSELL_IDX) FROM V_CON_MST WHERE ORD_MST_IDX=S1.ORD_MST_IDX)) COUNSELL_MEMO
+            FROM (
+            
+                SELECT
+                    X.*
+                FROM (
+                
+                    SELECT
+                        Y.ORD_MST_IDX,
+                        TRM.RDP_MST_IDX,
+                        CPM.PRD_MST_NM, -- 온라인 상품명
+                        CASE WHEN VOM.KSTBIT IS NULL THEN substr(Y.MEM_NM,1,1) || lpad('*',length(Y.MEM_NM )-2,'*') || substr(Y.MEM_NM,length(Y.MEM_NM), 1)
+                             ELSE substr(VOM.MEM_NM ,1,1) || lpad('*',length(VOM.MEM_NM )-2,'*') || substr(VOM.MEM_NM , length(VOM.MEM_NM), 1)
+                        END AS MEM_NM, -- 가입자명
+                        CASE WHEN VOM.KSTBIT IS NULL THEN substr(Y.CELL,1,3) || '-' || lpad('*',length(Y.CELL )-7,'*') || '-' || substr(Y.CELL,length(Y.CELL)-3, 4) 
+                             ELSE substr(VOM.CELL,1,3) || '-' || lpad('*',length(VOM.CELL )-7,'*') || '-' || substr(VOM.CELL,length(VOM.CELL)-3, 4)
+                        END AS CELL, -- 연락처
+                        CASE WHEN VOM.KSTBIT IS NULL THEN #{CONTRACT_STATUS_RECEIPT} -- 접수
+                             WHEN VOM.KSTBIT = #{CODE_WAITING_TO_JOIN} THEN #{CONTRACT_STATUS_WAITING_TO_JOIN} -- 가입대기
+                             WHEN VOM.KSTBIT = #{CODE_JOIN} THEN #{CONTRACT_STATUS_JOIN} -- 가입
+                             WHEN VOM.KSTBIT = #{CODE_CANCEL} THEN #{CONTRACT_STATUS_CANCEL} -- 해약
+                             WHEN VOM.KSTBIT = #{CODE_USE} THEN #{CONTRACT_STATUS_USE} -- 행사
+                             ELSE 0 
+                        END AS JOIN_STATE, -- 상태
+                        CASE WHEN VOM.KSTBIT IS NULL THEN SUBSTR(Y.ORD_MST_REG_DT, 0, 6) -- 접수
+                             WHEN VOM.KSTBIT = #{CODE_WAITING_TO_JOIN} THEN SUBSTR(VOM.REG_DM, 0, 6) -- 가입대기
+                             WHEN VOM.KSTBIT = #{CODE_JOIN} THEN SUBSTR(VOM.JOIN_DT, 0, 6) -- 가입
+                             ELSE '' 
+                        END AS BASE_DT, -- 기준일
+                        SUBSTR(Y.ORD_MST_REG_DT, 0, 8) AS RECEIPT_DT, -- 접수일
+                        Y.ORD_MST_REG_DT, -- 접수일2
+                        SUBSTR(VOM.REG_DM, 0, 8) AS WAITING_TO_JOIN_DT, -- 가입대기일
+                        SUBSTR(VOM.JOIN_DT, 0, 8) AS JOIN_DT, -- 가입일
+                        SUBSTR(VOM.RESN_PROC_DAY, 0, 8) AS CANCEL_DT, -- 해약일
+                        SUBSTR(VOM.EVENT_COMP_DAY, 0, 8) AS USE_DT -- 행사일
+                    FROM 
+                        T_RDP_MST TRM,
+                        C_PRD_MST CPM,
+                        (
+                        
+                            SELECT 
+                                TOD.RDP_MST_IDX,
+                                TOD.ORD_MST_IDX,
+                                TOD.MEM_NM,
+                                TOD.CELL,
+                                TOM.PRD_MST_NO,
+                                TOM.ORD_MST_REG_DT
+                            FROM 
+                                T_ORD_DLCC TOD,
+                                T_ORD_MST TOM
+                            WHERE 
+                                TOD.RDP_MST_IDX IS NOT NULL 
+                                AND TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+                        ) Y,
+                        V_ORD_MST VOM
+                    WHERE
+                        TRM.RDP_MST_IDX = Y.RDP_MST_IDX
+                        AND Y.PRD_MST_NO = CPM.PRD_MST_NO
+                        AND Y.ORD_MST_IDX = VOM.ORD_MST_IDX (+)
+                        AND Y.RDP_MST_IDX = #{RDP_MST_IDX}
+                ) X
+                WHERE 1=1
+                ORDER BY
+                    X.ORD_MST_REG_DT DESC
+            ) S1
+        ) S2
+        WHERE 1=1
+    </select>
+    
+</mapper>

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlannerCommon">
+
+    <!-- 조건절 -->
+    <sql id="plannerCommonWhere">
+    </sql>
+    
+    <!-- 플래너 기본 정보 조회 by 플래너번호 -->
+    <select id="selectPlannerInfoByPlannerNo" parameterType="HashMap" resultType="HashMap">
+        /* PlannerCommon.selectPlannerInfoByPlannerNo */
+        SELECT
+            TRM.*,
+            (SELECT TCF.CMM_FLE_ATT_PATH || TCF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH FROM T_CMM_FLE TCF WHERE TCF.CMM_FLE_TB_NM = 'T_RDP_MST' AND TCF.CMM_FLE_USE_YN = 'Y' AND TCF.CMM_FLE_TB_PK = TRM.RDP_MST_IDX AND TCF.CMM_FLE_TB_TYPE = 'I' AND ROWNUM <![CDATA[<=]]> 1) AS RDP_MST_PROFILE_IMAGE,
+            (SELECT TCC.CMN_COM_NM FROM T_CMM_COM TCC WHERE TCC.CMN_COM_IDX = TRM.RDP_MST_BNK_CD) AS RDP_MST_BNK_CD_NM
+        FROM 
+            T_RDP_MST TRM
+        WHERE
+            TRM.RDP_MST_NO = UPPER(#{RDP_MST_NO})
+    </select>
+    
+    <!-- 플래너 기본 정보 조회 by 플래너 IDX -->
+    <select id="selectPlannerInfoByPlannerIdx" parameterType="HashMap" resultType="HashMap">
+        /* PlannerCommon.selectPlannerInfoByPlannerIdx */
+        SELECT
+            TRM.*,
+            (SELECT TCF.CMM_FLE_ATT_PATH || TCF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH FROM T_CMM_FLE TCF WHERE TCF.CMM_FLE_TB_NM = 'T_RDP_MST' AND TCF.CMM_FLE_USE_YN = 'Y' AND TCF.CMM_FLE_TB_PK = TRM.RDP_MST_IDX AND TCF.CMM_FLE_TB_TYPE = 'I' AND ROWNUM <![CDATA[<=]]> 1) AS RDP_MST_PROFILE_IMAGE,
+            (SELECT TCC.CMN_COM_NM FROM T_CMM_COM TCC WHERE TCC.CMN_COM_IDX = TRM.RDP_MST_BNK_CD) AS RDP_MST_BNK_CD_NM
+        FROM 
+            T_RDP_MST TRM
+        WHERE
+            TRM.RDP_MST_IDX = #{RDP_MST_IDX}
+    </select>
+    
+    <!-- 플래너 기본 정보 조회 by 아이디 -->
+    <select id="selectPlannerInfoById" parameterType="HashMap" resultType="HashMap">
+        /* PlannerCommon.selectPlannerInfoById */
+        SELECT
+            TRM.*,
+            (SELECT TCF.CMM_FLE_ATT_PATH || TCF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH FROM T_CMM_FLE TCF WHERE TCF.CMM_FLE_TB_NM = 'T_RDP_MST' AND TCF.CMM_FLE_USE_YN = 'Y' AND TCF.CMM_FLE_TB_PK = TRM.RDP_MST_IDX AND TCF.CMM_FLE_TB_TYPE = 'I' AND ROWNUM <![CDATA[<=]]> 1) AS RDP_MST_PROFILE_IMAGE,
+            (SELECT TCC.CMN_COM_NM FROM T_CMM_COM TCC WHERE TCC.CMN_COM_IDX = TRM.RDP_MST_BNK_CD) AS RDP_MST_BNK_CD_NM
+        FROM 
+            T_RDP_MST TRM
+        WHERE
+            TRM.RDP_MST_ID = #{RDP_MST_ID}
+    </select>
+    
+    <!-- 플래너 상태 수정 -->
+    <update id="updateState" parameterType="HashMap">
+        /* PlannerCommon.updateState */
+        UPDATE 
+            T_RDP_MST 
+        SET
+            RDP_MST_STATE = #{RDP_MST_STATE}
+            <if test="RDP_MST_STATE != null and RDP_MST_STATE == @common.code.Code@PLANNER_STATE_REQUEST_RELEASE">
+                , RDP_MST_RLS_RSN = #{RDP_MST_RLS_RSN}
+            </if>
+        WHERE 
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 플래너 비밀번호 수정 -->
+    <update id="updatePlannerPassword" parameterType="HashMap">
+        /* PlannerCommon.updatePlannerPassword */
+        UPDATE 
+            T_RDP_MST 
+        SET
+            RDP_MST_PW = #{RDP_MST_PW}
+        WHERE 
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 플래너 연락처 수정 -->
+    <update id="updatePlannerPhoneNumber" parameterType="HashMap">
+        /* PlannerCommon.updatePlannerPhoneNumber */
+        UPDATE 
+            T_RDP_MST 
+        SET
+            RDP_MST_HP1 = #{RDP_MST_HP1},
+            RDP_MST_HP2 = #{RDP_MST_HP2},
+            RDP_MST_HP3 = #{RDP_MST_HP3}
+        WHERE 
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 플래너 정산계좌 수정 -->
+    <update id="updatePlannerBankAccount" parameterType="HashMap">
+        /* PlannerCommon.updatePlannerBankAccount */
+        UPDATE 
+            T_RDP_MST 
+        SET
+            RDP_MST_BNK_CD = #{RDP_MST_BNK_CD},
+            RDP_MST_BNK_ACT = #{RDP_MST_BNK_ACT},
+            RDP_MST_ACT_HDR = #{RDP_MST_ACT_HDR}
+        WHERE 
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 플래너 예상수익 조회 by 플래너번호 -->
+    <select id="selectPlannerExpectedProfits" parameterType="HashMap" resultType="HashMap">
+        <bind name="JOIN_STATE_JOIN" value="@common.code.Dlcc@JOIN_STATE_JOIN"/>
+        /* PlannerCommon.selectPlannerExpectedProfits */
+        
+        SELECT
+            NVL(SUM((VRB.PAY_NO_END - VRB.PAY_NO + 1 ) * VRB.AMT), 0) AS EXPECTED_PROFITS
+        FROM 
+            T_ORD_DLCC TOD,
+            T_ORD_MST TOM,
+            V_ORD_MST VOM,
+            V_B2B_MST VBM,
+            V_RMT_BASIC VRB
+        WHERE 
+            TOD.RDP_MST_IDX = #{RDP_MST_IDX}
+            AND TOD.ORD_MST_IDX = TOM.ORD_MST_IDX 
+            AND TOM.ORD_MST_IDX = VOM.ORD_MST_IDX 
+            AND VOM.KSTBIT = #{JOIN_STATE_JOIN}
+            AND VBM.COM_CD = TOD.SALE_TYPE 
+            AND VRB.SALE_TYPE = VBM.SALE_TYPE 
+            AND VRB.PROD_CD = TOD.PROD_CD 
+            AND VRB.B2B_COMP_CD = TOD.SALE_TYPE
+            AND VOM.JOIN_DT BETWEEN REPLACE(VRB.PROD_JOIN_DT_STR, '-', '') AND REPLACE(VRB.PROD_JOIN_DT_END, '-', '') 
+    </select>
+    
+</mapper>

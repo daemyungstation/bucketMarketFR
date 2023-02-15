@@ -1,0 +1,666 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <%@include file="/WEB-INF/jsp/pc/include/head.jsp" %>
+    <link rel="stylesheet" type="text/css" href="<spring:eval expression="@resource['css.ssl.domain']"/>/resources/pc/css/payment.css"> 
+</head>
+<body class="">
+    <%@include file="/WEB-INF/jsp/pc/include/header.jsp" %>
+    <%@include file="/WEB-INF/jsp/pc/include/gnb.jsp" %>
+    <%-- Body --%>
+    <div class="area-body">
+        <div class="area-top-type3">
+            <div class="area-inner">
+                <div class="contain-order-top<c:if test="${not (info.PRD_MST_TYPE eq Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE and info.PRD_MST_BND_YN eq 'Y') and info.PRD_MST_IRG_YN eq 'Y' }"> contain-order-irregular</c:if>">
+                    <div class="box-order-inner">
+                        <div class="box-order-title">
+                            <span class="order-title"><c:out value="${info.PRD_MST_NM }"/></span>
+                            <p class="text-account"><span><fmt:formatNumber value="${commandMap.ORD_MST_CNT }" type="number"/></span>개의 가입구좌</p>
+                        </div>
+                        <div class="box-order-details array4">
+                            <ul>
+                                <%-- 즉발(채권) --%>
+                                <c:if test="${info.PRD_MST_TYPE eq Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE and info.PRD_MST_BND_YN eq 'Y' }">
+                                    <li><p class="details-title">총 지원혜택</p><span class="text-point1"><c:out value="${info.PRD_MST_SPT_TXT }"/></li>
+                                    <li><p class="details-title">즉시 지원혜택</p><span class="text-point1"><fmt:formatNumber value="${info.REL_AMT }" type="number"/></span> 원</li>
+                                    <li><p class="details-title">상품금액</p><span class="text-point1"><fmt:formatNumber value="${info.PROD_AMT }" type="number"/></span> 원</li>
+                                    <li><p class="details-title">납부회차</p><span class="text-point1"><fmt:formatNumber value="${info.EXPR_NO }" type="number"/></span> 원</li>
+                                </c:if>
+                                <%-- 월지원형/즉발(비채권)/렌탈/할부지원 --%>
+                                <c:if test="${not (info.PRD_MST_TYPE eq Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE and info.PRD_MST_BND_YN eq 'Y') }">
+                                    <li><p class="details-title">월지원금</p><span class="text-point1"><fmt:formatNumber value="${info.MON_REL_AMT }" type="number"/></span> 원</li>
+                                    <li><p class="details-title">지원회차</p><span class="text-point1"><fmt:formatNumber value="${info.REL_CNT }" type="number"/></span> 회</li>
+                                    <%-- 정기형 --%>
+                                    <c:if test="${info.PRD_MST_IRG_YN ne 'Y' }">
+                                        <li><p class="details-title">월납부금</p><span class="text-point1"><fmt:formatNumber value="${info.MON_PAY_AMT }" type="number"/></span> 원</li>
+                                        <li><p class="details-title">납부회차</p><span class="text-point1"><fmt:formatNumber value="${info.EXPR_NO }" type="number"/></span> 회</li>
+                                    </c:if>
+                                    <%-- 비정기형 --%>
+                                    <c:if test="${info.PRD_MST_IRG_YN eq 'Y' }">
+                                        <li>
+                                            <p class="details-title">월납부금</p>
+                                            <c:if test="${not empty info.PRD_MST_PAY_AMT1 }">
+                                                <span class="text-point1"><fmt:formatNumber value="${info.PRD_MST_PAY_AMT1 }" type="number"/></span> 원<br/>
+                                            </c:if>
+                                            <c:if test="${not empty info.PRD_MST_PAY_AMT2 }">
+                                                <span class="text-point1"><fmt:formatNumber value="${info.PRD_MST_PAY_AMT2 }" type="number"/></span> 원<br/>
+                                            </c:if>
+                                            <c:if test="${not empty info.PRD_MST_PAY_AMT3 }">
+                                                <span class="text-point1"><fmt:formatNumber value="${info.PRD_MST_PAY_AMT3 }" type="number"/></span> 원
+                                            </c:if>
+                                            
+                                        </li>
+                                        <li>
+                                            <p class="details-title">납부회차</p>
+                                            <c:if test="${not empty info.PRD_MST_PAY_CNT1 }">
+                                                <span class="text-point1"><c:out value="${info.PRD_MST_PAY_CNT1 }"/></span> 회<br/>
+                                            </c:if>
+                                            <c:if test="${not empty info.PRD_MST_PAY_CNT2 }">
+                                                <span class="text-point1"><c:out value="${info.PRD_MST_PAY_CNT2 }"/></span> 회<br/>
+                                            </c:if>
+                                            <c:if test="${not empty info.PRD_MST_PAY_CNT3 }">
+                                                <span class="text-point1"><c:out value="${info.PRD_MST_PAY_CNT3 }"/></span> 회<br/>
+                                            </c:if>
+                                            
+                                        </li>
+                                    </c:if>
+                                </c:if>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="contain-order-inner">
+                    <h3 class="title">전자청약 상품가입 신청</h3>
+    
+                    <div class="contain-step">
+                        <div class="box-title-step">
+                            <p class="step-num"><span>1</span>약관동의 및 본인확인</p>
+                            <p class="step-num on"><span>2</span>가입정보입력</p>
+                            <p class="step-num"><span>3</span>가입정보확인</p>
+                        </div>
+                        <form name="contractForm" id="contractForm">
+                            <input type="hidden" name="PRD_MST_NO" value="<c:out value="${commandMap.PRD_MST_NO }"/>"/>
+                            <c:if test="${info.PRD_MST_OPT_YN eq 'Y' }">
+                                <c:forEach var="PRD_OPT_IDX" items="${commandMap.PRD_OPT_IDXs }">
+                                    <input type="hidden" name="PRD_OPT_IDXs" value="<c:out value="${PRD_OPT_IDX }"/>"/>
+                                </c:forEach>
+                            </c:if>
+                            <input type="hidden" name="ORD_MST_CNT" value="<c:out value="${commandMap.ORD_MST_CNT }"/>"/>
+                            <div class="box-step-form">
+                                <dl class="box-form">
+                                    <dt>가입자 정보<i>(필수)</i></dt>
+                                    <dd>
+                                        <span class="form-title">이름</span>
+                                        <input type="text" value="<c:out value="${SessionsUser.USER_NM }"/>" disabled="disabled"/>
+                                    </dd>
+                                    <dd>
+                                        <span class="form-title">연락처</span>
+                                        <input type="text" value="<c:out value="${SessionsUser.USER_HP }"/>" disabled="disabled"/>
+                                    </dd>
+                                    <dd>
+                                        <span class="form-title">생년월일</span>
+                                        <input type="text" value="<c:out value="${SessionsUser.USER_BIRTHDAY }"/>" disabled="disabled">
+                                        <span class="form-gender <c:if test="${SessionsUser.USER_SEX eq Const.MAN }">on</c:if>" style="margin-left: 25px;">남자</span>
+                                        <span class="form-gender <c:if test="${SessionsUser.USER_SEX eq Const.FEMALE }">on</c:if>">여자</span>
+                                    </dd>
+                                    <dd class="type2" style="margin-top:20px;">
+                                        <span class="form-title">주소<br />(가입증서 배송지)</span>
+                                        <span class="form-addbutton">
+                                            <input type="hidden" name="HOME_ZIP" maxlength="5"/>
+                                            <input type="text" name="HOME_ADDR" placeholder="가입증서 배송지 선택" maxlength="70" readonly="readonly"/>
+                                            <span class="btn-type-text1 zipcode" data-type="home"><button>주소검색</button></span>
+                                        </span>
+                                        <label class="form-alert" message-target="HOME_ADDR" data-name="가입증서 배송지"></label>
+                                    </dd>
+                                    <dd class="type2">
+                                        <input type="text" name="HOME_ADDR2" placeholder="상세주소 입력" maxlength="70" width="100%"/>
+                                        <label class="form-alert" message-target="HOME_ADDR2" data-name="가입증서가 배송될 상세주소"></label>
+                                    </dd>
+                                </dl>
+                                <dl class="box-form">
+                                    <dt>선택정보</dt>
+                                    <dd>
+                                        <span class="form-title">비상연락처</span>
+                                        <input type="text" name="HOME_TEL" placeholder="비상 연락처 (-없이 숫자만 입력)" maxlength="11"/>
+                                        <label class="form-alert" message-target="HOME_TEL" data-name="비상 연락처"></label>
+                                    </dd>
+                                    <dd>
+                                        <span class="form-title">이메일 주소</span>
+                                        <input type="text" name="EMAIL" placeholder="이메일 주소" maxlength="50"/>
+                                        <label class="form-alert" message-target="EMAIL" data-name="이메일 주소"></label>
+                                    </dd>
+                                </dl>
+                                <c:if test="${isMainLifeService }">
+                                    <dl class="box-form">
+                                        <dt>라이프 서비스 신청<i>(필수)</i></dt>
+                                        <dd class="type3">
+                                            <c:if test="${commandMap.ORD_MST_CNT gt 1 }">
+                                                <p class="text-normal-type1"><fmt:formatNumber value="${commandMap.ORD_MST_CNT }" type="number"/> 개 선택선택 (가입구좌 수량 만큼 선택해 주세요)</p>
+                                            </c:if>
+                                            <c:forEach begin="1" end="${commandMap.ORD_MST_CNT }" varStatus="stat">
+                                                <span class="form-select">
+                                                    <select name="MAIN_CONTRACT">
+                                                        <option value="">주 계약 선택</option>
+                                                        <c:forEach var="row" items="${mainLifeServiceList }" varStatus="stat">
+                                                            <option value="<c:out value="${row.CMN_COM_ETC1 }"/>" <c:if test="${fn:length(mainLifeServiceList) eq 1 and stat.first }">selected="selected"</c:if>><c:out value="${row.CMN_COM_NM }"/></option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </span>
+                                            </c:forEach>
+                                            <label class="form-alert" message-target="MAIN_CONTRACT" data-name="주 계약"></label>
+                                        </dd>
+                                    </dl>
+                                </c:if>
+                                <c:if test="${isDelivery }">
+                                    <dl class="box-form">
+                                        <dt>배송/설치 정보<i>(필수)</i></dt>
+                                        <dd>
+                                            <c:if test="${commandMap.ORD_MST_CNT gt 1 }">
+                                                <p class="text-normal-type1"><fmt:formatNumber value="${commandMap.ORD_MST_CNT }" type="number"/> 개 선택 가능<br />(가입구좌 수량 만큼 선택해 주세요)</p>
+                                            </c:if>
+                                            <input type="hidden" name="INSPL_VALID"/>
+                                            <span class="deliver-checkbox">
+                                                <label class="form-checkbox"><input type="checkbox" class="contractor-same-add">가입자 주소와 동일</label>
+                                                <c:if test="${commandMap.ORD_MST_CNT gt 1 }">
+                                                    <label class="form-checkbox"><input type="checkbox" class="delivery-all-add" >배송지 일괄입력</label>
+                                                </c:if>
+                                            </span>
+                                        </dd>
+                                        <dd>
+                                            <c:forEach begin="1" end="${commandMap.ORD_MST_CNT }" varStatus="stat">
+                                                <div class="box-order">
+                                                    <span class="product"><c:out value="${info.PRD_MST_SPL_NM }"/></span>
+                                                    <c:if test="${info.PRD_MST_OPT_YN eq 'Y' }">
+                                                        <span class="option">
+                                                            <c:forEach var="row" items="${optionList }">
+                                                                <c:if test="${commandMap.PRD_OPT_IDXs[stat.index - 1] eq row.PRD_OPT_IDX }">
+                                                                    <c:out value="${row.PRD_OPT_DTL }"/>
+                                                                </c:if>
+                                                            </c:forEach>
+                                                        </span>
+                                                    </c:if>
+                                                    <span class="delivery-area"></span>
+                                                    <span class="btn-type-text5 delivery-row-add"><button>배송지 등록</button></span>
+                                                </div>
+                                            </c:forEach>
+                                            <label class="form-alert" message-target="INSPL_VALID" data-name="배송/설치 주소"></label>
+                                        </dd>
+                                    </dl>
+                                </c:if>
+                                <c:if test="${isEtc }">
+                                    <dl class="box-form">
+                                        <dt>추가 정보<span class="btn-help"><button class="help1">도움말</button></span><i>(필수)</i></dt>
+                                        <dd>
+                                            <c:if test="${commandMap.ORD_MST_CNT gt 1 }">
+                                                <span class="select"><fmt:formatNumber value="${commandMap.ORD_MST_CNT }" type="number"/>개 선택 가능</span>
+                                            </c:if>
+                                            <span class="deliver-checkbox">
+                                                <c:if test="${commandMap.ORD_MST_CNT gt 1 }">
+                                                    <label class="form-checkbox"><input type="checkbox" class="etc-all-add">추가정보 일괄입력</label>
+                                                </c:if>
+                                            </span>
+                                        </dd>
+                                        <dd class="type3">
+                                            <p class="form-type2">
+                                                <c:if test="${not empty info.PRD_MST_BND_ID }">
+                                                    <span><c:out value="${info.PRD_MST_BND_ID }"/></span>
+                                                </c:if>
+                                                <c:forEach begin="1" end="${commandMap.ORD_MST_CNT }" varStatus="stat">
+                                                    <input type="text" name="ORD_MST_VDR_BNF_ID" value="" placeholder="추가정보 입력" maxlength="20"/>
+                                                </c:forEach>
+                                            </p>
+                                            <label class="form-alert" message-target="ORD_MST_VDR_BNF_ID" data-name="추가정보"></label>
+                                        </dd>
+                                    </dl>
+                                </c:if>
+                                <dl class="box-form">
+                                    <dt>해피콜 상담시간<span class="btn-help"><button class="help2">도움말</button></span>
+                                        <i>(필수)</i></dt>
+                                    <dd class="type3">
+                                        <p class="text-normal-type1">* 가입완료 후, 전문 상담원이 해피콜을 드립니다. 통화 가능한 시간대를 선택해 주세요</p>
+                                        <span class="form-select" style="width:450px;">
+                                            <select name="HPCALL_TIME">
+                                                <option value="">상담시간 선택</option>
+                                                <c:forEach var="row" items="${happCallList }">
+                                                    <option value="<c:out value="${row.CMN_COM_ETC1 }"/>"><c:out value="${row.CMN_COM_NM }"/></option>
+                                                </c:forEach>
+                                            </select>
+                                        </span>
+                                        <label class="form-alert" message-target="HPCALL_TIME" data-name="해피콜 상담시간"></label>
+                                    </dd>
+                                </dl>
+                                <c:if test="${info.PRD_MST_TYPE eq Code.PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN }">
+                                    <dl class="box-form">
+                                        <dt>사전 결제금액</span>
+                                            <i>(필수)</i></dt>
+                                        <dd class="type3">
+                                            <span class="text-payment">결제금액 <span class="text-point1"><fmt:formatNumber value="${info.PRD_MST_ISTM_SPT_PAY}" type="number"/></span>원</span>
+                                        </dd>
+                                    </dl>
+                                </c:if>
+                            </div>
+                            <div class="fixed-box-button">
+                                <span class="btn-type-text1 disabled"><button>카카오페이 전자서명</button></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <%-- //Body --%>
+    <%-- 도움말 --%>
+    <div class="box-help help1">
+        <div class="box-inner">혜택 받으실 아이디를 정확하게 기입해주세요. 아이디를 잘못 입력하실 경우, 혜택이 제공되지 않을 수 있습니다.</div>
+    </div>
+    <div class="box-help help2">
+        <div class="box-inner">해피콜 미 진행 시, 상품 가입이 되지 않습니다. 해피콜은 약 5분 정도 소요 되며, 고객님께서 원하시는 시간에 연락 드리겠습니다.</div>
+    </div>
+    <div class="box-help help3">
+        <div class="box-inner">사전 결제금액 내용</div>
+    </div>
+    <%-- //도움말 --%>
+    <form name="joinStepForm" id="joinStepForm">
+        <input type="hidden" name="PRD_MST_NO" value="<c:out value="${commandMap.PRD_MST_NO }"/>"/>
+        <c:if test="${info.PRD_MST_OPT_YN eq 'Y' }">
+            <c:forEach var="PRD_OPT_IDX" items="${commandMap.PRD_OPT_IDXs }">
+                <input type="hidden" name="PRD_OPT_IDXs" value="<c:out value="${PRD_OPT_IDX }"/>"/>
+            </c:forEach>
+        </c:if>
+        <input type="hidden" name="ORD_MST_CNT" value="<c:out value="${commandMap.ORD_MST_CNT }"/>"/>
+    </form>
+    <%@include file="/WEB-INF/jsp/pc/include/footer.jsp" %>
+    <%@include file="/WEB-INF/jsp/pc/include/layer.jsp" %>
+    <%@include file="/WEB-INF/jsp/pc/include/script.jsp" %>
+    <script src="<spring:eval expression="@resource['js.ssl.domain']"/>/resources/common/js/lib/tmpl/jquery.tmpl.min.js"></script>
+    <script id="deliveryAddButtonTemplate" type="text/x-jquery-tmpl">
+        <span class="btn-type-text5 delivery-row-add"><button>배송지 등록</button></span>
+    </script>
+    <script id="deliveryTemplate" type="text/x-jquery-tmpl">
+        <span class="infor">
+            \${INSPL_MEM_NM} \${StringUtil.formatPhone(INSPL_CELL, "-")}
+        </span>
+        <span class="address">
+            \${INSPL_ADDR} \${INSPL_ADDR2}
+        </span>
+        <span class="data">
+            <input type="hidden" name="INSPL_MEM_NM" value="\${INSPL_MEM_NM}"/>
+            <input type="hidden" name="INSPL_CELL" value="\${INSPL_CELL}"/>
+            <input type="hidden" name="INSPL_ZIP" value="\${INSPL_ZIP}"/>
+            <input type="hidden" name="INSPL_ADDR" value="\${INSPL_ADDR}"/>
+            <input type="hidden" name="INSPL_ADDR2" value="\${INSPL_ADDR2}"/>
+        </span>
+        <span class="btn-type-text5 delivery-row-mod"><button>배송지 수정</button></span>
+    </script>
+    <script id="deliveryFormLayerTemplate" type="text/x-jquery-tmpl">
+        <header class="area-header-layer">
+            <div class="area-inner">
+                <h1 class="title">배송(설치)주소</h1>
+                <span class="btn-close"><button>닫기</button></span>
+            </div>
+        </header>
+        <div class="area-content-layer">
+            <div class="area-inner">
+                <form name="deliveryForm" id="deliveryForm">
+                    <div class="contain-information-payment-layer">
+                        <p class="text-normal-type1">* 배송/설치를 위한 수령인 정보를 입력해 주세요.</p>
+                        <p class="text-notice-type2 form2">* 필수</p>
+                        {{if MODE == "regist"}}
+                            <dl class="box-form">
+                                <dt class="necessary">이름</dt>
+                                <dd>
+                                    <input type="text" name="INSPL_MEM_NM" placeholder="수령인 이름" maxlength="30"/>
+                                    <label class="form-alert" message-target="INSPL_MEM_NM" data-name="수령인 이름"></label>
+                                </dd>
+                            </dl>
+                            <dl class="box-form">
+                                <dt class="necessary">연락처</dt>
+                                <dd>
+                                    <input type="text" name="INSPL_CELL" placeholder="수령인 연락처" maxlength="11"/>
+                                    <label class="form-alert" message-target="INSPL_CELL" data-name="수령인 연락처"></label>
+                                </dd>
+                            </dl>
+                            <dl class="box-form">
+                                <dt class="necessary">주소</dt>
+                                <dd>
+                                    <span class="form-addbutton">
+                                        <input type="hidden" name="INSPL_ZIP" value="" maxlength="5"/>
+                                        <input type="text" name="INSPL_ADDR" placeholder="주소 선택" readonly="readonly" maxlength="70"/>
+                                        <span class="btn-type-text1 zipcode" data-type="inspl"><button>주소찾기</button></span>
+                                    </span>
+                                    <label class="form-alert" message-target="INSPL_ADDR" data-name="주소"></label>
+                                    <input type="text" name="INSPL_ADDR2" placeholder="상세주소 입력"  maxlength="70"/>
+                                    <label class="form-alert" message-target="INSPL_ADDR2" data-name="상세주소 입력"></label>
+                                </dd>
+                            </dl>
+                        {{else}}
+                            <dl class="box-form">
+                                <dt class="necessary">이름</dt>
+                                <dd>
+                                    <input type="text" name="INSPL_MEM_NM" value="\${INSPL_MEM_NM}" placeholder="수령인 이름" maxlength="30"/>
+                                    <label class="form-alert" message-target="INSPL_MEM_NM" data-name="수령인 이름"></label>
+                                </dd>
+                            </dl>
+                            <dl class="box-form">
+                                <dt class="necessary">연락처</dt>
+                                <dd>
+                                    <input type="text" name="INSPL_CELL" value="\${INSPL_CELL}" placeholder="수령인 연락처" maxlength="11"/>
+                                    <label class="form-alert" message-target="INSPL_CELL" data-name="수령인 연락처"></label>
+                                </dd>
+                            </dl>
+                            <dl class="box-form">
+                                <dt class="necessary">주소</dt>
+                                <dd>
+                                    <span class="form-addbutton">
+                                        <input type="hidden" name="INSPL_ZIP" value="\${INSPL_ZIP}" maxlength="5"/>
+                                        <input type="text" name="INSPL_ADDR" value="\${INSPL_ADDR}" placeholder="주소 선택" readonly="readonly" maxlength="70"/>
+                                        <span class="btn-type-text1 zipcode" data-type="inspl"><button>주소찾기</button></span>
+                                    </span>
+                                    <label class="form-alert" message-target="INSPL_ADDR" data-name="주소"></label>
+                                    <input type="text" name="INSPL_ADDR2" value="\${INSPL_ADDR2}" placeholder="상세주소 입력" maxlength="70"/>
+                                    <label class="form-alert" message-target="INSPL_ADDR2" data-name="상세주소 입력"></label>
+                                </dd>
+                            </dl>
+                        {{/if}}
+                    </div>
+                    <div class="fixed-box-button">
+                        <span class="btn-type-text1 {{if MODE == "regist"}}disabled{{/if}}"><button>저장</button></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </script>
+    <script id="etcFormLayerTemplate" type="text/x-jquery-tmpl">
+        <header class="area-header-layer">
+            <div class="area-inner">
+                <h1 class="title">추가정보</h1>
+                <span class="btn-close"><button>닫기</button></span>
+            </div>
+        </header>
+        <div class="area-content-layer">
+            <div class="area-inner">
+                <form name="etcForm" id="etcForm">
+                    <div class="contain-library-payment-layer">
+                        <p class="text-normal-type1">* 지원 혜택을 받을 추가 정보를 입력해 주세요.</p>
+                        <dl class="box-form">
+                            <dt><c:out value="${info.PRD_MST_BND_ID }"/></dt>
+                            <dd>
+                                <input type="text" name="ORD_MST_VDR_BNF_ID" placeholder="추가정보를 입력해주세요." maxlength="20"/>
+                                <label class="form-alert" message-target="ORD_MST_VDR_BNF_ID" data-name="추가정보"></label>
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="fixed-box-button">
+                        <span class="btn-type-text1 disabled"><button>저장</button></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </script>
+    <script>
+        $(function () {
+            var $areaBody = $(".area-body"),
+                $layerPopup = $(".layer-popup1"),
+                $contractForm = $areaBody.find("#contractForm"),
+                $joinStepForm = $("#joinStepForm");
+            var $deliveryAddButtonTemplate = $("#deliveryAddButtonTemplate"),
+                $deliveryTemplate = $("#deliveryTemplate"),
+                $deliveryFormLayerTemplate = $("#deliveryFormLayerTemplate"),
+                $etcFormLayerTemplate = $("#etcFormLayerTemplate");
+            
+            <%-- 우편번호 검색 버튼 클릭 이벤트 --%>
+            $(document).on("click", ".zipcode", function (e) {
+                e.preventDefault();
+                var type = $(this).data("type");
+                var deliveryFormArray = new Array();
+                if (type == "inspl") {
+                    deliveryFormArray.push($layerPopup.find(".area-header-layer").detach());
+                    deliveryFormArray.push($layerPopup.find(".area-content-layer").detach());
+                }
+                $.common.layer.zipcode(function (data) {
+                    if (type == "home") {
+                        $contractForm.find("input[name='HOME_ZIP']").val(data.zipcode);
+                        $contractForm.find("input[name='HOME_ADDR']").val(data.roadAddress);
+                        buttonDisabledToggle();
+                    } else if (type == "inspl") {
+                        $layerPopup.requestLayerByTemplate(deliveryFormArray);
+                        $layerPopup.find("input[name='INSPL_ZIP']").val(data.zipcode);
+                        $layerPopup.find("input[name='INSPL_ADDR']").val(data.roadAddress);
+                    }
+                });
+            });
+            <%-- 가입자 주소와 동일 체크박스 변경 이벤트 --%>
+            $contractForm.on("change", ".contractor-same-add", function (e) {
+                e.preventDefault();
+                var $this = $(this),
+                    $boxOrder = $this.closest(".box-form").find(".box-order"),
+                    $deliveryArea = $boxOrder.find(".delivery-area");
+                if ($this.is(":checked")) {
+                    var data = {
+                        INSPL_MEM_NM : "<c:out value="${SessionsUser.USER_NM }"/>",
+                        INSPL_CELL : "<c:out value="${SessionsUser.USER_HP }"/>",
+                        INSPL_ZIP : $contractForm.find("input[name='HOME_ZIP']").val(),
+                        INSPL_ADDR : $contractForm.find("input[name='HOME_ADDR']").val(),
+                        INSPL_ADDR2 : $contractForm.find("input[name='HOME_ADDR2']").val()
+                    };
+                    appendDeliveryInfo(data, $boxOrder, $deliveryArea);
+                } else {
+                    $deliveryArea.empty();
+                    $deliveryAddButtonTemplate.tmpl().appendTo($deliveryArea);
+                } 
+                buttonDisabledToggle();
+            });
+            <%-- 배송지 일괄 입력 체크박스 변경 이벤트 --%>
+            $contractForm.on("change", ".delivery-all-add", function (e) {
+                e.preventDefault();
+                var $this = $(this),
+                    $boxOrder = $this.closest(".box-form").find(".box-order"),
+                    $deliveryArea = $boxOrder.find(".delivery-area");
+                if ($this.is(":checked")) {
+                    openDeliveryLayer(function (data) {
+                        appendDeliveryInfo(data, $boxOrder, $deliveryArea);
+                        buttonDisabledToggle();
+                    }, "regist");
+                } else {
+                    $deliveryArea.empty();
+                    $deliveryAddButtonTemplate.tmpl().appendTo($deliveryArea);
+                    buttonDisabledToggle();
+                }
+            });
+            <%-- 배송지 등록/수정 버튼 클릭 이벤트 --%>
+            $contractForm.on("click", ".delivery-row-add, .delivery-row-mod", function (e) {
+                e.preventDefault();
+                var $this = $(this),
+                    $boxOrder = $this.closest(".box-order"),
+                    $deliveryArea = $boxOrder.find(".delivery-area");
+                var params = new Object(),
+                    mode = "regist";
+                if ($this.hasClass("delivery-row-mod")) {
+                    mode = "modify";
+                    var $input = $deliveryArea.find(".data").children("input");
+                    $input.each(function (key, value) {
+                        params[this.name] = this.value;
+                    });
+                }
+                openDeliveryLayer(function (data) {
+                    appendDeliveryInfo(data, $boxOrder, $deliveryArea);
+                    buttonDisabledToggle();
+                }, mode, params);
+            });
+            <%-- 추가정보 일괄 입력 체크박스 변경 이벤트--%>
+            $contractForm.on("change", ".etc-all-add", function () {
+                var $this = $(this),
+                    $boxForm = $this.closest(".box-form");
+                if ($this.is(":checked")) {
+                    openEtcLayer(function (data) {
+                        $boxForm.find("input[name='ORD_MST_VDR_BNF_ID']").val(data.ORD_MST_VDR_BNF_ID);
+                        if (data.ORD_MST_VDR_BNF_ID != "") {
+                            $contractForm.find(".form-alert[message-target='ORD_MST_VDR_BNF_ID']").removeClass(["ver2", "on"]);
+                        }
+                        buttonDisabledToggle();
+                    });
+                } else {
+                    $boxForm.find("input[name='ORD_MST_VDR_BNF_ID']").val("");
+                    buttonDisabledToggle();
+                }
+            });
+            
+            <%-- 배송지 정보 추가 --%>
+            function appendDeliveryInfo (data, $boxOrder, $deliveryArea) {
+                $deliveryArea.empty();
+                $boxOrder.find(".delivery-row-add").remove();
+                $deliveryTemplate.tmpl(data).appendTo($deliveryArea);
+            }
+            <%-- 배송지 입력 폼 레이어 호출 --%>
+            function openDeliveryLayer(callback, mode, params) {
+                params = typeof(params) != "undefined" ? params : new Object();
+                params.MODE = mode;
+                $layerPopup.requestLayerByTemplate($deliveryFormLayerTemplate.tmpl(params), "", function () {
+                    var $deliveryForm = $(this).find("#deliveryForm");
+                    $deliveryForm.validate({
+                        ignore : [],
+                        rules : {
+                            INSPL_MEM_NM : {
+                                required : true,
+                                maxlength : 30
+                            },
+                            INSPL_CELL : {
+                                required : true,
+                                number : true,
+                                rangelength : [9, 11]
+                            },
+                            INSPL_ADDR : {
+                                required : true,
+                                maxlength : 70
+                            },
+                            INSPL_ADDR2 : {
+                                required : true,
+                                maxlength : 70
+                            }
+                        },
+                        submitHandler : function(form) {
+                            var $form = $(form);
+                            var data = $form.serializeObject();
+                            data.INSPL_ADDR = $form.find("input[name='INSPL_ADDR']").val();
+                            callback.call(this, data);
+                            $.common.layer.close($layerPopup);
+                        }
+                    });
+                });
+            }
+            <%-- 추가정보 입력 폼 레이어 호출 --%>
+            function openEtcLayer(callback) {
+                $layerPopup.requestLayerByTemplate($etcFormLayerTemplate.tmpl(), "", function () {
+                    var $etcForm = $(this).find("#etcForm");
+                    $etcForm.validate({
+                        rules : {
+                            ORD_MST_VDR_BNF_ID : {
+                                required : true,
+                                engOrNum : true,
+                                maxlength : 20
+                            }
+                        },
+                        submitHandler : function(form) {
+                            callback.call(this, $(form).serializeObject());
+                            $.common.layer.close($layerPopup);
+                        }
+                    });
+                    setTimeout(function () {
+                        $etcForm.find("input[name='ORD_MST_VDR_BNF_ID']").focus();
+                    });
+                });
+            }
+            <%-- 데이터 유효성 검증 --%>
+            var $contractFormValidator = $contractForm.validate({
+                ignore : [],
+                rules : {
+                    HOME_ADDR : {
+                        required : true,
+                        maxlength : 70
+                    },
+                    HOME_ADDR2 : {
+                        required : true,
+                        maxlength : 70
+                    },
+                    HOME_TEL : {
+                        number : true,
+                        rangelength : [9, 11]
+                    },
+                    EMAIL : {
+                        email : true,
+                        maxlength : 50
+                    },
+                    MAIN_CONTRACT : {
+                        required : true
+                    },
+                    INSPL_VALID : {
+                        insplValid : true
+                    },
+                    INSPL_MEM_NM : {
+                        required : true,
+                        maxlength : 30
+                    },
+                    INSPL_CELL : {
+                        required : true,
+                        number : true,
+                        rangelength : [9, 11]
+                    },
+                    INSPL_ADDR : {
+                        required : true,
+                        maxlength : 70
+                    },
+                    INSPL_ADDR2 : {
+                        required : true,
+                        maxlength : 70
+                    },
+                    ORD_MST_VDR_BNF_ID : {
+                        required : true,
+                        engOrNumOrSl : true,
+                        maxlength : 20
+                    },
+                    HPCALL_TIME : {
+                        required : true
+                    }
+                },
+                submitHandler : function(form) {
+                    var $form = $(form);
+                    if ($form.valid()) {
+                        $.postSyncJsonAjax($.action.contract.join.form.save.ajax(), $form.serialize(), function () {
+                            $.requestPage($.action.contract.join.step3.form(), $joinStepForm.serializeObject());
+                        });
+                    }
+                }
+            });
+            <%-- 설치 주소 유효성 검증 추가 --%>
+            $.validator.addMethod("insplValid", function(value, element, param) {
+                var $boxOrder = $contractForm.find(".box-order"),
+                    $deliveryArea = $boxOrder.find(".delivery-area");
+                var valid = true;
+                if ($deliveryArea.children(".data").length == 0) {
+                    valid = false;
+                } else {
+                    $deliveryArea.children(".data").each(function () {
+                        $(this).find("input").each(function () {
+                            if (this.value == "") {
+                                valid = false;
+                            }
+                        });
+                    });
+                }
+                return valid;
+            }, "은(는) 필수 항목입니다.");
+            <%-- 버튼 disabled 클래스 토글 --%>
+            function buttonDisabledToggle() {
+                if ($contractFormValidator.checkForm()) {
+                    $contractForm.find(".btn-type-text1").filter(":not(.zipcode)").removeClass("disabled");
+                } else {
+                    $contractForm.find(".btn-type-text1").filter(":not(.zipcode)").addClass("disabled");
+                }
+            }
+            
+        });
+    </script>
+</body>
+</html>

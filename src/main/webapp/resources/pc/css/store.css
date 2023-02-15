@@ -1,0 +1,56 @@
+@charset "utf-8"; 
+
+.contain-store-top {padding: 0 0 0 0;}
+.contain-store-box {padding: 60px 0 60px 0;}
+
+/* 전시매장-swiper */ 
+.box-popup-store {width:100%; margin-top:20px;}
+.box-popup-store img {display:block;width:100%;margin: 0 auto;}
+.box-popup-store .swiper-pagination {text-align: center; position: relative; width: 100%; margin-top:10px; bottom:0px;}
+.box-popup-store .swiper-control {float:left;}
+.box-popup-store .swiper-pagination-bullet {border:1px solid #333; background: #fff !important; width:7px; height:7px;}
+.box-popup-store .swiper-pagination-bullet-active {border:1px solid #222; background: #222 !important;}
+.box-popup-store .swiper-control{width:14px; height:14px; margin: 4px 0 0 12px;}
+.box-popup-store button{float:left; width:14px;height:14px;display:block;text-indent:-9999px;font-size:0px; line-height: 0px; z-index:1;}
+.box-popup-store button::before {content:''; display: block; width:14px; height: 14px; background: url(../images/popup-store-control.png); background-size: auto 100%; background-position: -14px top; vertical-align: middle;}
+.box-popup-store button.btn-stop::before {background-position: 0px top;}
+.box-popup-store .btn-stop.on,
+.box-popup-store .btn-play.on{display:none;}
+
+/* 전시매장, 베스트랭킹 - 카테고리 */
+.box-store-category {margin: 0 0 30px 0; border:2px solid #d9d9d9; overflow: hidden;}
+.store-category-list { overflow: hidden; box-sizing: border-box; margin: 0 0 -2px 0; background: url(../images/store_category_bg.png) repeat left top;}
+.store-category-list .store-name{float:left; display: inline-table; width:212px; height:88px; /* border-bottom:2px solid #d9d9d9; */ position: relative; }
+.store-category-list .store-name:nth-of-type(3n) {width:214px;}
+.store-category-list a {display:table-cell; vertical-align: middle; width:100%; height:100%; font-size:20px; text-align:center; color:#999; white-space:nowrap;}
+.store-category-list .title a,
+.store-category-list .on a {color: #fd5490; font-weight:700; font-size:22px;}
+.store-category-list a:hover,
+.store-category-list a:focus {color: #fd5490}
+
+/* 관련키워드 */
+.contain-keyword {margin: 30px 0;}
+.box-hotkeyword {margin: 0 0 30px 0; overflow: hidden;}
+.box-hotkeyword .title {font-size:32px; line-height:46px; margin-bottom: 20px;}
+.keyword {background: #f2f2f2; margin: 0 16px 10px 0px}
+.keyword a {color: #999; font-size: 18px; padding: 10px 25px; line-height:27px;}
+
+/* 키워드선택 결과 */
+.box-hotkeyword-result {width:100%; margin: 0 auto 60px; overflow: hidden; text-align: center;}
+.box-hotkeyword-result .keyword {float: none;}
+.box-hotkeyword-result .keyword a {font-size:32px; line-height:48px; padding: 8px 30px;}
+
+/* 베스트랭킹 */
+.contain-bestranking {padding: 60px 0;}
+.contain-bestranking > .box-store-list.array5-best dl {height:450px;}
+
+/* 래디플래너 전용상품 표시 */
+.product-prp-parent { display: flex; align-content: center; align-items: flex-start; }
+.product-prp-text { width: 25%; color: #007AFF; font-size: 12px; margin: 0 10px; }
+
+
+
+
+
+
+

@@ -1,0 +1,80 @@
+package web.naver.api.service.impl;
+
+import java.nio.charset.Charset;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import egovframework.rte.fdl.property.EgovPropertyService;
+import web.naver.api.model.NaverApiShortenUrlResult;
+import web.naver.api.service.NaverApiService;
+
+/**
+ * <pre>
+ * &#64;PackageName: web.naver.api.service.impl
+ * &#64;FileName : NaverApiServiceImpl.java
+ * &#64;Date : 2020. 5. 22.
+ * &#64;프로그램 설명 : 네이버 API 서비스
+ * &#64;author upleat
+ * </pre>
+ */
+@Service("naverApiService")
+public class NaverApiServiceImpl implements NaverApiService {
+
+    @Resource(name = "naverPropertiesService")
+    private EgovPropertyService properties;
+
+    /**
+     * <pre>
+     * 1. MethodName : getShortenUrl
+     * 2. ClassName  : NaverApiServiceImpl.java
+     * 3. Comment    : 네이버 단축 URL 생성
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 22.
+     * </pre>
+     *
+     * @see web.naver.api.service.NaverApiService#getShortenUrl(java.lang.String)
+     * @param url
+     */
+    @Override
+    public String getShortenUrl(String url) {
+
+        try {
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(new MediaType("application", "x-www-form-urlencoded", Charset.forName("UTF-8")));
+            headers.add("X-Naver-Client-Id", this.properties.getString("naver.api.client.id"));
+            headers.add("X-Naver-Client-Secret", this.properties.getString("naver.api.client.secret"));
+            LinkedMultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+            map.add("url", url);
+            HttpEntity<MultiValueMap<String, String>> requestBody = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+            // HTTP 요청
+            String responseBody = new RestTemplate().postForEntity(this.properties.getString("naver.api.shortenurl.url"), requestBody, String.class).getBody();
+
+            // 결과
+            NaverApiShortenUrlResult result = new ObjectMapper().readValue(responseBody, NaverApiShortenUrlResult.class);
+            if ("ok".equals(result.getMessage())) {
+                return result.getResult().getUrl();
+            } else {
+                return "";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            NaverApiShortenUrlResult result = new NaverApiShortenUrlResult();
+            result.setMessage("error");
+            return "";
+        }
+    }
+
+}

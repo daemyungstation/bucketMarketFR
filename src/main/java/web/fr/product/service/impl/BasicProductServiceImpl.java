@@ -1,0 +1,392 @@
+package web.fr.product.service.impl;
+
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import common.code.Code;
+import common.code.CookieName;
+import common.code.Product;
+import common.dao.CommonDefaultDAO;
+import common.exception.CustomHandleException;
+import common.model.Request;
+import common.model.User;
+import common.session.SessionsUser;
+import common.util.CookieUtil;
+import common.util.DeviceUtil;
+import common.util.StringUtil;
+import lombok.extern.log4j.Log4j2;
+import web.fr.board.service.CommentBoardService;
+import web.fr.common.service.CommonFileService;
+import web.fr.display.service.BannerDisplayService;
+import web.fr.planner.service.PlannerCommonService;
+import web.fr.product.service.BasicProductService;
+import web.fr.product.service.ProductImageService;
+import web.fr.product.service.ProductNotificationInfoService;
+import web.fr.product.service.ProductQnAService;
+import web.fr.product.service.ProductTemplateService;
+
+@Log4j2
+@Service("basicProductService")
+public class BasicProductServiceImpl implements BasicProductService {
+
+    @Resource(name = "defaultDAO")
+    private CommonDefaultDAO defaultDAO;
+
+    @Resource(name = "commonFileService")
+    private CommonFileService commonFileService;
+
+    @Resource(name = "bannerDisplayService")
+    private BannerDisplayService bannerDisplayService;
+
+    @Resource(name = "productImageService")
+    private ProductImageService productImageService;
+
+    @Resource(name = "productNotificationInfoService")
+    private ProductNotificationInfoService productNotificationInfoService;
+
+    @Resource(name = "productTemplateService")
+    private ProductTemplateService productTemplateService;
+
+    @Resource(name = "productQnAService")
+    private ProductQnAService productQnAService;
+
+    @Resource(name = "commentBoardService")
+    private CommentBoardService commentBoardService;
+
+    @Resource(name = "plannerCommonService")
+    private PlannerCommonService plannerCommonService;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectBasicProductListCount
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품  > 목록 개수
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @see web.fr.product.service.BasicProductService#selectBasicProductListCount(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public int selectBasicProductListCount(Map<String, Object> commandMap) throws Exception {
+        return defaultDAO.selectCount("BasicProduct.selectBasicProductListCount", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectBasicProductList
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품  > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @see web.fr.product.service.BasicProductService#selectBasicProductList(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectBasicProductList(Map<String, Object> commandMap) throws Exception {
+        return (List<Map<String, Object>>) defaultDAO.selectList("BasicProduct.selectBasicProductList", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : validBasicProduct
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품 상세 > 유효성 검증
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @param PRD_MST_NO
+     * @throws Exception
+     */
+    private void validBasicProduct(String PRD_MST_NO) throws Exception {
+        if ("".equals(PRD_MST_NO)) {
+            throw new CustomHandleException(Product.ERROR.E499);
+        }
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : validBasicProduct
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품 상세 > 유효성 검증
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @param info
+     * @throws Exception
+     */
+    private void validBasicProduct(Map<String, Object> info) throws Exception {
+        if (info == null) {
+            throw new CustomHandleException(Product.ERROR.E404);
+        }
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : getProductQnAInfo
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품 상세 > 상품 QnA 정보를 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param PRD_MST_NO
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> getProductQnAInfo(String PRD_MST_NO) throws Exception {
+        Map<String, Object> commandMap = new HashMap<>();
+        commandMap.put("searchPrdMstNo", PRD_MST_NO);
+
+        Map<String, Object> returnMap = new HashMap<>();
+        // 상품 QnA 전체 개수
+        returnMap.put("productQnACount", productQnAService.selectProductQnAListCount(commandMap));
+
+        commandMap.put("startNum", 1);
+        if (DeviceUtil.isNormal()) {
+            commandMap.put("endNum", 20);
+        } else {
+            commandMap.put("endNum", 3);
+        }
+        commandMap.put("searchPrdQnADspYn", "Y");
+        // 상품 QnA 목록
+        returnMap.put("productQnAList", productQnAService.selectProductQnAList(commandMap));
+        return returnMap;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : getCommentBoardInfo
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품 상세 > 가입후기 정보를 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 28.
+     * </pre>
+     *
+     * @param PRD_MST_NO
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> getCommentBoardInfo(String PRD_MST_NO) throws Exception {
+        Map<String, Object> commandMap = new HashMap<>();
+        commandMap.put("searchPrdMstNo", PRD_MST_NO);
+
+        Map<String, Object> returnMap = new HashMap<>();
+        commandMap.put("searchPrdRevBstYn", "Y");
+        int commentBoardBestCount = commentBoardService.selectCommentBoardListCount(commandMap);
+        // BEST 가입 후기 목록 개수
+        returnMap.put("commentBoardBestCount", commentBoardBestCount);
+        if (commentBoardBestCount > 0) {
+            commandMap.put("startNum", 1);
+            commandMap.put("endNum", 10);
+            // BEST 가입 후기 목록
+            returnMap.put("commentBoardBestList", commentBoardService.selectCommentBoardList(commandMap));
+            
+        }
+        commandMap.put("searchPrdRevBstYn", "N");
+        int commentBoardCount = commentBoardService.selectCommentBoardListCount(commandMap);
+        // 일반 가입후기 목록 개수
+        returnMap.put("commentBoardCount", commentBoardCount);
+        if (commentBoardCount > 0) {
+            if (!DeviceUtil.isNormal()) {
+                commandMap.put("startNum", 1);
+                commandMap.put("endNum", 0);
+            }
+            // 일반 가입후기 목록
+            returnMap.put("commentBoardList", commentBoardService.selectCommentBoardList(commandMap));
+        }
+        return returnMap;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : setLatelyBasicProductNo
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품상세 > 최근 본 상품 > 쿠키 저장
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @param request
+     * @param response
+     * @param PRD_MST_NO
+     * @throws Exception
+     */
+    private void setLatelyBasicProductNo(HttpServletRequest request, HttpServletResponse response, String PRD_MST_NO) throws Exception {
+        CookieUtil cookieUtil = new CookieUtil(request);
+        String cookieValue = "";
+        if (cookieUtil.isExist(CookieName.LATELY_PRODUCT_LIST_NM)) {
+            Cookie cookie = cookieUtil.getCookie(CookieName.LATELY_PRODUCT_LIST_NM);
+            cookieValue = cookie.getValue();
+            log.debug("PRD_MST_NO : [{}]", PRD_MST_NO);
+            log.debug("LATELY_PRODUCT_NO : [{}]", cookieValue);
+            if (!cookieValue.contains(PRD_MST_NO)) {
+                String[] tempPrdMstNoArray = cookie.getValue().split("-");
+                String[] prdMstNoArray = new String[tempPrdMstNoArray.length + 1];
+                for (int i = 0; i < tempPrdMstNoArray.length; i++) {
+                    prdMstNoArray[i] = tempPrdMstNoArray[i];
+                }
+                prdMstNoArray[tempPrdMstNoArray.length] = PRD_MST_NO;
+                cookieValue = String.join("-", prdMstNoArray);
+                log.debug("cookieValue : [{}]", cookieValue);
+
+            }
+        } else {
+            cookieValue = PRD_MST_NO;
+        }
+        response.addCookie(CookieUtil.createCookie(CookieName.LATELY_PRODUCT_LIST_NM, URLEncoder.encode(cookieValue, "UTF-8"), "/", (365 * 24 * 60 * 60)));
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectBasicProductInfo
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품상세 > 상세정보
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 13.
+     * </pre>
+     *
+     * @see web.fr.product.service.BasicProductService#selectBasicProductInfo(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectBasicProductInfo(Map<String, Object> commandMap) throws Exception {
+        return (Map<String, Object>) defaultDAO.select("BasicProduct.selectBasicProductInfo", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectBasicProductOptionList
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품상세 > 옵션 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 27.
+     * </pre>
+     *
+     * @see web.fr.product.service.BasicProductService#selectBasicProductOptionList(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectBasicProductOptionList(Map<String, Object> commandMap) throws Exception {
+        return (List<Map<String, Object>>) defaultDAO.selectList("BasicProduct.selectBasicProductOptionList", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectBasicProductInfo
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품상세 > 상세정보
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @see web.fr.product.service.BasicProductService#selectBasicProductInfo(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse, java.util.Map)
+     * @param request
+     * @param response
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectBasicProductInfo(HttpServletRequest request, HttpServletResponse response, Map<String, Object> commandMap) throws Exception {
+        Map<String, Object> returnMap = new HashMap<>();
+        String PRD_MST_NO = StringUtil.getString(commandMap, "PRD_MST_NO", "");
+        validBasicProduct(PRD_MST_NO);
+        // 상품 상세정보 조회
+        Map<String, Object> info = selectBasicProductInfo(commandMap);
+        validBasicProduct(info);
+        // 최근본 상품 쿠키 저장
+        setLatelyBasicProductNo(request, response, PRD_MST_NO);
+        returnMap.put("info", info);
+        // 배너 목록
+        returnMap.put("bannerList", bannerDisplayService.selectBannerDisplayList("BANNER_PRODUCT_VIEW"));
+        // 유형별 소개
+        returnMap.put("typeInfo", productTemplateService.selectProductTemplateTypeInfo(commandMap));
+        // 라이프 서비스 목록
+        returnMap.put("lifeServiceList", productTemplateService.selectProductTemplateLifeServiceList(commandMap));
+        // 멤버쉽 정보
+        returnMap.put("membershipInfo", productTemplateService.selectProductTemplateMembershipInfo(commandMap));
+        // 상품 이미지 목록
+        returnMap.put("imageList", productImageService.selectProductImageList(commandMap));
+        // 상품 오디오 정보
+        commandMap.put("CMM_FLE_TB_NM", "C_PRD_MST");
+        returnMap.put("fileInfo", commonFileService.selectCommonFileInfo(commandMap));
+        commandMap.remove("CMM_FLE_TB_NM");
+        // 상품 고시정보 목록
+        returnMap.put("notificationInfoList", productNotificationInfoService.selectProductNotificationInfoList(commandMap));
+        // 상품 옵션 사용 여부 
+        if ("Y".equals(StringUtil.getString(info, "PRD_MST_OPT_YN", "N"))) {
+            returnMap.put("optionList", selectBasicProductOptionList(commandMap));
+        }
+        // 상품 Q&A 노출 여부
+        if ("Y".equals(StringUtil.getString(info, "PRD_MST_QNA_YN", "N")) && !DeviceUtil.isNormal()) {
+            returnMap.putAll(getProductQnAInfo(PRD_MST_NO));
+        }
+        // 가입후기 노출 여부
+        if ("Y".equals(StringUtil.getString(info, "PRD_MST_REV_YN", "N"))) {
+            returnMap.putAll(getCommentBoardInfo(PRD_MST_NO));
+        }
+        // 연관상품 노출 여부
+        if ("Y".equals(StringUtil.getString(info, "PRD_MST_RLT_YN", "N"))) {
+            returnMap.put("relationList", defaultDAO.selectList("BasicProduct.selectBasicProductRelationList", commandMap));
+        }
+        // 상품 조회수 수정
+        defaultDAO.update("BasicProduct.updateBasicProductReadCount", commandMap);
+        return returnMap;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : setBasicProductPlannerKey
+     * 2. ClassName  : BasicProductServiceImpl.java
+     * 3. Comment    : 프론트 > 상품상세 > 레디플레너 key 값 세션 저장
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 29.
+     * </pre>
+     *
+     * @see web.fr.product.service.BasicProductService#setBasicProductPlannerKey(java.util.Map)
+     * @param commandMap
+     * @throws Exception
+     */
+    public void setBasicProductPlannerKey(Map<String, Object> commandMap) throws Exception {
+        String RDP_MST_NO = StringUtil.getString(commandMap, "plannerNo", "");
+        commandMap.put("RDP_MST_NO", RDP_MST_NO);
+        if (!"".equals(RDP_MST_NO)) {
+//            commandMap.put("PRP_RDP_MST_NO", RDP_MST_NO);
+            // 플래너 정보 조회
+            Map<String, Object> plannerInfo = this.plannerCommonService.selectPlannerInfoByPlannerNo(commandMap);
+            String RDP_MST_IDX = StringUtil.getString(plannerInfo, "RDP_MST_IDX");
+            // 정상 플래너인 경우에만 세션에 플래너 정보 저장
+            if (plannerInfo != null && StringUtils.isNotBlank(RDP_MST_IDX) && Code.PLANNER_STATE_ACTIVE == StringUtil.getInt(plannerInfo, "RDP_MST_STATE", -1)) {
+                User user = new User();
+                user.setRDP_MST_IDX(RDP_MST_IDX);
+                String sellerName = StringUtil.getString(commandMap, "sellerName", "");
+                if( StringUtils.isNotEmpty(sellerName) ) {
+                    user.setSELLER_NAME(sellerName);
+                }
+                SessionsUser.setSessionUser(Request.getCurrentRequest(), user);
+            }
+        }
+    }
+}

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProductTemplate">
+    <!-- 프론트 > 상품템플릿 > 조건절 -->
+    <sql id="productTemplateWhere">
+        WHERE TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+            )
+    </sql>
+    <!-- 프론트 > 상품템플릿 > 상품유형소개 > 상세정보 -->
+    <resultMap id="resultProductTemplateTypeInfo" type="HashMap">
+        <result property="PRD_TPL_NM" column="PRD_TPL_NM"/>
+        <result property="PRD_TPL_PC_DTL_DSC" column="PRD_TPL_PC_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_TPL_MB_DTL_DSC" column="PRD_TPL_MB_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="selectProductTemplateTypeInfo" parameterType="HashMap" resultMap="resultProductTemplateTypeInfo">
+        /* ProductTemplate.selectProductTemplateTypeInfo */
+        SELECT S1.*
+        FROM (
+            SELECT
+                PT.PRD_TPL_NM,
+                PT.PRD_TPL_PC_DTL_DSC,
+                PT.PRD_TPL_MB_DTL_DSC
+            FROM T_PRD_TPL PT
+            WHERE PRD_TPL_TYPE = '${@common.code.Code@PRODUCT_TYPE}'
+                AND PRD_TPL_YN = 'Y'
+                AND EXISTS (
+                    SELECT *
+                    FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                    <include refid="productTemplateWhere"/>
+                        AND CPM.PRD_MST_TYPE = PT.PRD_TPL_SVC
+                        AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+                )
+            ORDER BY PRD_TPL_REG_DT DESC
+        ) S1
+        WHERE ROWNUM = 1
+    </select>
+    
+    <!-- 프론트 > 상품템플릿 > 라이프서비스 > 목록 -->
+    <resultMap id="resultProductTemplateLifeServiceList" type="HashMap">
+        <result property="PRD_TPL_TYPE" column="PRD_TPL_TYPE"/>
+        <result property="PRD_TPL_SVC" column="PRD_TPL_SVC"/>
+        <result property="PRD_TPL_SVC_NM" column="PRD_TPL_SVC_NM"/>
+        <result property="PRD_TPL_BND_YN" column="PRD_TPL_BND_YN"/>
+        <result property="PRD_TPL_PC_DTL_DSC" column="PRD_TPL_PC_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_TPL_MB_DTL_DSC" column="PRD_TPL_MB_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="selectProductTemplateLifeServiceList" parameterType="HashMap" resultMap="resultProductTemplateLifeServiceList">
+        /* ProductTemplate.selectProductTemplateLifeServiceList */
+        SELECT
+            PT.PRD_TPL_TYPE,
+            PT.PRD_TPL_SVC,
+            (SELECT CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_IDX = PT.PRD_TPL_SVC) AS PRD_TPL_SVC_NM,
+            PT.PRD_TPL_BND_YN,
+            PT.PRD_TPL_PC_DTL_DSC,
+            PT.PRD_TPL_MB_DTL_DSC
+        FROM T_PRD_TPL PT, T_CMM_COM CC
+        WHERE PT.PRD_TPL_SVC = CC.CMN_COM_IDX
+            AND PT.PRD_TPL_TYPE = '${@common.code.Code@LIFE_SERVICE}'
+            AND PT.PRD_TPL_YN = 'Y'
+            AND PT.PRD_TPL_SVC IN (
+                SELECT DISTINCT TRIM(PRD_MST_DSP_SVC) AS PRD_MST_DSP_SVC
+                FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                <include refid="productTemplateWhere"/>
+                    AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+                MODEL 
+                    RETURN UPDATED ROWS
+                    PARTITION BY (ROWNUM RN)
+                    DIMENSION BY (0 POSITION)
+                    MEASURES (PRD_MST_DSP_SVC, NVL(LENGTH(REGEXP_REPLACE(PRD_MST_DSP_SVC, '[^,]+', '')), 0) + 1 NB_MOT)
+                    RULES (PRD_MST_DSP_SVC[FOR POSITION FROM 1 TO NB_MOT[0] INCREMENT 1] = REGEXP_SUBSTR(PRD_MST_DSP_SVC[0], '[^,]+', 1, CV(POSITION)))
+            )
+        ORDER BY CC.CMN_COM_SORT
+    </select>
+    <!-- 프론트 > 상품템플릿 > 멤버쉽 > 상세정보 -->
+    <resultMap id="resultProductTemplateMembershipInfo" type="HashMap">
+        <result property="PRD_TPL_NM" column="PRD_TPL_NM"/>
+        <result property="PRD_TPL_PC_DTL_DSC" column="PRD_TPL_PC_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_TPL_MB_DTL_DSC" column="PRD_TPL_MB_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+    </resultMap>
+    <select id="selectProductTemplateMembershipInfo" parameterType="HashMap" resultMap="resultProductTemplateMembershipInfo">
+        /* ProductTemplate.selectProductTemplateMembershipInfo */
+        SELECT S1.*
+        FROM (
+            SELECT
+                PRD_TPL_NM,
+                PRD_TPL_PC_DTL_DSC,
+                PRD_TPL_MB_DTL_DSC
+            FROM T_PRD_TPL
+            WHERE PRD_TPL_TYPE = '${@common.code.Code@MEMBERSHIP}' 
+                AND PRD_TPL_YN = 'Y'
+            ORDER BY PRD_TPL_REG_DT DESC
+        ) S1
+        WHERE ROWNUM = 1
+    </select>
+</mapper>

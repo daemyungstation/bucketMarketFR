@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlannerFind">
+
+    <!-- 조건절 -->
+    <sql id="plannerFindWhere">
+    </sql>
+    
+    <!-- 플래너 정보 조회 by CI -->
+    <select id="selectPlannerByCi" parameterType="HashMap" resultType="HashMap">
+        /* PlannerFind.selectPlannerByCi */
+        SELECT
+            *
+        FROM 
+            T_RDP_MST
+        WHERE
+            RDP_MST_CI = #{RDP_MST_CI}
+    </select>
+    
+    <!-- 플래너 정보 조회 by 아이디 -->
+    <select id="selectPlannerById" parameterType="HashMap" resultType="HashMap">
+        /* PlannerFind.selectPlannerByIdAndCi */
+        SELECT
+            *
+        FROM 
+            T_RDP_MST
+        WHERE
+            RDP_MST_ID = #{RDP_MST_ID}
+    </select>
+    
+    <!-- 플래너 비밀번호 수정 -->
+    <update id="updatePlannerPassword" parameterType="HashMap">
+        UPDATE 
+            T_RDP_MST
+        SET
+            RDP_MST_PW = #{RDP_MST_PW}
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+</mapper>

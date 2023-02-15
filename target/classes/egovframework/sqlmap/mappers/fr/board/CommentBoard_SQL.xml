@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommentBoard">
+    <!-- 프론트 > 상품 상세/마이페이지 > 가입후기 > 조건절 -->
+    <sql id="commentBoardWhere">
+        <if test="searchPrdMstNo != null and searchPrdMstNo != ''">
+            AND CPM.PRD_MST_NO = #{searchPrdMstNo}
+        </if>
+        <if test="searchPrdRevBstYn != null and searchPrdRevBstYn != ''">
+            AND PR.PRD_REV_BST_YN = #{searchPrdRevBstYn}
+        </if>
+        <if test="ORD_MST_GRP_IDX != null and ORD_MST_GRP_IDX != ''">
+            AND OM.ORD_MST_GRP_IDX = #{ORD_MST_GRP_IDX}
+        </if>
+    </sql>
+
+    <!-- 프론트 > 상품 상세/마이페이지 > 가입후기 > 목록 개수 -->
+    <select id="selectCommentBoardListCount" parameterType="HashMap" resultType="Integer">
+        /* CommentBoard.selectCommentBoardListCount */
+        SELECT COUNT(PRD_REV_IDX)
+        FROM T_PRD_REV PR, T_ORD_MST OM, C_PRD_MST CPM
+        WHERE PR.ORD_MST_IDX = OM.ORD_MST_IDX
+            AND OM.PRD_MST_NO = CPM.PRD_MST_NO
+            AND PR.PRD_REV_USE_YN = 'Y'
+            <include refid="commentBoardWhere"/>
+    </select>
+    <!-- 프론트 > 상품 상세/마이페이지 > 가입후기 > 목록 -->
+    <resultMap id="resultCommentBoardList" type="HashMap">
+        <result property="PRD_REV_IDX" column="PRD_REV_IDX"/>
+        <result property="PRD_REV_PIT" column="PRD_REV_PIT"/>
+        <result property="PRD_REV_CTS" column="PRD_REV_CTS"/>
+        <result property="PRD_REV_RPL" column="PRD_REV_RPL" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_REV_BST_YN" column="PRD_REV_BST_YN"/>
+        <result property="PRD_REV_REG_DT" column="PRD_REV_REG_DT"/>
+        <result property="PRD_REV_UPD_DT" column="PRD_REV_UPD_DT"/>
+        <result property="PRD_REV_UPD_ID" column="PRD_REV_UPD_ID"/>
+        <result property="AUT_MST_VDR_YN" column="AUT_MST_VDR_YN"/>
+        <result property="PRD_MST_NO" column="PRD_MST_NO"/>
+        <result property="PRD_MST_NM" column="PRD_MST_NM"/>
+        <result property="CMM_FLE_WEB_PATH" column="CMM_FLE_WEB_PATH"/>
+        <result property="MEM_NM" column="MEM_NM"/>
+        <result property="SEX" column="SEX"/>
+        <result property="AGE" column="AGE"/>
+    </resultMap>
+    <select id="selectCommentBoardList" parameterType="HashMap" resultMap="resultCommentBoardList">
+        /* CommentBoard.selectCommentBoardList */
+        SELECT
+            S2.PRD_REV_IDX,
+            S2.PRD_REV_PIT,
+            S2.PRD_REV_CTS,
+            S2.PRD_REV_RPL,
+            S2.PRD_REV_BST_YN,
+            S2.PRD_REV_REG_DT,
+            S2.PRD_REV_UPD_DT,
+            S2.PRD_REV_UPD_ID,
+            NVL((
+                SELECT AUT_MST_VDR_YN
+                FROM T_ADM_MST ADM, T_AUT_MST AUT
+                WHERE ADM.ADM_MST_ID = S2.PRD_REV_UPD_ID
+                    AND ADM.AUT_MST_IDX = AUT.AUT_MST_IDX
+                    AND AUT.AUT_MST_VDR_YN = 'Y'
+            ), 'N') AS AUT_MST_VDR_YN,
+            S2.PRD_MST_NO,
+            S2.PRD_MST_NM,
+            S2.CMM_FLE_WEB_PATH,
+            FN_MASKING('USER_NM', (SELECT MEM_NM FROM T_ORD_DLCC OD WHERE OD.ORD_MST_IDX = S2.ORD_MST_IDX)) AS MEM_NM,
+            (SELECT SEX FROM T_ORD_DLCC OD WHERE OD.ORD_MST_IDX = S2.ORD_MST_IDX) AS SEX,
+            FN_AGE((SELECT BRTH_MON_DAY FROM T_ORD_DLCC OD WHERE OD.ORD_MST_IDX = S2.ORD_MST_IDX)) AS AGE
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    PR.PRD_REV_IDX,
+                    OM.ORD_MST_IDX,
+                    PR.PRD_REV_PIT,
+                    PR.PRD_REV_CTS,
+                    PR.PRD_REV_RPL,
+                    PR.PRD_REV_BST_YN,
+                    PR.PRD_REV_REG_DT,
+                    PR.PRD_REV_UPD_DT,
+                    PR.PRD_REV_UPD_ID,
+                    CPM.PRD_MST_NO,
+                    CPM.PRD_MST_NM,
+                    CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH
+                FROM T_PRD_REV PR, T_ORD_MST OM, C_PRD_MST CPM, T_CMM_FLE CF
+                WHERE PR.ORD_MST_IDX = OM.ORD_MST_IDX
+                    AND OM.PRD_MST_NO = CPM.PRD_MST_NO
+                    AND PR.PRD_REV_IDX = CF.CMM_FLE_TB_PK (+)
+                    AND CF.CMM_FLE_TB_NM (+) = 'T_PRD_REV'
+                    AND CF.CMM_FLE_USE_YN (+) = 'Y'
+                    AND PR.PRD_REV_USE_YN = 'Y'
+                    <include refid="commentBoardWhere"/>
+                ORDER BY PRD_REV_REG_DT DESC
+            ) S1
+            WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+        ) S2
+        WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+    </select>
+</mapper>

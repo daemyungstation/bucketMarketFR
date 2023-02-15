@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BasicProduct">
+    <!-- 프론트 > 상품  > 조건절 -->
+    <sql id="basicProductWhere">
+        WHERE TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+                <if test="PRD_CTG_IDX != null and PRD_CTG_IDX != ''">
+                    START WITH PC.PRD_CTG_IDX = #{PRD_CTG_IDX} OR PC.PRD_CTG_UP_IDX = #{PRD_CTG_IDX}
+                    CONNECT BY PRIOR PC.PRD_CTG_IDX = PC.PRD_CTG_UP_IDX
+                </if>
+            )
+    </sql>
+    <!-- 프론트 > 상품  > 검색 조건 -->
+    <sql id="basicProductSearch">
+        <if test="searchPrdMstNoArray != null and searchPrdMstNoArray.length > 0">
+            AND CPM.PRD_MST_NO IN
+            <foreach item="searchPrdMstNo" collection="searchPrdMstNoArray" separator="," open="(" close=")">
+                #{searchPrdMstNo}
+            </foreach>
+        </if>
+        <if test="searchPrdMstNm != null and searchPrdMstNm != ''">
+            AND (
+                UPPER(CPM.PRD_MST_NM) LIKE '%' || UPPER(#{searchPrdMstNm}) || '%'
+                OR UPPER(CPM.PRD_MST_KWD) LIKE '%' || UPPER(#{searchPrdMstNm}) || '%'
+            )
+        </if>
+        <if test="searchPrdMstKwd != null and searchPrdMstKwd != ''">
+            AND UPPER(CPM.PRD_MST_KWD) LIKE '%' || UPPER(REPLACE(#{searchPrdMstKwd}, '#', '')) || '%'
+        </if>
+        <if test="searchCrtKwdIdxArys != null and searchCrtKwdIdxArys.length > 0">
+            <foreach item="searchCrtKwdIdxAry" collection="searchCrtKwdIdxArys">
+            AND EXISTS (
+                SELECT CK.*
+                FROM (
+                    SELECT DISTINCT TRIM(REPLACE(REPLACE(CRT_KWD_RLT, ',', ''), '#', '')) AS CRT_KWD_RLT
+                    FROM T_CRT_KWD
+                    WHERE CRT_KWD_IDX IN
+                    <foreach item="searchCrtKwdIdx" collection="searchCrtKwdIdxAry" open="(" close=")" separator=",">
+                        #{searchCrtKwdIdx}
+                    </foreach>
+                    AND CRT_KWD_RLT <![CDATA[<>]]> ' '
+                    MODEL 
+                        RETURN UPDATED ROWS
+                        PARTITION BY (ROWNUM RN)
+                        DIMENSION BY (0 POSITION)
+                        MEASURES (CRT_KWD_RLT, NVL(LENGTH(REGEXP_REPLACE(CRT_KWD_RLT, '[^,]+', '')), 0) + 1 NB_MOT)
+                        RULES (CRT_KWD_RLT[FOR POSITION FROM 1 TO NB_MOT[0] INCREMENT 1] = REGEXP_SUBSTR(CRT_KWD_RLT[0], '[^,]+', 1, CV(POSITION)))
+                ) CK
+                WHERE CPM.PRD_MST_KWD LIKE '%' || CK.CRT_KWD_RLT || '%'
+            )
+            </foreach>
+        </if>
+    </sql>
+    <!-- 프론트 > 상품  > 정렬 조건 -->
+    <sql id="basicProductOrderBy">
+        <choose>
+            <when test="prdMstOdr != null and prdMstOdr.equals(@common.code.Product@ORDER_BY_REG_DT_DESC)">
+                ORDER BY CPM.PRD_MST_REG_DT DESC
+            </when>
+            <when test="prdMstOdr != null and prdMstOdr.equals(@common.code.Product@ORDER_BY_MON_REL_AMT_DESC)">
+                ORDER BY VPM.MON_REL_AMT DESC, CPM.PRD_MST_SRT ASC, CPM.PRD_MST_HITS DESC
+            </when>
+            <when test="prdMstOdr != null and prdMstOdr.equals(@common.code.Product@ORDER_BY_MON_REL_AMT_ASC)">
+                ORDER BY VPM.MON_REL_AMT ASC, CPM.PRD_MST_SRT ASC, CPM.PRD_MST_HITS DESC
+            </when>
+            <otherwise>
+                ORDER BY CPM.PRD_MST_SRT ASC, CPM.PRD_MST_HITS DESC
+            </otherwise>
+        </choose>
+    </sql>
+    <!-- 프론트 > 상품  > 목록 개수 -->
+    <select id="selectBasicProductListCount" parameterType="HashMap" resultType="Integer">
+        /* BasicProduct.selectBasicProductListCount */
+        SELECT COUNT(CPM.PRD_MST_NO)
+        FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+        <include refid="basicProductWhere"/>
+        <include refid="basicProductSearch"/>
+    </select>
+    <!-- 프론트 > 상품  > 목록 -->
+    <select id="selectBasicProductList" parameterType="HashMap" resultType="HashMap">
+        /* BasicProduct.selectBasicProductList */
+        SELECT S2.*
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    TPM.PRD_MST_CD,
+                    CPM.PRD_MST_NO,
+                    CPM.PRD_MST_NM,
+                    CPM.PRD_MST_TYPE,
+                    CPM.PRD_MST_BND_YN,
+                    CPM.PRD_MST_SEL_TXT,
+                    CPM.PRD_MST_SPT_TXT,
+                    CPM.PRD_MST_DPL_YN,
+                    VPM.MON_PAY_AMT,
+                    VPM.EXPR_NO,
+                    VPM.REL_AMT,
+                    VPM.REL_CNT,
+                    VPM.MON_REL_AMT,
+                    VM.VDR_MST_NM
+                FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                <include refid="basicProductWhere"/>
+                <include refid="basicProductSearch"/>
+                <include refid="basicProductOrderBy"/>
+            ) S1
+        <if test="endNum != null and endNum != ''">
+            WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+        </if>
+        ) S2
+        <if test="startNum != null and startNum != ''">
+            WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+        </if>
+    </select>
+    <!-- 프론트 > 상품  > 상세정보 -->
+    <resultMap id="resultBasicProductInfo" type="HashMap">
+        <result property="PRD_MST_NO" column="PRD_MST_NO"/>
+        <result property="PRD_MST_NM" column="PRD_MST_NM"/>
+        <result property="PRD_MST_OPT_YN" column="PRD_MST_OPT_YN"/>
+        <result property="PRD_MST_OPT_NM" column="PRD_MST_OPT_NM"/>
+        <result property="PRD_MST_APV_STATE" column="PRD_MST_APV_STATE"/>
+        <result property="PRD_MST_SEL_TXT" column="PRD_MST_SEL_TXT"/>
+        <result property="PRD_MST_SPT_TXT" column="PRD_MST_SPT_TXT"/>
+        <result property="PRD_MST_RTL_PAY" column="PRD_MST_RTL_PAY"/>
+        <result property="PRD_MST_TYPE" column="PRD_MST_TYPE"/>
+        <result property="PRD_MST_BND_YN" column="PRD_MST_BND_YN"/>
+        <result property="PRD_MST_BND_ID" column="PRD_MST_BND_ID"/>
+        <result property="PRD_MST_ISTM_MTH" column="PRD_MST_ISTM_MTH"/>
+        <result property="PRD_MST_ISTM_SPT_PAY" column="PRD_MST_ISTM_SPT_PAY"/>
+        <result property="PRD_MST_DPL_YN" column="PRD_MST_DPL_YN"/>
+        <result property="PRD_MST_QNA_YN" column="PRD_MST_QNA_YN"/>
+        <result property="PRD_MST_REV_YN" column="PRD_MST_REV_YN"/>
+        <result property="PRD_MST_RLT_YN" column="PRD_MST_RLT_YN"/>
+        <result property="PRD_MST_JOIN_LMT" column="PRD_MST_JOIN_LMT"/>
+        <result property="PRD_MST_MAIN_CTRT" column="PRD_MST_MAIN_CTRT"/>
+        <result property="PRD_MST_DSP_SVC" column="PRD_MST_DSP_SVC"/>
+        <result property="PRD_MST_CMS_CD" column="PRD_MST_CMS_CD"/>
+        <result property="PRD_MST_RDP_CMS_CD" column="PRD_MST_RDP_CMS_CD"/>
+        <result property="PRD_MST_IRG_YN" column="PRD_MST_IRG_YN"/>
+        <result property="PRD_MST_PAY_CNT1" column="PRD_MST_PAY_CNT1"/>
+        <result property="PRD_MST_PAY_AMT1" column="PRD_MST_PAY_AMT1"/>
+        <result property="PRD_MST_PAY_CNT2" column="PRD_MST_PAY_CNT2"/>
+        <result property="PRD_MST_PAY_AMT2" column="PRD_MST_PAY_AMT2"/>
+        <result property="PRD_MST_PAY_CNT3" column="PRD_MST_PAY_CNT3"/>
+        <result property="PRD_MST_PAY_AMT3" column="PRD_MST_PAY_AMT3"/>
+        <result property="PRD_MST_CD" column="PRD_MST_CD"/>
+        <result property="PRD_MST_MD" column="PRD_MST_MD"/>
+        <result property="PRD_MST_PC_YTB" column="PRD_MST_PC_YTB" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_MST_MB_YTB" column="PRD_MST_MB_YTB" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_MST_NFI_INF1" column="PRD_MST_NFI_INF1"/>
+        <result property="PRD_MST_NFI_INF2" column="PRD_MST_NFI_INF2"/>
+        <result property="PRD_MST_NFI_INF3" column="PRD_MST_NFI_INF3"/>
+        <result property="PRD_MST_NFI_INF4" column="PRD_MST_NFI_INF4"/>
+        <result property="PRD_MST_NFI_INF5" column="PRD_MST_NFI_INF5"/>
+        <result property="PRD_MST_NFI_INF6" column="PRD_MST_NFI_INF6"/>
+        <result property="PRD_MST_NFI_INF7" column="PRD_MST_NFI_INF7"/>
+        <result property="PRD_MST_NFI_INF8" column="PRD_MST_NFI_INF8"/>
+        <result property="PRD_MST_NFI_INF9" column="PRD_MST_NFI_INF9"/>
+        <result property="PRD_MST_NFI_INF10" column="PRD_MST_NFI_INF10"/>
+        <result property="PRD_MST_NFI_INF11" column="PRD_MST_NFI_INF11"/>
+        <result property="PRD_MST_NFI_INF12" column="PRD_MST_NFI_INF12"/>
+        <result property="PRD_MST_NFI_INF13" column="PRD_MST_NFI_INF13"/>
+        <result property="PRD_MST_NFI_INF14" column="PRD_MST_NFI_INF14"/>
+        <result property="PRD_MST_PC_DTL_DSC" column="PRD_MST_PC_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_MST_MB_DTL_DSC" column="PRD_MST_MB_DTL_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_MST_NTC_DSC" column="PRD_MST_NTC_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_MST_DLV_DSC" column="PRD_MST_DLV_DSC" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PRD_MST_SPL_NM" column="PRD_MST_SPL_NM"/>
+        <result property="PROD_CD" column="PROD_CD"/>
+        <result property="PROD_KIND" column="PROD_KIND"/>
+        <result property="MODEL_CD" column="MODEL_CD"/>
+        <result property="PROD_AMT" column="PROD_AMT"/>
+        <result property="MON_PAY_AMT" column="MON_PAY_AMT"/>
+        <result property="EXPR_NO" column="EXPR_NO"/>
+        <result property="REL_AMT" column="REL_AMT"/>
+        <result property="REL_CNT" column="REL_CNT"/>
+        <result property="MON_REL_AMT" column="MON_REL_AMT"/>
+        <result property="VDR_MST_NM" column="VDR_MST_NM"/>
+        <result property="VDR_MST_DLCC_B2B" column="VDR_MST_DLCC_B2B"/>
+    </resultMap>
+    <select id="selectBasicProductInfo" parameterType="HashMap" resultMap="resultBasicProductInfo">
+        /* BasicProduct.selectBasicProductInfo */
+        SELECT
+            CPM.PRD_MST_NO, CPM.PRD_MST_NM, TPM.PRD_MST_OPT_YN, TPM.PRD_MST_OPT_NM, TPM.PRD_MST_APV_STATE, CPM.PRD_MST_SEL_TXT, CPM.PRD_MST_SPT_TXT,
+            CPM.PRD_MST_RTL_PAY, CPM.PRD_MST_TYPE, CPM.PRD_MST_BND_YN, CPM.PRD_MST_BND_ID, CPM.PRD_MST_ISTM_MTH, CPM.PRD_MST_ISTM_SPT_PAY, CPM.PRD_MST_DPL_YN,
+            CPM.PRD_MST_QNA_YN, CPM.PRD_MST_REV_YN, CPM.PRD_MST_RLT_YN, CPM.PRD_MST_JOIN_LMT, CPM.PRD_MST_MAIN_CTRT, CPM.PRD_MST_DSP_SVC, CPM.PRD_MST_CMS_CD,
+            CPM.PRD_MST_RDP_CMS_CD, CPM.PRD_MST_IRG_YN, CPM.PRD_MST_PAY_CNT1, CPM.PRD_MST_PAY_AMT1, CPM.PRD_MST_PAY_CNT2, CPM.PRD_MST_PAY_AMT2, CPM.PRD_MST_PAY_CNT3,
+            CPM.PRD_MST_PAY_AMT3, TPM.PRD_MST_CD, TPM.PRD_MST_MD, TPM.PRD_MST_PC_YTB, TPM.PRD_MST_MB_YTB, TPM.PRD_MST_NFI_INF1, TPM.PRD_MST_NFI_INF2,
+            TPM.PRD_MST_NFI_INF3, TPM.PRD_MST_NFI_INF4, TPM.PRD_MST_NFI_INF5, TPM.PRD_MST_NFI_INF6, TPM.PRD_MST_NFI_INF7, TPM.PRD_MST_NFI_INF8, TPM.PRD_MST_NFI_INF9,
+            TPM.PRD_MST_NFI_INF10, TPM.PRD_MST_NFI_INF11, TPM.PRD_MST_NFI_INF12, TPM.PRD_MST_NFI_INF13, TPM.PRD_MST_NFI_INF14, TPM.PRD_MST_PC_DTL_DSC, TPM.PRD_MST_MB_DTL_DSC,
+            TPM.PRD_MST_NTC_DSC, TPM.PRD_MST_DLV_DSC, TPM.PRD_MST_SPL_NM, VPM.PROD_CD, VPM.PROD_KIND, VPM.MODEL_CD, VPM.PROD_AMT,
+            VPM.MON_PAY_AMT, VPM.EXPR_NO, VPM.REL_AMT, VPM.REL_CNT, VPM.MON_REL_AMT, VM.VDR_MST_NM, VM.VDR_MST_DLCC_B2B
+        FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+        <include refid="basicProductWhere"/>
+            AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+    </select>
+    <!-- 프론트 > 상품  > 상세 > 옵션 목록 -->
+    <select id="selectBasicProductOptionList" parameterType="HashMap" resultType="HashMap">
+        /* BasicProduct.selectBasicProductOptionList */
+        SELECT
+            PO.PRD_OPT_IDX,
+            PO.PRD_OPT_DTL
+        FROM T_PRD_OPT PO, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+        <include refid="basicProductWhere"/>
+            AND PO.PRD_MST_CD = TPM.PRD_MST_CD
+            AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+            <if test="PRD_OPT_IDXs != null and PRD_OPT_IDXs.length > 0">
+                AND PO.PRD_OPT_IDX IN
+                <foreach item="PRD_OPT_IDX" collection="PRD_OPT_IDXs" open="(" close=")" separator=",">
+                    #{PRD_OPT_IDX}
+                </foreach>
+            </if>
+        ORDER BY PRD_OPT_IDX ASC
+    </select>
+    
+    <!-- 프론트 > 상품  > 상세 > 연관상품 목록 -->
+    <select id="selectBasicProductRelationList" parameterType="HashMap" resultType="HashMap">
+        /* BasicProduct.selectBasicProductRelationList */
+        SELECT
+            CPM.PRD_MST_NO,
+            CPM.PRD_MST_CD,
+            CPM.PRD_MST_NM,
+            CPM.PRD_MST_TYPE,
+            CPM.PRD_MST_BND_YN,
+            CPM.PRD_MST_SEL_TXT,
+            CPM.PRD_MST_SPT_TXT,
+            CPM.PRD_MST_DPL_YN,
+            VPM.MON_PAY_AMT,
+            VPM.EXPR_NO,
+            VPM.REL_AMT,
+            VPM.REL_CNT,
+            VPM.MON_REL_AMT,
+            VM.VDR_MST_NM
+        FROM T_PRD_RLT PR, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+        <include refid="basicProductWhere"/>
+            AND PR.PRD_RLT_MST_NO = CPM.PRD_MST_NO
+            AND PR.PRD_MST_NO = #{PRD_MST_NO}
+        <include refid="basicProductOrderBy"/>
+    </select>
+    <!-- 프론트 > 상품 > 상세 > 조회수 수정 -->
+    <update id="updateBasicProductReadCount" parameterType="HashMap">
+        UPDATE C_PRD_MST SET
+            PRD_MST_HITS = NVL(PRD_MST_HITS, 0) + 1
+        WHERE PRD_MST_NO = #{PRD_MST_NO}
+    </update>
+</mapper>

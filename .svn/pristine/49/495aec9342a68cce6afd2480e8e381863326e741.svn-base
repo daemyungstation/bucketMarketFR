@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProductImage">
+    <!-- 프론트 > 상품  > 이미지 > 조건절 -->
+    <sql id="productImageWhere">
+        WHERE TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+            )
+    </sql>
+    <!-- 프론트 > 상품  > 이미지 > 목록 -->
+    <select id="selectProductImageList" parameterType="HashMap" resultType="HashMap">
+        /* ProductImage.selectProductImageList */
+        SELECT PI.PRD_IMG_URL_PATH
+        FROM T_PRD_IMG PI, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+        <include refid="productImageWhere"/> 
+            AND PI.PRD_PRD_MST_CD = TPM.PRD_MST_CD
+            AND PI.PRD_IMG_GBN IN ('${@common.code.Product@IMG_MAIN}', '${@common.code.Product@IMG_SUB}')
+            AND PI.PRD_IMG_ATT_SIZE = '${@common.code.Product@IMG_MB_TUMBNAIL_SIZE}' 
+            AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+        ORDER BY PI.PRD_IMG_SORT ASC
+    </select>
+</mapper>

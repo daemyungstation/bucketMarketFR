@@ -1,0 +1,244 @@
+package web.fr.myplanner.service.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import common.dao.CommonDefaultDAO;
+import common.session.SessionsPlanner;
+import common.util.StringUtil;
+import web.fr.myplanner.service.MyPlannerPerformanceService;
+
+/**
+ * 
+ * <pre>
+ * &#64;PackageName: web.fr.myplanner.service.impl
+ * &#64;FileName : MyPlannerCampaignServiceImpl.java
+ * &#64;Date : 2020. 5. 18.
+ * &#64;프로그램 설명 : 마이플래너 실적
+ * &#64;author upleat
+ * #529
+ * </pre>
+ */
+@Service("myPlannerPerformanceService")
+public class MyPlannerPerformanceServiceImpl implements MyPlannerPerformanceService {
+
+    @Resource(name = "defaultDAO")
+    private CommonDefaultDAO defaultDAO;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectPerformanceDaily
+     * 2. ClassName  : MyPlannerPerformanceServiceImpl.java
+     * 3. Comment    : 일별 실적 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 21.
+     * </pre>
+     *
+     * @see web.fr.myplanner.service.MyPlannerPerformanceService#selectPerformanceByDaily(java.util.Map)
+     * @param commandMap
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, Object> selectPerformanceByDaily(Map<String, Object> commandMap) {
+        commandMap.put("RDP_MST_IDX", SessionsPlanner.getSessionValue("RDP_MST_IDX"));
+
+        List<Map<String, Object>> list = (List<Map<String, Object>>) this.defaultDAO.selectList("MyPlannerPerformance.selectPerformanceByDaily", commandMap);
+
+        // 차트 데이터 생성
+        long dailyTotalReceipt = 0;
+        long dailyTotalWaitingToJoin = 0;
+        long dailyTotalJoin = 0;
+        long dailyTotalExpectedReturn = 0;
+        List<String> xAxisList = new ArrayList<>();
+        List<Long> receiptList = new ArrayList<>();
+        List<Long> waitingToJoinList = new ArrayList<>();
+        List<Long> joinList = new ArrayList<>();
+        List<Long> expectedReturnList = new ArrayList<>();
+
+        for (Map<String, Object> daily : list) {
+            long dailyReceipt = StringUtil.getLong(daily, "TOTAL_RECEIPT");
+            long dailyWaitingToJoin = StringUtil.getLong(daily, "TOTAL_WAITING_TO_JOIN");
+            long dailyJoin = StringUtil.getLong(daily, "TOTAL_JOIN");
+            long dailyExpectedReturn = StringUtil.getLong(daily, "TOTAL_EXPECTED_RETURN");
+            xAxisList.add(StringUtil.getString(daily, "BASE_DT"));
+            receiptList.add(dailyReceipt);
+            waitingToJoinList.add(dailyWaitingToJoin);
+            joinList.add(dailyJoin);
+            expectedReturnList.add(dailyExpectedReturn);
+        }
+
+        dailyTotalReceipt = receiptList.stream().mapToLong(Long::valueOf).sum();
+        dailyTotalWaitingToJoin = waitingToJoinList.stream().mapToLong(Long::valueOf).sum();
+        dailyTotalJoin = joinList.stream().mapToLong(Long::valueOf).sum();
+        dailyTotalExpectedReturn = expectedReturnList.stream().mapToLong(Long::valueOf).sum();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("dailyTotalReceipt", dailyTotalReceipt);
+        result.put("dailyTotalWaitingToJoin", dailyTotalWaitingToJoin);
+        result.put("dailyTotalJoin", dailyTotalJoin);
+        result.put("dailyTotalExpectedReturn", dailyTotalExpectedReturn);
+        Map<String, Object> data = new HashMap<>();
+        data.put("xAxis", xAxisList);
+        data.put("receipt", receiptList);
+        data.put("waitingToJoin", waitingToJoinList);
+        data.put("join", joinList);
+        result.put("data", data);
+
+        return result;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectPerformanceByMonthly
+     * 2. ClassName  : MyPlannerPerformanceServiceImpl.java
+     * 3. Comment    : 월별 실적 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 3.
+     * </pre>
+     *
+     * @see web.fr.myplanner.service.MyPlannerPerformanceService#selectPerformanceByMonthly(java.util.Map)
+     * @param commandMap
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Map<String, Object> selectPerformanceByMonthly(Map<String, Object> commandMap) {
+        commandMap.put("RDP_MST_IDX", SessionsPlanner.getSessionValue("RDP_MST_IDX"));
+
+        List<Map<String, Object>> list = (List<Map<String, Object>>) this.defaultDAO.selectList("MyPlannerPerformance.selectPerformanceByMonthly", commandMap);
+
+        // 차트 데이터 생성
+        long monthlyTotalReceipt = 0;
+        long monthlyTotalWaitingToJoin = 0;
+        long monthlyTotalJoin = 0;
+        long monthlyTotalExpectedReturn = 0;
+        List<String> xAxisList = new ArrayList<>();
+        List<Long> receiptList = new ArrayList<>();
+        List<Long> waitingToJoinList = new ArrayList<>();
+        List<Long> joinList = new ArrayList<>();
+        List<Long> expectedReturnList = new ArrayList<>();
+
+        for (Map<String, Object> daily : list) {
+            long monthlyReceipt = StringUtil.getLong(daily, "TOTAL_RECEIPT");
+            long monthlyWaitingToJoin = StringUtil.getLong(daily, "TOTAL_WAITING_TO_JOIN");
+            long monthlyJoin = StringUtil.getLong(daily, "TOTAL_JOIN");
+            long monthlyExpectedReturn = StringUtil.getLong(daily, "TOTAL_EXPECTED_RETURN");
+            xAxisList.add(StringUtil.getString(daily, "BASE_DT"));
+            receiptList.add(monthlyReceipt);
+            waitingToJoinList.add(monthlyWaitingToJoin);
+            joinList.add(monthlyJoin);
+            expectedReturnList.add(monthlyExpectedReturn);
+        }
+
+        monthlyTotalReceipt = receiptList.stream().mapToLong(Long::valueOf).sum();
+        monthlyTotalWaitingToJoin = waitingToJoinList.stream().mapToLong(Long::valueOf).sum();
+        monthlyTotalJoin = joinList.stream().mapToLong(Long::valueOf).sum();
+        monthlyTotalExpectedReturn = expectedReturnList.stream().mapToLong(Long::valueOf).sum();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("monthlyTotalReceipt", monthlyTotalReceipt);
+        result.put("monthlyTotalWaitingToJoin", monthlyTotalWaitingToJoin);
+        result.put("monthlyTotalJoin", monthlyTotalJoin);
+        result.put("monthlyTotalExpectedReturn", monthlyTotalExpectedReturn);
+        Map<String, Object> data = new HashMap<>();
+        data.put("xAxis", xAxisList);
+        data.put("receipt", receiptList);
+        data.put("waitingToJoin", waitingToJoinList);
+        data.put("join", joinList);
+        result.put("data", data);
+
+        return result;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectPerformanceByProduct
+     * 2. ClassName  : MyPlannerPerformanceServiceImpl.java
+     * 3. Comment    : 상품별 실적 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 3.
+     * </pre>
+     *
+     * @see web.fr.myplanner.service.MyPlannerPerformanceService#selectPerformanceByProduct(java.util.Map)
+     * @param commandMap
+     * @return
+     */
+    @Override
+    public Map<String, Object> selectPerformanceByProduct(Map<String, Object> commandMap) {
+        commandMap.put("RDP_MST_IDX", SessionsPlanner.getSessionValue("RDP_MST_IDX"));
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", this.defaultDAO.selectList("MyPlannerPerformance.selectPerformanceByProduct", commandMap));
+        return result;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectPerformanceByProductHistory
+     * 2. ClassName  : MyPlannerPerformanceServiceImpl.java
+     * 3. Comment    : 상품별 실적 조회 히스토리
+     * 4. 작성자       : inuscommunity
+     * 5. 작성일       : 2022. 2. 5.
+     * </pre>
+     *
+     * @see web.fr.myplanner.service.MyPlannerPerformanceService#selectPerformanceByProductHistory(java.util.Map)
+     * @param commandMap
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectPerformanceByProductHistory(Map<String, Object> commandMap) {
+        commandMap.put("RDP_MST_IDX", SessionsPlanner.getSessionValue("RDP_MST_IDX"));
+
+        List<Map<String, Object>> list = (List<Map<String, Object>>) this.defaultDAO.selectList("MyPlannerPerformance.selectPerformanceByProductHistory", commandMap);
+        return list;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectPerformanceByProductCounsel
+     * 2. ClassName  : MyPlannerPerformanceServiceImpl.java
+     * 3. Comment    : 상품별 실적 조회 상담내역
+     * 4. 작성자       : inuscommunity
+     * 5. 작성일       : 2022. 2. 5.
+     * </pre>
+     *
+     * @see web.fr.myplanner.service.MyPlannerPerformanceService#selectPerformanceByProductCounsel(java.util.Map)
+     * @param commandMap
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectPerformanceByProductCounsel(Map<String, Object> commandMap) {
+        commandMap.put("RDP_MST_IDX", SessionsPlanner.getSessionValue("RDP_MST_IDX"));
+
+        List<Map<String, Object>> list = (List<Map<String, Object>>) this.defaultDAO.selectList("MyPlannerPerformance.selectPerformanceByProductCounsel", commandMap);
+        return list;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectPerformanceByProductDown
+     * 2. ClassName  : MyPlannerPerformanceServiceImpl.java
+     * 3. Comment    : 상품별 실적 조회 다운
+     * 4. 작성자       : inuscommunity
+     * 5. 작성일       : 2022. 2. 4.
+     * </pre>
+     *
+     * @see web.fr.myplanner.service.MyPlannerPerformanceService#selectPerformanceByProductDown(java.util.Map)
+     * @param commandMap
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> selectPerformanceByProductDown(Map<String, Object> commandMap) {
+        commandMap.put("RDP_MST_IDX", SessionsPlanner.getSessionValue("RDP_MST_IDX"));
+
+        List<Map<String, Object>> list = (List<Map<String, Object>>) this.defaultDAO.selectList("MyPlannerPerformance.selectPerformanceByProductDown", commandMap);
+        return list;
+    }
+}

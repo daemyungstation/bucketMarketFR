@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>대명 아임레디</title>
+    <link rel='stylesheet' type='text/css' href='../css/common.css'>
+    <link rel='stylesheet' type='text/css' href='../css/lib.css'>
+    <link rel='stylesheet' type='text/css' href='../css/promotion.css'>
+    <script src="../js/lib.js"></script>
+    <script src="../js/style.js"></script>
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="../images/favicon.png" type="image/x-icon" />   
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="area-header">
+    <div class="area-inner">
+        <span class="btn-historyback"><button>이전으로</button></span>
+        <h1 class="title">기획전</h1>
+        <span class="btn-search"><button>검색</button></span>
+    </div>
+</header>
+<!-- //헤더 -->
+
+<!-- 본문 -->
+<div class="area-content">
+    <div class="area-inner">
+
+        <div class="contain-event-basis">
+            <div class="box-basis-list">       
+                <a href="#">         
+                    <dl>
+                        <dt>하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 하와이 7박8일 + 신혼가전 전액지원 </dt>
+                        <dd class="data">2020.02.13 ~ 2020.03.31</dd>                    
+                    </dl>
+                    <span class="image"><img src="../images/img_photo_event01.png" alt="기획전 사진" /></span>
+                </a>
+            </div>
+            <div class="box-basis-list">       
+                <a href="#">         
+                    <dl>
+                        <dt>파리 7박8일 + 이사비용 100만원 지원<br /> 서유럽으로 가는 가장 합리적인 방법</dt>
+                        <dd class="data">2020.02.13 ~ 2020.03.31</dd>                    
+                    </dl>
+                    <span class="image"><img src="../images/img_photo_event02.png" alt="기획전 사진" /></span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- //본문 -->
+<!-- 푸터 -->
+<footer class="area-footer">
+    <div class="area-inner">
+        <div class="box-footer-link">
+            <span><a href="#">APP 다운로드</a>
+            <!-- 구글 플레이 / 앱스토어 다운로드 추가 -->
+            </span>
+            <span class="on"><a href="https://www.daemyungimready.com/main/index.do"title="새창열림" target="_blank">대명아임레디</a></span>
+        </div>
+        <div class="box-footer-infolink">
+            <span><button>중요정보고시사항</button></span>
+            <span><button>법적고시</button></span>
+            <span><button><strong>개인정보처리방침</strong></button></span>
+            <span><button>이용약관</button></span>
+            <span class="btn-business">
+                <a href=“tel:전화번호” class="btn-customer">버킷마켓 고객센터 1644-8399</a>
+                <button>사업자정보확인</button>
+            </span>
+        </div>
+        <div class="box-footer-address">
+            <span>서울시 송파구 법원로 135 대명타워</span>
+            <span>(주)대명스테이션  대표이사 서준혁, 최성훈</span>
+            <span>사업자등록번호 220-88-09321  |  통신판매신고번호  제2016-서울송파-0669호</span>
+        </div>
+        <p class="text-copryright">COPYRIGHT DAEMYUNGSTATION.CO,.LTD. ALL RIGHTS RESERVED.</p>
+    </div>
+</footer>
+<!-- //푸터 -->
+<!-- 사이드바 -->
+<aside class="area-aside left">
+    <div class="area-inner">
+        <header class="contain-header">
+            <h1 class="title">버킷마켓</h1>
+            <span class="btn-link-home"><a href="">HOME</a></span>
+            <span class="btn-sidebar-close"><button>닫기</button></span>
+        </header>
+        <div class="box-side1">
+            <dl>
+                <dt>CATEGORY</dt>
+                <dd>
+                    <span class="link1"><a href="">가전렌탈</a></span>
+                    <span class="link2"><a href="">생활쇼핑</a></span>
+                    <span class="link7"><a href="">통신</a></span>
+                    <span class="link3"><a href="">소형가전</a></span>
+                    <span class="link4"><a href="">유아동용품</a></span>
+                    <span class="link5"><a href="">이미용용품</a></span>
+                    <span class="link50"><a href="">라이프스타일</a></span>
+                </dd>
+            </dl>
+        </div>
+        <div class="box-side2">
+            <span class="link1"><a href="">기획전</a></span>
+            <span class="link2"><a href="">이벤트</a></span>
+            <span class="link3"><a href="">베스트랭킹</a></span>
+            <span class="link4"><a href="">가입후기</a></span>
+        </div>
+        <div class="box-side3">
+            <span class="link1"><a href="">최근본상품</a></span>
+            <span class="link2"><a href="">고객센터</a></span>
+        </div>
+
+    </div>
+</aside>
+<!-- //사이드바 -->
+<!-- 하단 탭바 -->
+<aside class="area-aside bottom">
+    <div class="area-inner">
+        <div class="contain-tabbar">
+            <span class="btn-tabbar1"><button>카테고리</button></span> <!-- 하단 탭바 활성화시 on추가 / ex) class="btn-tabbar1 on" -->
+            <span class="btn-tabbar2"><button>추천</button></span>            
+            <span class="btn-tabbar3"><a href="">홈</a></span>                       
+            <span class="btn-tabbar4"><a href="">레디플래너</a></span>
+            <span class="btn-tabbar5"><a href="">My계약</a></span> 
+        </div>
+    </div>
+</aside>
+<!-- //하단 탭바 -->
+
+<!-- 플로팅 버튼 -->
+<div class="area-floating">
+    <span class="btn-topancher"><button>TOP</button></span>
+    <span class="btn-favview"><button>최근 본 상품</button></span>
+    <span class="btn-chatbot"><button>챗봇</button></span>
+</div>
+<!-- //플로팅 버튼 -->
+
+<script src="../js/dom.js"></script>
+
+</body>
+</html>

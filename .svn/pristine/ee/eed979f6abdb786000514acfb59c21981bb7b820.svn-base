@@ -1,0 +1,365 @@
+########################### Common ###########################
+# 500 ERROR
+common.error.default=/common/error/error.do
+# 404, 403 ERROR
+common.error.not.found=/common/error/errorNotFund.do
+# \ub85c\uadf8\uc778 \uc138\uc158 \ub9cc\ub8cc ERROR
+common.error.authentication=/common/error/errorAuthentication.do
+# url mapping
+common.url.list.ajax=/common/urlListAjax.do
+# \ud30c\uc77c \ub2e4\uc6b4\ub85c\ub4dc
+common.file.download=/common/commonFileDownload.do
+# \ub85c\uadf8\uc778 (ajax)
+common.board.login.ajax=/common/boardLoginAjax.do
+# \ub85c\uadf8\uc778\uc544\uc6c3 (ajax)
+common.board.logout.ajax=/common/boardLogoutAjax.do
+# \ub85c\uadf8\uc778 \ud3fc (layer)
+common.login.form.layer=/fr/common/loginFormLayer.do
+# SNS \uacf5\uc720 (layer)
+common.sns.view.layer=/fr/common/snsShareViewLayer.do
+# \uc6b0\ud3b8\ubc88\ud638 \uac80\uc0c9 \ubaa9\ub85d (layer)
+common.zipcode.list.layer=/fr/common/zipCodeListLayer.do
+# \uc57d\uad00 (layer)
+common.term.view.layer=/fr/common/termViewLayer.do
+# \uc0ac\uc5c5\uc790 \uc815\ubcf4\ud655\uc778 (layer)
+common.ftc.view.layer=/fr/common/ftcViewLayer.do
+# \uc2e4\uba85\ud655\uc778 (ajax)
+common.check.bank.account.ajax=/fr/common/checkBankAccountAjax.do
+# \uacc4\uc88c\ud655\uc778 (ajax)
+common.check.ssn.ajax=/fr/common/checkSsnAjax.do
+# \uc778\uc99d \uc694\uccad \ubc88\ud638 \uc0dd\uc131
+common.oneself.req.num.ajax=/fr/common/oneselfReqNumAjax.do
+# \uc778\uc99d \uc694\uccad \ud30c\ub77c\uba54\ud130 \uc0dd\uc131
+common.oneself.req.ajax=/fr/common/oneselfReqAjax.do
+# \uc778\uc99d \uc694\uccad \ud31d\uc5c5
+common.oneself.req.popup=/fr/common/oneselfReqPopup.do
+# \ubcf8\uc778\uc778\uc99d \uacb0\uacfc
+common.oneself.result=/fr/common/oneselfResult.do
+# \ubcf8\uc778\uc778\uc99d \uacb0\uacfc (ajax)
+common.oneself.result.ajax=/fr/common/oneselfResultAjax.do
+# \uc0c1\ud488\uac80\uc0c9 (layer)
+common.product.search.layer=/fr/common/basicProductSearchLayer.do
+# \uce74\uce74\uc624 \uc804\uc790 \uc11c\uba85 - \uc694\uccad (ajax)
+common.signature.request.ajax=/fr/common/signatureRequestAjax.do
+# \uce74\uce74\uc624 \uc804\uc790 \uc11c\uba85 - \uc0c1\ud0dc\ud655\uc778(ajax)
+common.signature.status.ajax=/fr/common/signatureStatusAjax.do
+# \uacf5\ud1b5 \uac80\uc0c9 
+common.search.list=/fr/common/searchList.do
+########################## 00. Main ##########################
+# \uba54\uc778
+main.index=/fr/main/index.do
+# \uc0c8\ub85c\uc6b4 \ucd94\ucc9c\uc0c1\ud488 \ubcf4\uae30 (ajax)
+main.reload.recommend.product.ajax=/fr/main/reloadRecommendProductAjax.do
+######################## 01. Display #########################
+# \uce74\ud14c\uace0\ub9ac \ubaa9\ub85d (ajax)
+display.category.product.list.ajax=/fr/display/categoryProductDisplayListAjax.do
+# \ubca0\uc2a4\ud2b8 \ub7ad\ud0b9
+display.product.list=/fr/display/productDisplayList.do
+# \ud050\ub808\uc774\uc158
+display.curation.list=/fr/display/curationDisplayList.do
+######################## 02. Product #########################
+# \uc0c1\ud488 \ubaa9\ub85d
+product.basic.list=/fr/product/basicProductList.do
+# \uc0c1\ud488 \ubaa9\ub85d (ajax)
+product.basic.list.ajax=/fr/product/basicProductListAjax.do
+# \uc0c1\ud488 \uc0c1\uc138
+product.basic.view=/fr/product/basicProductView.do
+# \uc0c1\ud488 QnA \ubaa9\ub85d (layer)
+product.qna.list.layer=/fr/product/productQnAListLayer.do
+# \uc0c1\ud488 QnA \ubaa9\ub85d (ajax)
+product.qna.list.ajax=/fr/product/productQnAListAjax.do
+# \uc0c1\ud488 QnA \ub85c\uadf8\uc778 (ajax)
+product.qna.login.ajax=/fr/product/productQnALoginAjax.do
+# \uc0c1\ud488 QnA \ub4f1\ub85d \ud3fc (layer)
+product.qna.form.layer=/fr/product/productQnAFormLayer.do
+# \uc0c1\ud488 QnA \ub4f1\ub85d (ajax)
+product.qna.regist.ajax=/fr/product/productQnARegistAjax.do
+##################### 03. SpecialStore #######################
+####################### 04. Marketing ########################
+# \uae30\ud68d\uc804 \ubaa9\ub85d
+marketing.plan.list=/fr/marketing/planList.do
+# \uae30\ud68d\uc804 \uc0c1\uc138
+marketing.plan.view=/fr/marketing/planView.do
+# \uae30\ud68d\uc804 \ub313\uae00 \ubaa9\ub85d (ajax)
+marketing.plan.reply.list.ajax=/fr/marketing/planReplyListAjax.do
+# \uae30\ud68d\uc804 \ub313\uae00 \uc0c1\uc138 (ajax)
+marketing.plan.reply.info.ajax=/fr/marketing/planReplyInfoAjax.do
+# \uae30\ud68d\uc804 \ub313\uae00 \ub85c\uadf8\uc778 (ajax)
+marketing.plan.reply.login.ajax=/fr/marketing/planReplyLoginAjax.do
+# \uae30\ud68d\uc804 \ub313\uae00 \ub4f1\ub85d \ud3fc (layer)
+marketing.plan.reply.form.layer=/fr/marketing/planReplyFormLayer.do
+# \uae30\ud68d\uc804 \ub313\uae00 \uc218\uc815 \ud3fc (layer)
+marketing.plan.reply.edit.layer=/fr/marketing/planReplyEditLayer.do
+# \uae30\ud68d\uc804 \ub313\uae00 \ub4f1\ub85d (ajax)
+marketing.plan.reply.regist.ajax=/fr/marketing/planReplyRegistAjax.do
+# \uae30\ud68d\uc804 \ub313\uae00 \uc218\uc815 (ajax)
+marketing.plan.reply.modify.ajax=/fr/marketing/planReplyModifyAjax.do
+# \uae30\ud68d\uc804 \ub313\uae00 \uc0ad\uc81c (ajax)
+marketing.plan.reply.remove.ajax=/fr/marketing/planReplyRemoveAjax.do
+# \uc774\ubca4\ud2b8 \ubaa9\ub85d
+marketing.event.list=/fr/marketing/eventList.do
+# \uc774\ubca4\ud2b8 \uc0c1\uc138
+marketing.event.view=/fr/marketing/eventView.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \ubaa9\ub85d (ajax)
+marketing.event.reply.list.ajax=/fr/marketing/eventReplyListAjax.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \uc0c1\uc138 (ajax)
+marketing.event.reply.info.ajax=/fr/marketing/eventReplyInfoAjax.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \ub85c\uadf8\uc778 (ajax)
+marketing.event.reply.login.ajax=/fr/marketing/eventReplyLoginAjax.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \ub4f1\ub85d \ud3fc (layer)
+marketing.event.reply.form.layer=/fr/marketing/eventReplyFormLayer.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \uc218\uc815 \ud3fc (layer)
+marketing.event.reply.edit.layer=/fr/marketing/eventReplyEditLayer.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \ub4f1\ub85d (ajax)
+marketing.event.reply.regist.ajax=/fr/marketing/eventReplyRegistAjax.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \uc218\uc815 (ajax)
+marketing.event.reply.modify.ajax=/fr/marketing/eventReplyModifyAjax.do
+# \uc774\ubca4\ud2b8 \ub313\uae00 \uc0ad\uc81c (ajax)
+marketing.event.reply.remove.ajax=/fr/marketing/eventReplyRemoveAjax.do
+######################## 05. Planner #########################
+# \ud50c\ub798\ub108 \ub85c\uadf8\uc778
+planner.login.form=/fr/planner/plannerLoginForm.do
+# \ud50c\ub798\ub108 \ub85c\uadf8\uc544\uc6c3
+planner.logout=/fr/planner/plannerLogout.do
+# \ud50c\ub798\ub108 \uc544\uc774\ub514/\ube44\ubc00\ubc88\ud638\ub85c \ub85c\uadf8\uc778
+planner.login.byIdPw=/fr/planner/plannerLoginByIdPw.do
+# \ud50c\ub798\ub108 \ubc88\ud638\ub85c \ub85c\uadf8\uc778
+planner.login.byPlannerNo=/fr/planner/plannerLoginByPlannerNo.do
+# \ud50c\ub798\ub108 \uc544\uc774\ub514 \ucc3e\uae30
+planner.find.id.form=/fr/planner/plannerFindIdForm.do
+# \ud50c\ub798\ub108 \uc544\uc774\ub514 \ucc3e\uae30 \uc694\uccad
+planner.find.id.find=/fr/planner/plannerFindIdFind.do
+# \ud50c\ub798\ub108 \uc544\uc774\ub514 \ucc3e\uae30 \uacb0\uacfc
+planner.find.id.result.view=/fr/planner/plannerFindIdResultView.do
+# \ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \ucc3e\uae30
+planner.find.pw.form=/fr/planner/plannerFindPwForm.do
+# \ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \ucc3e\uae30 \uc694\uccad
+planner.find.pw.find=/fr/planner/plannerFindPwFind.do
+# \ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \uacb0\uacfc & \ube44\ubc00\ubc88\ud638 \ubcc0\uacbd
+planner.find.pw.reset.form=/fr/planner/plannerFindPwResetForm.do
+# \ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \ubcc0\uacbd \uc694\uccad
+planner.find.pw.reset.password=/fr/planner/plannerFindPwResetPassword.do
+# \ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \ubcc0\uacbd \uacb0\uacfc
+planner.find.pw.reset.result.view=/fr/planner/plannerFindPwResetResultView.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (1/5) \uc57d\uad00 \ub3d9\uc758 \ubc0f \ubcf8\uc778 \ud655\uc778
+planner.join.step1.form=/fr/planner/plannerJoinStep1Form.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (2/5) \uc2e0\uccad \uc815\ubcf4 \uc785\ub825
+planner.join.step2.form=/fr/planner/plannerJoinStep2Form.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (2/5) \uc7ac\uc2e0\uccad
+planner.join.step2.reapply=/fr/planner/plannerJoinStep2Reapply.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (2/5) \ud50c\ub798\ub108 \uc2e0\uccad
+planner.join.step2.apply=/fr/planner/plannerJoinStep2Apply.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (3/5) \uc2e0\uccad \uc644\ub8cc
+planner.join.step3.form=/fr/planner/plannerJoinStep3Form.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (4/5) \ucd94\uac00\uc815\ubcf4 \uc785\ub825
+planner.join.step4.form=/fr/planner/plannerJoinStep4Form.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (4/5) \ucd94\uac00\uc815\ubcf4 \uc785\ub825
+planner.join.step4.updateInfo=/fr/planner/updateAdditionalInfo.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (5/5) \uad50\uc721 \uc774\uc218
+planner.join.step5.form=/fr/planner/plannerJoinStep5Form.do
+# \ud50c\ub798\ub108 \uac00\uc785 - (5/5) \uad50\uc721 \uc774\uc218 \uc644\ub8cc
+planner.join.step5.updateQuiz=/fr/planner/updateQuizComplete.do
+# \ud50c\ub798\ub108 \uac00\uc785 - \uc544\uc774\ub514 \uc911\ubcf5 \ud655\uc778
+planner.join.checkIdDuplicate.ajax=/fr/planner/checkIdDuplicateAjax.do
+# \ud50c\ub798\ub108 \uac00\uc785 - \ud64d\ubcf4\uc0ac\uc774\ud2b8 \uc911\ubcf5 \ud655\uc778
+planner.join.checkSiteDuplicate.ajax=/fr/planner/checkSiteDuplicateAjax.do
+# \ud50c\ub798\ub108 \uac00\uc785 - \uc2e4\uba85\uc778\uc99d \ud655\uc778
+planner.join.checkSsn.ajax=/fr/planner/checkSsnAjax.do
+# \ud50c\ub798\ub108 \uac00\uc785 - \uacc4\uc88c \ud655\uc778
+planner.join.checkBankAccount.ajax=/fr/planner/checkBankAccountAjax.do
+####################### 06. Contract #########################
+# \uac00\uc785\uacb0\uc81c - (1/3) \uac00\uc785\uc815\ubcf4 \uc785\ub825
+contract.join.step1.form=/fr/contract/joinStep1Form.do
+# \uac00\uc785\uacb0\uc81c - (2/3) \uc57d\uad00\ub3d9\uc758
+contract.join.step2.form=/fr/contract/joinStep2Form.do
+# \uac00\uc785\uacb0\uc81c - (2/3) \ubcf8\uc778\ud655\uc778 \uc644\ub8cc
+contract.join.step2.complete=/fr/contract/joinStep2Complete.do
+# \uac00\uc785\uacb0\uc81c - (3/3) \uacb0\uc81c
+contract.join.step3.form=/fr/contract/joinStep3Form.do
+# \uac00\uc785\uacb0\uc81c - \uac00\uc785\uc815\ubcf4 \uc138\uc158 \uc800\uc7a5 (ajax)
+contract.join.form.save.ajax=/fr/contract/joinFormSaveAjax.do
+# \uac00\uc785\uacb0\uc81c - \uac00\uc785\uc815\ubcf4 \uc138\uc158 \uc815\ubcf4 \uc874\uc7ac \uc720\ubb34 (ajax)
+contract.join.data.exists.ajax=/fr/contract/joinFormDataExistsAjax.do
+# \uac00\uc785 \uc815\ubcf4 \ub4f1\ub85d
+contract.join.regist=/fr/contract/joinRegist.do
+# \uac00\uc785\uc644\ub8cc
+contract.join.complete.view=/fr/contract/joinCompleteView.do
+###################### 07. MyContract ########################
+# \ub9c8\uc774\uacc4\uc57d - \uba54\uc778
+mycontract.index=/fr/mycontract/index.do
+# \ub9c8\uc774\uacc4\uc57d - \ubcf8\uc778\ud655\uc778 \uc548\ub0b4
+mycontract.oneself.form=/fr/mycontract/oneselfForm.do
+# \ub9c8\uc774\uacc4\uc57d - \ub85c\uadf8\uc544\uc6c3
+mycontract.login=/fr/mycontract/login.do
+# \ub9c8\uc774\uacc4\uc57d - \ub85c\uadf8\uc544\uc6c3
+mycontract.logout=/fr/mycontract/logout.do
+# \ub9c8\uc774\uacc4\uc57d - \uac00\uc785\ub0b4\uc5ed \uc870\ud68c
+mycontract.info.list.view=/fr/mycontract/infoListView.do
+# \ub9c8\uc774\uacc4\uc57d - \uac00\uc785\ub0b4\uc5ed \uc870\ud68c
+mycontract.info.detail.view=/fr/mycontract/infoDetailView.do
+# \ub9c8\uc774\uacc4\uc57d - \uac00\uc785\ud6c4\uae30 \uc791\uc131 (layer)
+mycontract.info.review.layer=/fr/mycontract/infoReviewLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \uac00\uc785\ud6c4\uae30 \uc791\uc131 (ajax)
+mycontract.info.review.ajax=/fr/mycontract/infoReviewAjax.do
+# \ub9c8\uc774\uacc4\uc57d - \ud574\uc9c0 \uc2e0\uccad (layer)
+mycontract.info.contract.cancel.layer=/fr/mycontract/infoContractCancelLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \ud574\uc9c0 \uc2e0\uccad (ajax)
+mycontract.info.contract.cancel.ajax=/fr/mycontract/infoContractCancelAjax.do
+# \ub9c8\uc774\uacc4\uc57d - \uc591\ub3c4/\uc591\uc218 \uc2e0\uccad (layer)
+mycontract.info.contract.transfer.layer=/fr/mycontract/infoContractTransferLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \uc591\ub3c4/\uc591\uc218 \uc2e0\uccad (ajax)
+mycontract.info.contract.transfer.ajax=/fr/mycontract/infoContractTransferAjax.do
+# \ub9c8\uc774\uacc4\uc57d - \ub0a9\uc785/\ud658\uae09\uae08 \uc870\ud68c
+mycontract.paymentrefund.list.view=/fr/mycontract/paymentRefundListView.do
+# \ub9c8\uc774\uacc4\uc57d - \ub0a9\uc785\uc0c1\uc138 (layer)
+mycontract.paymentrefund.detail.view.layer=/fr/mycontract/paymentDetailViewLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \ud658\uae09\uae08 \uc870\ud68c (layer)
+mycontract.paymentrefund.refund.view.layer=/fr/mycontract/paymentRefundViewLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \ubc30\uc1a1/\uc9c0\uc6d0\ud61c\ud0dd \uc870\ud68c
+mycontract.shipping.list.view=/fr/mycontract/shippingListView.do
+# \ub9c8\uc774\uacc4\uc57d - \uc9c0\uc6d0\ud61c\ud0dd \uc870\ud68c (layer)
+mycontract.shipping.benefit.view.layer=/fr/mycontract/benefitViewLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \ubc30\uc1a1\uc0c1\ud0dc \uc870\ud68c (layer)
+mycontract.shipping.shipping.view.layer=/fr/mycontract/shippingViewLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \uacb0\uc81c\uc218\ub2e8 \ubcc0\uacbd \uc2e0\uccad
+mycontract.paymentmethod.list.view=/fr/mycontract/paymentMethodListView.do
+# \ub9c8\uc774\uacc4\uc57d - \uce74\ub4dc \uacb0\uc81c\uc218\ub2e8 \ubcc0\uacbd \uc2e0\uccad (layer)
+mycontract.paymentmethod.card.layer=/fr/mycontract/paymentMethodCardLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \uce74\ub4dc \uacb0\uc81c\uc218\ub2e8 \ubcc0\uacbd \uc2e0\uccad (ajax)
+mycontract.paymentmethod.card.ajax=/fr/mycontract/paymentMethodCardAjax.do
+# \ub9c8\uc774\uacc4\uc57d - CMS \uacb0\uc81c\uc218\ub2e8 \ubcc0\uacbd \uc2e0\uccad (layer)
+mycontract.paymentmethod.cms.layer=/fr/mycontract/paymentMethodCmsLayer.do
+# \ub9c8\uc774\uacc4\uc57d - CMS \uacb0\uc81c\uc218\ub2e8 \ubcc0\uacbd \uc2e0\uccad (ajax)
+mycontract.paymentmethod.cms.ajax=/fr/mycontract/paymentMethodCmsAjax.do
+# \ub9c8\uc774\uacc4\uc57d - \ub9f5\ubc84\uc2ed\uce74\ub4dc \uc870\ud68c
+mycontract.membership.list.view=/fr/mycontract/membershipListView.do
+# \ub9c8\uc774\uacc4\uc57d - \ub9f5\ubc84\uc2ed\uce74\ub4dc \uc870\ud68c (layer)
+mycontract.membership.view.layer=/fr/mycontract/membershipViewLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \ub77c\uc774\ud504\uc11c\ube44\uc2a4 \uc2e0\uccad
+mycontract.lifeservice.list.view=/fr/mycontract/lifeServiceListView.do
+# \ub9c8\uc774\uacc4\uc57d - \ub77c\uc774\ud504\uc11c\ube44\uc2a4 \uc2e0\uccad
+mycontract.lifeservice.apply.layer=/fr/mycontract/lifeServiceApplyLayer.do
+# \ub9c8\uc774\uacc4\uc57d - \ub77c\uc774\ud504\uc11c\ube44\uc2a4 \uc2e0\uccad
+mycontract.lifeservice.apply.ajax=/fr/mycontract/lifeServiceApplyAjax.do
+####################### 08. MyPlanner ########################
+# \ub9c8\uc774\ud50c\ub798\ub108 \uba54\uc778
+myplanner.main.view=/fr/myplanner/myplannerMainView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud574\uc81c \uc694\uccad (layer)
+myplanner.release.request.form.layer=/fr/myplanner/myplannerReleaseRequestFormLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud574\uc81c \uc694\uccad (ajax)
+myplanner.release.request.form.ajax=/fr/myplanner/myplannerReleaseRequestFormAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud504\ub85c\ud544 \ube44\ubc00\ubc88\ud638 \uc785\ub825
+myplanner.profile.password.check.form=/fr/myplanner/myplannerProfilePasswordCheckForm.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud504\ub85c\ud544 \ube44\ubc00\ubc88\ud638 \ud655\uc778
+myplanner.profile.password.check.request=/fr/myplanner/myplannerProfilePasswordCheckRequest.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud504\ub85c\ud544 \uc218\uc815
+myplanner.profile.edit=/fr/myplanner/myplannerProfileEdit.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud504\ub85c\ud544 \uc774\ubbf8\uc9c0 \uc5c5\ub85c\ub4dc (ajax)
+myplanner.profile.image.upload.ajax=/fr/myplanner/myplannerProfileImageUploadAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \ubcc0\uacbd \uc694\uccad (layer)
+myplanner.change.password.form.layer=/fr/myplanner/myplannerChangePasswordFormLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ube44\ubc00\ubc88\ud638 \ubcc0\uacbd \uc694\uccad (ajax)
+myplanner.change.password.form.ajax=/fr/myplanner/myplannerChangePasswordFormAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uc5f0\ub77d\ucc98 \ubcc0\uacbd \uc694\uccad (ajax)
+myplanner.change.phone.form.ajax=/fr/myplanner/myplannerChangePhoneFormAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uc815\uc0b0\uacc4\uc88c \ubcc0\uacbd \uc694\uccad (layer)
+myplanner.change.bank.form.layer=/fr/myplanner/myplannerChangeBankFormLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uc815\uc0b0\uacc4\uc88c \ubcc0\uacbd \uc694\uccad (ajax)
+myplanner.change.bank.form.ajax=/fr/myplanner/myplannerChangeBankFormAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uacf5\uc9c0\uc0ac\ud56d \ubaa9\ub85d
+myplanner.notice.list=/fr/myplanner/myplannerNoticeList.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uacf5\uc9c0\uc0ac\ud56d \uc0c1\uc138
+myplanner.notice.view=/fr/myplanner/myplannerNoticeView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \ubaa9\ub85d
+myplanner.community.list=/fr/myplanner/myplannerCommunityList.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \uc0c1\uc138
+myplanner.community.view=/fr/myplanner/myplannerCommunityView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \ub4f1\ub85d
+myplanner.community.form.page=/fr/myplanner/myplannerCommunityFormPage.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \ub4f1\ub85d (layer)
+myplanner.community.form.layer=/fr/myplanner/myplannerCommunityFormLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \ub4f1\ub85d (ajax)
+myplanner.community.form.ajax=/fr/myplanner/myplannerCommunityFormAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \uc218\uc815
+myplanner.community.edit.page=/fr/myplanner/myplannerCommunityEditPage.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \uc218\uc815 (layer)
+myplanner.community.edit.layer=/fr/myplanner/myplannerCommunityEditLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \uc218\uc815 (ajax)
+myplanner.community.edit.ajax=/fr/myplanner/myplannerCommunityEditAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucee4\ubba4\ub2c8\ud2f0 \uc0ad\uc81c
+myplanner.community.remove.ajax=/fr/myplanner/myplannerCommunityRemoveAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ud65c\uc6a9 \uac00\uc774\ub4dc
+myplanner.application.guide.view=/fr/myplanner/myplannerApplicationGuideView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucea0\ud398\uc778 \uc0c1\ud488 \ubaa9\ub85d
+myplanner.campaign.product.list=/fr/myplanner/myplannerCampaignProductList.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ucea0\ud398\uc778 \uc0dd\uc131 (layer)
+myplanner.campaign.create.view.layer=/fr/myplanner/myplannerCampaignCreateViewLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uba54\uc778 \ucea0\ud398\uc778 \uc0dd\uc131 (layer)
+myplanner.campaign.create.main.view.layer=/fr/myplanner/myplannerCampaignCreateMainViewLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc2e4\uc801 \uc870\ud68c
+myplanner.performance.view=/fr/myplanner/myplannerPerformanceView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc2e4\uc801 \uc870\ud68c - \uc77c\ubcc4 (ajax)
+myplanner.performance.daily.list.ajax=/fr/myplanner/myplannerPerformanceDailyListAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc2e4\uc801 \uc870\ud68c - \uc6d4\ubcc4 (ajax)
+myplanner.performance.monthly.list.ajax=/fr/myplanner/myplannerPerformanceMonthlyListAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc2e4\uc801 \uc870\ud68c - \uc0c1\ud488\ubcc4 (ajax)
+myplanner.performance.product.list.ajax=/fr/myplanner/myplannerPerformanceProductListAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc9c0\uae09\ub0b4\uc5ed \uc870\ud68c
+myplanner.payment.view=/fr/myplanner/myplannerPaymentView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc9c0\uae09\ub0b4\uc5ed \uc870\ud68c (ajax)
+myplanner.payment.list.ajax=/fr/myplanner/myplannerPaymentListAjax.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub9ac\uc6cc\ub4dc \uc9c0\uae09\ub0b4\uc5ed \uc0c1\uc138 (layer)
+myplanner.payment.detail.layer=/fr/myplanner/myplannerPaymentDetailLayer.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uc774\uc6a9\uc57d\uad00
+myplanner.use.term.view=/fr/myplanner/myplannerUseTermView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \uc6b4\uc601\uc815\ucc45
+myplanner.manage.term.view=/fr/myplanner/myplannerManageTermView.do
+# \ub9c8\uc774\ud50c\ub798\ub108 \ub808\ub514\ud50c\ub798\ub108 \uc18c\uac1c
+myplanner.introduce.view=/fr/myplanner/myplannerIntroduceView.do
+########################## 09. Board #########################
+# \uacf5\uc9c0\uc0ac\ud56d \ubaa9\ub85d
+board.notice.list=/fr/board/noticeBoardList.do
+# \uacf5\uc9c0\uc0ac\ud56d \uc0c1\uc138
+board.notice.view=/fr/board/noticeBoardView.do
+# FAQ \ubaa9\ub85d
+board.faq.list=/fr/board/faqBoardList.do
+# FAQ \uc870\ud68c\uc218 \uc218\uc815 (ajax)
+board.faq.readcnt.modify.ajax=/fr/board/faqBoardReadCntModifyAjax.do
+# 1:1\ubb38\uc758 \ub4f1\ub85d \ud3fc
+board.inquiry.form=/fr/board/inquiryBoardForm.do
+# 1:1\ubb38\uc758 \ub4f1\ub85d
+board.inquiry.regist.ajax=/fr/board/inquiryRegistAjax.do
+# 1:1\ubb38\uc758 \ub85c\uadf8\uc778 (ajax)
+board.inquiry.login.ajax=/fr/board/inquiryLoginAjax.do
+# 1:1\ubb38\uc758 \ubaa9\ub85d (ajax)
+board.inquiry.list.ajax=/fr/board/inquiryBoardListAjax.do
+# 1:1\ubb38\uc758 \uc870\ud68c\uc218 \uc218\uc815 (ajax)
+board.inquiry.readcnt.modify.ajax=/fr/board/inquiryBoardReadCntModifyAjax.do
+# \uc81c\ud734\ubb38\uc758 \ub4f1\ub85d \ud3fc
+board.contact.us.form=/fr/board/contactUsBoardForm.do
+# \uc81c\ud734\ubb38\uc758 \ub4f1\ub85d (ajax)
+board.contact.us.registAjax=/fr/board/contactUsBoardRegistAjax.do
+# \uac00\uc785\ud6c4\uae30 \ubaa9\ub85d
+board.comment.list=/fr/board/commentBoardList.do
+# \uac00\uc785\ud6c4\uae30 \ubaa9\ub85d (layer)
+board.comment.list.layer=/fr/board/commentBoardListLayer.do
+# \uac00\uc785\ud6c4\uae30 \ubaa9\ub85d (ajax)
+board.comment.list.ajax=/fr/board/commentBoardListAjax.do
+# \uac00\uc785\ud6c4\uae30 \ub4f1\ub85d \ud3fc (layer)
+board.comment.form.layer=/fr/board/commentBoardFormLayer.do
+######################## 10. Contents ########################
+# APP \ub4f1\ub85d \uc774\uc6a9\uc57d\uad00
+contents.terms.use.view=/fr/contents/useTermsView.do
+# APP \ub4f1\ub85d \uac1c\uc778\uc815\ubcf4\ucc98\ub9ac\ubc29\uce68 
+contents.terms.privacy.view=/fr/contents/privacyTermsView.do
+# \ubc84\ud0b7\ub9c8\ucf13 \uc18c\uac1c
+contents.introduction.view=/fr/contents/introductionView.do
+########################### 11. PG ###########################
+# pg \ud638\ucd9c (layer)
+pg.request.layer=/fr/pg/requestLayer.do
+# pg \ud638\ucd9c (ajax)
+pg.request.ajax=/fr/pg/requestAjax.do
+# pg \uc778\uc99d \uacb0\uacfc(pc)
+pg.request.pc.result=/fr/pg/requestPcResult.do
+# pg \uc778\uc99d \uacb0\uacfc(mobile)
+pg.request.mb.result=/fr/pg/requestMbResult.do

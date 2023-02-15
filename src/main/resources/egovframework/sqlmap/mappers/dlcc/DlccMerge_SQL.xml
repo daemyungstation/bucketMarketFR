@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DlccMergeMapper">
+    
+    <insert id="mergeOrderDtl" parameterType="web.fr.dlcc.model.OrderDtlModel">
+        /* DlccMergeMapper.mergeOrderDtl */
+        MERGE INTO V_ORD_DTL
+            USING DUAL
+               ON (ORD_MST_IDX = #{ordMstIdx} AND PAY_NO = #{payNo})
+            WHEN MATCHED THEN
+            
+                UPDATE SET 
+                      RESN_AMT = #{resnAmt}
+                    , ORD_DTL_UPD_DT = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+                    
+            WHEN NOT MATCHED THEN
+            
+                INSERT (
+                     ORD_MST_IDX
+                   , PAY_NO
+                   , ACCNT_NO
+                   , PAY_DAY
+                   , PAY_AMT
+                   , PAY_AMT1
+                   , PAY_AMT2
+                   , PAY_MTHD
+                   , PAY_SUM
+                   , RESN_AMT
+                   , ORD_DTL_REG_DT
+                ) 
+                VALUES ( 
+                     #{ordMstIdx}
+                   , #{payNo}
+                   , #{accntNo}
+                   , #{payDay}
+                   , #{payAmt}
+                   , #{payAmt1}
+                   , #{payAmt2}
+                   , #{payMthd}
+                   , #{paySum}
+                   , #{resnAmt}
+                   , TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+                )
+    </insert>
+    
+</mapper>

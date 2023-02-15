@@ -1,0 +1,74 @@
+package common.util.renderer;
+
+import java.util.Map;
+
+import common.code.Code;
+import common.code.Product;
+import common.util.FormatUtil;
+import common.util.StringUtil;
+
+public class ProductListRender {
+
+    
+    
+    /**
+     * <pre>
+     * 1. MethodName : renderProductListTag
+     * 2. ClassName  : ProductListRender.java
+     * 3. Comment    : 상품 목록 Tag를 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 26.
+     * </pre>
+     *
+     * @param info
+     * @param thubnailSize
+     * @param type
+     * @return
+     */
+    public static String renderProductListTag(Map<String, Object> info, String thubnailSize, String type) {
+        type = StringUtil.getString(type);
+        StringBuilder sb = new StringBuilder();
+        sb.append("<a href=\"javascript:$.requestPage($.action.product.basic.view(), {PRD_MST_NO : '" + StringUtil.getString(info, "PRD_MST_NO", "") + "'});\">");
+        sb.append("<dl class=\"detail-product-type1 " + type + "\">");
+        sb.append("<dd class=\"image\">");
+        if (Product.DISPLAY_SOLDOUT.equals(StringUtil.getString(info, "PRD_MST_DPL_YN", Product.DISPLAY_HIDE))) {
+            sb.append("<span class=\"soldout\"><span>SOLD OUT</span></span>");
+        }
+        if (!"".equals(StringUtil.getString(info, "RNK", ""))) {
+            String rankClass = "";
+            if (StringUtil.getInt(info, "RNK") <= 3) {
+                rankClass = "ranktop";
+            }
+            sb.append("<span class=\"ranking " + rankClass + "\">" + StringUtil.getString(info, "RNK", "") + "</span>");
+        }
+        sb.append(ProductImageRender.renderProductImageTag(StringUtil.getString(info, "PRD_MST_CD"), thubnailSize));
+        if (!"".equals(StringUtil.getString(info, "PRD_MST_SPT_TXT", ""))) {
+            if ((StringUtil.getString(info, "PRD_MST_TYPE", "")).equals(StringUtil.getString(Code.PRODUCT_TYPE_RENTAL))) {
+                sb.append("<span class=\"ribbon-type1\">" + StringUtil.getString(info, "PRD_MST_SPT_TXT", "") + "</span>");
+            }
+        }
+        sb.append("</dd>");
+        sb.append("<dt>");
+        sb.append("<span class=\"brand\">" + StringUtil.getString(info, "VDR_MST_NM", "") + "</span>");
+        sb.append("<span class=\"catchphrase\">" + StringUtil.getString(info, "PRD_MST_SEL_TXT", "") + "</span>");
+        sb.append("<span class=\"detail\">" + StringUtil.getString(info, "PRD_MST_NM", "") + "</span>");
+        sb.append("</dt>");
+        String VDR_MST_NM = StringUtil.getString(info, "VDR_MST_NM", "");
+        if (VDR_MST_NM != ""){
+            sb.append("<dd class=\"payment\">");
+            if (StringUtil.getInt(info, "PRD_MST_TYPE") == Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE && "Y".equals(StringUtil.getString(info, "PRD_MST_BND_YN"))) {
+                sb.append("총 " + FormatUtil.formatNumber(StringUtil.getString(info, "REL_AMT", "0")) + "원");
+                sb.append(" X ");
+                sb.append(FormatUtil.formatNumber(StringUtil.getString(info, "REL_CNT", "0")) + "회");
+            } else {
+                sb.append("매월 " + FormatUtil.formatNumber(StringUtil.getString(info, "MON_REL_AMT", "0")) + "원");
+                sb.append(" X ");
+                sb.append(FormatUtil.formatNumber(StringUtil.getString(info, "REL_CNT", "0")) + "회");
+            }
+            sb.append("</dd>");
+        }
+        sb.append("</dl>");
+        sb.append("</a>");
+        return sb.toString();
+    }
+}

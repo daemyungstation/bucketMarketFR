@@ -1,0 +1,40 @@
+#################################################################################################################################
+#################################################################################################################################
+############################################################# LOCAL #############################################################
+#################################################################################################################################
+#################################################################################################################################
+# \ud504\ub85c\uc81d\ud2b8 \uba85
+project.title=\ubc84\ud0b7\ub9c8\ucf13 LOCAL
+
+# UPLOAD
+cdn.domain=/nas/cdn
+cdn.domain.editor=/nas/cdn/editor
+
+# WAS
+front.ssl.domain=https://localhost:7443
+mobile.ssl.domain=https://localhost:7443
+admin.ssl.domain=https://bo.bucketmarket.co.kr
+
+# WEB
+js.ssl.domain=
+css.ssl.domain=
+img.ssl.domain=
+img.ssl.none.src.pc=/resources/pc/images/none.png
+img.ssl.none.src.mobile=/resources/mo/images/none.png
+
+# UPLOAD
+doc.ssl.domain=/nas/doc
+cdn.ssl.domain=/nas/cdn
+cdn.ssl.domain.editor=/nas/cdn/editor
+
+# DAUM ZIPCODE
+daum.zipcode.api.url=https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js
+# KAKAO SNS SHARE
+kakao.api.url=https://developers.kakao.com/sdk/js/kakao.min.js
+#kakao.api.javascript.key=e068dc8eb0bddb27f2a1945e8d51dbcd
+kakao.api.javascript.key=626e9446d4fc0267dda58cf0a0c99eb4
+
+# app \ud328\ud0a4\uc9c0\uba85
+app.pakage.name=bucketmarket
+# app \uc2a4\ud0a4\ub9c8\uba85
+app.schema.name=bucketmarket

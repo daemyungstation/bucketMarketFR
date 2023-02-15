@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대명 아임레디</title>
+    <link rel="stylesheet" type="text/css" href="../css/common.css" >
+    <link rel='stylesheet' type='text/css' href='../css/lib.css'>
+    <link rel='stylesheet' type='text/css' href='../css/search.css'>
+    <script type="text/javascript" src="../js/lib.js"></script>
+    <script type="text/javascript" src="../js/style.js"></script>
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" /> 
+</head>
+<body class="">
+
+<!-- 상단배너 -->
+<div class="area-topbanner">
+    <div class="area-inner">
+        <a href=""><img src="../images/temp_header_banner.png" alt="" ></a>
+        <span class="btn-close-banner"><button>닫기</button></span>
+    </div>
+</div>
+<!-- //상단배너 -->
+
+<!-- Header -->
+<header class="area-header">
+    <div class="contain-util">
+        <div class="contain-inner">
+            <span><a href="">고객센터</a></span>
+            <span><a href="">APP 다운로드</a></span>
+        </div>
+    </div>
+    <div class="area-inner">
+
+        <a href="#"><h1 class="title">버킷마켓</h1></a>
+        <div class="contain-search">
+            <input type="text" placeholder="무엇을 찾고 싶으세요?" >
+            <span class="btn-search"><button>검색</button></span>
+
+            <div class="box-favword">
+                <div class="box-inner">
+                    <p class="title">인기 검색어</p>
+                    <span class="tag"><button>#하이브리드서비스</button></span>
+                    <span class="tag"><button>#크루즈여행</button></span>
+                    <span class="tag"><button>#월납입금</button></span>
+                    <span class="tag"><button>#이벤트</button></span>
+                    <span class="tag"><button>#청약</button></span>
+                    <span class="tag"><button>#하이브리드</button></span>
+                    <span class="tag"><button>#자동납부서비스</button></span>
+                </div>
+            </div>
+
+        </div>
+        <div class="contain-word">
+            <ul>
+                <li><a href="">1. 하이브리드</a></li>
+                <li><a href="">2. 검색단어 순위</a></li>
+                <li><a href="">3. 검색단어 순위</a></li>
+                <li><a href="">4. 검색단어 순위</a></li>
+                <li><a href="">5. 검색단어 순위</a></li>
+                <li><a href="">6. 검색단어 순위</a></li>
+                <li><a href="">7. 검색단어 순위</a></li>
+                <li><a href="">8. 검색단어 순위</a></li>
+                <li><a href="">9. 검색단어 순위</a></li>
+                <li><a href="">10. 검색단어 순위</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+<!-- //Header -->
+
+<!-- GNB -->
+<section class="area-navigation-global">
+    <div class="area-inner">
+        <div class="contain-category">
+            <span class="btn-category"><button>전체카테고리</button></span>
+            <span class="btn-link"><a href="">베스트</a></span>
+            <span class="btn-link"><a href="">기획전</a></span>
+            <span class="btn-link"><a href="">이벤트</a></span>
+            <span class="btn-tag"><a href="">#나만을 위한 추천</a></span>
+        </div>
+        <div class="box-search">
+            <span class="btn-searchbox"><button>검색</button></span>
+            <div class="article-search">
+                <div class="contain-inner">
+                    <div class="contain-search">
+                        <input type="text" placeholder="무엇을 찾고 싶으세요?" >
+                        <span class="btn-search"><button>검색</button></span>
+                    </div>
+                    <div class="contain-favword">
+                        <div class="box-inner">
+                            <p class="title">인기 검색어</p>
+                            <span class="tag"><button>#하이브리드서비스</button></span>
+                            <span class="tag"><button>#크루즈여행</button></span>
+                            <span class="tag"><button>#월납입금</button></span>
+                            <span class="tag"><button>#이벤트</button></span>
+                            <span class="tag"><button>#청약</button></span>
+                            <span class="tag"><button>#하이브리드</button></span>
+                            <span class="tag"><button>#자동납부서비스</button></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="contain-myinfor">
+            <div class="box-planner">
+                <span class="detail-planner"><button>MY계약</button></span>
+                <div class="detail-planner-links">
+                    <ul>
+                        <li><a href="">가입내역 조회</a></li>
+                        <li><a href="">납입/환급금 조회</a></li>
+                        <li><a href="">배송/지원혜택 조회</a></li>
+                        <li><a href="">결제수단변경 신청</a></li>
+                        <li><a href="">멤버십 카드 조회</a></li>
+                        <li><a href="">라이프서비스 신청</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="box-infor">
+                <div class="box-detail">
+                    <!-- <span class="name"><button>레디플래너</button></span><!-- 로그인 전 -->
+                    <span class="photo"><img src="../images/img_profile_women.png" alt="" ></span>
+                    <span class="name"><button>레디플래너, <i>홍길동님</i></button></span>
+                </div>
+                <div class="box-detail-links">
+                    <ul>
+                        <li><a href="#">레디플래너 소개</a></li>
+                        <li><a href="#">이용가이드</a></li>
+                        <li><a href="#">이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                        <li><a href="#">레디플래너 FAQ</a></li>
+                        <li><a href="#">캠페인 생성</a></li>
+                        <li><a href="#">리워드 실적조회</a></li>
+                        <li><a href="#">리워드 지급내역</a></li>
+                        <li><a href="#">커뮤니티</a></li>
+                        <li><a href="#">프로필 관리</a></li>
+                        <li><a href="#">공지사항</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- //GNB -->
+
+<!-- Navigation Category -->
+<div class="area-category">
+    <div class="area-inner">
+        <dl>
+            <dt><a href="">가전렌탈</a></dt>
+            <dd><a href="">공기청정기</a></dt>
+            <dd><a href="">세탁기</a></dt>
+            <dd><a href="">건조기</a></dt>
+            <dd><a href="">안마의자</a></dt>
+            <dd><a href="">TV</a></dt>
+            <dd><a href="">정수기</a></dt>
+            <dd><a href="">냉장고</a></dt>
+            <dd><a href="">김치냉장고</a></dt>
+            <dd><a href="">에어컨</a></dt>
+            <dd><a href="">청소기</a></dd>
+        </dl>
+        <dl>
+            <dt><a href="">생활쇼핑</a></dt>
+            <dd><a href="">통합포인트</a></dd>
+        </dl>
+        <dl>
+            <dt><a href="">통신</a></dt>
+            <dd><a href="">통신비 지원(LGU+)</a></dd>
+        </dl>
+        <dl>
+            <dt><a href="">소형가전</a></dt>
+            <dd><a href="">플레이스테이션</a></dd>
+            <dd><a href="">카메라</a></dd>
+            <dd><a href="">태블릿PC</a></dd>
+            <dd><a href="">커피머신</a></dd>
+            <dd><a href="">청소기</a></dd>
+            <dd><a href="">마사지기</a></dd>
+        </dl>
+        <dl>
+            <dt><a href="">유아동용품</a></dt>
+            <dd><a href="">유모차</a></dd>
+            <dd><a href="">카시트</a></dd>
+            <dd><a href="">교구</a></dd>
+            <dd><a href="">스킨/바디용품</a></dd>
+        </dl>
+        <dl>
+            <dt><a href="">이미용</a></dt>
+            <dd><a href="">피부마사지기</a></dd>
+        </dl>
+        <dl>
+            <dt><a href="">라이프스타일</a></dt>
+            <dd><a href="">라이프</a></dd>
+        </dl>
+    </div>
+</div>
+<!-- //Navigation Category -->
+
+<!-- Body -->
+<div class="area-body">
+    <div class="area-inner">
+
+        <div class="contain-search-box">
+            <div class="box-search-none">
+                <p class="text-result"><u class="text-point1">좋아요</u>에 대한<br />검색 결과가 없습니다.</p>
+                <ul class="text-information-list1">
+                    <li>검색어 단어수를 줄여 검색해 보세요.</li>
+                    <li>일반적인 문구로 다시 검색해 보세요.</li>
+                    <li>단어의 철자가 정확한지 확인해 주세요.</li>
+                </ul>
+            </div>
+
+            <div class="box-hotkeyword">
+                <p class="title">지금 뜨고 있는 <span class="text-point1">핫 키워드</span></p>
+                <span class="keyword"><a href="#">#하이브리드서비스</a></span>
+                <span class="keyword"><a href="#">#크루즈여행</a></span>
+                <span class="keyword"><a href="#">#월납입금</a></span>
+                <span class="keyword"><a href="#">#이벤트</a></span>
+                <span class="keyword"><a href="#">#청약</a></span>
+                <span class="keyword"><a href="#">#하이브리드서비스</a></span>
+                <span class="keyword"><a href="#">#자동납부서비스</a></span>
+                <span class="keyword"><a href="#">#크루즈여행</a></span>
+                <span class="keyword"><a href="#">#월납입금</a></span>
+                <span class="keyword"><a href="#">#이벤트</a></span>
+                <span class="keyword"><a href="#">#청약저축</a></span>
+            </div>
+
+        </div> 
+
+    </div>
+</div>
+<!-- //Body -->
+
+<!-- Footer -->
+<footer class="area-footer">
+    <div class="contain-links">
+        <div class="area-inner">
+            <span><a href="">개인정보처리방침</a></span>
+            <span><a href="">이용약관</a></span>
+            <span><a href="">중요정보 고시사항</a></span>
+            <span><a href="">법적고시</a></span>
+            <span><a href="">고객센터</a></span>
+            <span class="customer-number">버킷마켓 고객센터 1644-8399</span>
+            <span><a href="">사업자정보확인</a></span>
+        </div>
+    </div>
+    <div class="contain-footer">
+        <div class="area-inner">
+            <p class="text-address">서울시 송파구 법원로 135 대명타워 | 사업자등록번호 220-88-09321 | 대표자 (주)대명스테이션 대표이사 서준혁, 최성훈 |  통신판매신고번호 제2016-서울송파-0669호</p>
+            <p class="text-copyright">COPYRIGHT DAEMYUNGSTATION.CO,.LTD. ALL RIGHTS RESERVED.</p>
+            <div class="contain-util">
+                <p>내 폰의 버킷마켓 담기</p>
+                <span class="btn-link-google"><a href="">구글 플레이</a></span>
+                <span class="btn-link-apple"><a href="">앱스토어</a></span>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- //Footer -->
+
+</body>
+</html>

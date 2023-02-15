@@ -1,0 +1,22 @@
+package common.model;
+
+import java.io.Serializable;
+
+import lombok.Data;
+
+@Data
+public class User implements Serializable {
+    private static final long serialVersionUID = -1080425820358038500L;
+    
+    static public enum ROLE_USER {
+        contractor, guest
+    }
+    
+    private String USER_CI;
+    private String USER_NM;
+    private String USER_HP;
+    private String USER_BIRTHDAY;
+    private String USER_SEX;
+    private String RDP_MST_IDX;
+    private String SELLER_NAME;
+}

@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Contract">
+
+    <sql id="contractWhere">
+        WHERE TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX (+)
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+            )
+    </sql>
+
+    <!-- 프론트 > 간편가입 > 약관동의 > 약관 목록 -->
+    <resultMap id="resultContractTermList" type="HashMap">
+        <result property="AGR_MST_IDX" column="AGR_MST_IDX"/>
+        <result property="AGR_MST_TITLE" column="AGR_MST_TITLE"/>
+        <result property="AGR_MST_CONTENTS" column="AGR_MST_CONTENTS" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="AGR_MST_CRT_DAY" column="AGR_MST_CRT_DAY"/>
+        <result property="AGR_MST_PRE_YN" column="AGR_MST_PRE_YN"/>
+        <result property="CMN_COM_IDX" column="CMN_COM_IDX"/>
+        <result property="CMN_COM_ETC3" column="CMN_COM_ETC3"/>
+        <result property="AGR_MST_CFM_FRT_YN" column="AGR_MST_CFM_FRT_YN"/>
+    </resultMap>
+    <select id="selectContractTermList" parameterType="HashMap" resultMap="resultContractTermList">
+        /* Contract.selectContractTermList */
+        SELECT
+            AGR_MST_IDX,
+            AGR_MST_TITLE,
+            AGR_MST_CONTENTS,
+            AGR_MST_CRT_DAY,
+            AGR_MST_PRE_YN,
+            CMN_COM_IDX,
+            CMN_COM_ETC3,
+            DECODE(CMN_COM_IDX,
+                '${@common.code.Code@TERM_CONTRACT_CONFIRM_FIRST_A}', 'Y',
+                '${@common.code.Code@TERM_CONTRACT_CONFIRM_FIRST_B}', 'Y',
+                '${@common.code.Code@TERM_CONTRACT_CONFIRM_FIRST_C}', 'Y',
+                '${@common.code.Code@TERM_CONTRACT_CONFIRM_FIRST_D}', 'Y',
+                '${@common.code.Code@TERM_CONTRACT_CONFIRM_FIRST_E}', 'Y', 'N') AS AGR_MST_CFM_FRT_YN,
+            CMN_COM_UP_IDX
+        FROM (
+                SELECT *
+                FROM (
+                    SELECT
+                        ROW_NUMBER() OVER(PARTITION BY CMN_COM_IDX ORDER BY AGR_MST_CRT_DAY DESC) AS RNUM,
+                        AGR_MST_IDX,
+                        AGR_MST_TITLE,
+                        AGR_MST_CONTENTS,
+                        AGR_MST_CRT_DAY,
+                        AGR_MST_PRE_YN,
+                        CMN_COM_IDX,
+                        CMN_COM_UP_IDX,
+                        CMN_COM_SORT,
+                        CMN_COM_ETC3
+                    FROM (
+                        SELECT AM.AGR_MST_IDX, AM.AGR_MST_TITLE, AM.AGR_MST_CONTENTS, AM.AGR_MST_CRT_DAY, AM.AGR_MST_PRE_YN, AM.AGR_MST_PRD_NO, 
+                            CC.CMN_COM_IDX, CC.CMN_COM_NM, CC.CMN_COM_UP_IDX, CC.CMN_COM_SORT, CC.CMN_COM_ETC3
+                        FROM T_CMM_COM CC, T_AGR_MST AM
+                        WHERE CC.CMN_COM_IDX = AM.AGR_MST_GBN
+                            AND CC.CMN_COM_IDX IN ('${@common.code.Code@TERM_PERSONAL_INFORMATION_USE}','${@common.code.Code@TERM_PERSONAL_INFORMATION_TRUST}')
+                            AND CC.CMN_COM_USE_YN = 'Y'
+                            AND AM.AGR_MST_USE_YN = 'Y'
+                        UNION ALL
+                        SELECT AM.AGR_MST_IDX, AM.AGR_MST_TITLE, AM.AGR_MST_CONTENTS, AM.AGR_MST_CRT_DAY, AM.AGR_MST_PRE_YN, AM.AGR_MST_PRD_NO, 
+                            CC.CMN_COM_IDX, CC.CMN_COM_NM, CC.CMN_COM_UP_IDX, CC.CMN_COM_SORT, CC.CMN_COM_ETC3
+                        FROM T_CMM_COM CC, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM, T_AGR_MST AM
+                        <include refid="contractWhere"/>
+                            AND CC.CMN_COM_ETC1 LIKE '%' || CPM.PRD_MST_TYPE || '%'
+                            AND CC.CMN_COM_ETC2 LIKE '%' || CPM.PRD_MST_BND_YN || '%'
+                            AND CC.CMN_COM_IDX = AM.AGR_MST_GBN
+                            AND CPM.PRD_MST_NO = AM.AGR_MST_PRD_NO
+                            AND CC.CMN_COM_UP_IDX = '${@common.code.Code@TERM_CONTRACT_CODE}'
+                            AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+                            AND CC.CMN_COM_USE_YN = 'Y'
+                            AND AM.AGR_MST_USE_YN = 'Y'
+                        UNION ALL
+                        SELECT AM.AGR_MST_IDX, AM.AGR_MST_TITLE, AM.AGR_MST_CONTENTS, AM.AGR_MST_CRT_DAY, AM.AGR_MST_PRE_YN, AM.AGR_MST_PRD_NO, 
+                            CC.CMN_COM_IDX, CC.CMN_COM_NM, CC.CMN_COM_UP_IDX, CC.CMN_COM_SORT, CC.CMN_COM_ETC3
+                        FROM T_CMM_COM CC, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM, T_AGR_MST AM
+                        <include refid="contractWhere"/>
+                            AND CC.CMN_COM_ETC1 LIKE '%' || CPM.PRD_MST_TYPE || '%'
+                            AND CC.CMN_COM_ETC2 LIKE '%' || CPM.PRD_MST_BND_YN || '%'
+                            AND CC.CMN_COM_IDX = AM.AGR_MST_GBN
+                            AND CC.CMN_COM_UP_IDX = '${@common.code.Code@TERM_CONTRACT_CODE}'
+                            AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+                            AND CC.CMN_COM_USE_YN = 'Y'
+                            AND AM.AGR_MST_USE_YN = 'Y'
+                            AND AM.AGR_MST_PRD_NO IS NULL
+                    )
+                )
+                WHERE RNUM = 1
+            UNION ALL
+                SELECT *
+                FROM (
+                    SELECT
+                        ROW_NUMBER() OVER(PARTITION BY CC.CMN_COM_IDX ORDER BY AM.AGR_MST_CRT_DAY DESC) AS RNUM,
+                        AM.AGR_MST_IDX,
+                        AM.AGR_MST_TITLE,
+                        AM.AGR_MST_CONTENTS,
+                        AM.AGR_MST_CRT_DAY,
+                        AM.AGR_MST_PRE_YN,
+                        CC.CMN_COM_IDX,
+                        CC.CMN_COM_UP_IDX, 
+                        CC.CMN_COM_SORT,
+                        CC.CMN_COM_ETC3
+                    FROM T_AGR_MST AM, T_CMM_COM CC
+                    WHERE AM.AGR_MST_TYPE = CC.CMN_COM_IDX
+                        AND CC.CMN_COM_IDX = '${@common.code.Code@TERM_MARKETING}' 
+                        AND CC.CMN_COM_USE_YN = 'Y'
+                        AND AM.AGR_MST_USE_YN = 'Y'
+                )
+                WHERE RNUM = 1
+        )  R
+        ORDER BY ( SELECT CMN_COM_SORT FROM T_CMM_COM WHERE CMN_COM_IDX = R.CMN_COM_UP_IDX ) ASC , CMN_COM_SORT ASC
+    </select>
+    <!-- 프론트 > 간편가입 > 가입정보 입력 > 메인 계약 목록 -->
+    <select id="selectContractMainLifeServiceList" parameterType="HashMap" resultType="HashMap">
+        /* Contract.selectContractMainLifeServiceList */
+        SELECT
+            CMN_COM_IDX,
+            CMN_COM_NM,
+            CMN_COM_ETC1
+        FROM T_CMM_COM CC
+        WHERE CC.CMN_COM_USE_YN = 'Y'
+        AND EXISTS (
+            SELECT S1.*
+            FROM (
+                SELECT DISTINCT TRIM(PRD_MST_MAIN_CTRT) AS PRD_MST_MAIN_CTRT
+                FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                <include refid="contractWhere"/>
+                    AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+                    AND CPM.PRD_MST_MAIN_CTRT <![CDATA[<>]]> ' '
+                MODEL 
+                    RETURN UPDATED ROWS
+                    PARTITION BY (ROWNUM RN)
+                    DIMENSION BY (0 POSITION)
+                    MEASURES (PRD_MST_MAIN_CTRT, NVL(LENGTH(REGEXP_REPLACE(PRD_MST_MAIN_CTRT, '[^,]+', '')), 0) + 1 NB_MOT)
+                    RULES (PRD_MST_MAIN_CTRT[FOR POSITION FROM 1 TO NB_MOT[0] INCREMENT 1] = REGEXP_SUBSTR(PRD_MST_MAIN_CTRT[0], '[^,]+', 1, CV(POSITION)))
+            ) S1
+            WHERE S1.PRD_MST_MAIN_CTRT = CC.CMN_COM_IDX
+        )
+        ORDER BY CC.CMN_COM_SORT ASC
+    </select>
+    <!-- 프론트 > 간편가입 > 가입정보 등록 > 마스터key 생성 -->
+    <select id="selectContractMasterKeyStr" parameterType="HashMap" resultType="String">
+        SELECT #{ORD_MST_AGT} || TO_CHAR(SYSDATE, 'YYYYMMDD') || LPAD(SEQ_ORD_MST_IDX.NEXTVAL, 4, '0') AS ORD_MST_IDX FROM DUAL
+    </select>
+    <!-- 프론트 > 간편가입 > 가입정보 등록 > 그룹key 생성 -->
+    <select id="selectContractGroupKeyStr" parameterType="HashMap" resultType="String">
+        /* Contract.selectContractGroupKeyStr */
+        SELECT SEQ_ORD_MST_GRP_IDX.NEXTVAL AS ORD_MST_GRP_IDX FROM DUAL
+    </select>
+    <!-- 프론트 > 간편가입 > 가입정보 등록 > 마스터 등록 -->
+    <insert id="insertContractMaster" parameterType="HashMap">
+        /* Contract.insertContractMaster */
+        INSERT INTO T_ORD_MST (
+            ORD_MST_IDX,
+            ORD_MST_GRP_IDX,
+            PRD_MST_NO,
+            ORD_MST_ORD_DT,
+            ORD_MST_PAY_PRC,
+            <if test="isDelivery != null and isDelivery == true">
+                ORD_MST_DLV_STATE,
+            </if>
+            <if test="PRD_MST_OPT_YN != null and PRD_MST_OPT_YN.equals('Y'.toString())">
+                PRD_OPT_IDX,
+            </if>
+            ORD_MST_AGT,
+            ORD_MST_AGE,
+            ORD_MST_VDR_APV,
+            ORD_MST_REG_DT,
+            ORD_MST_REG_IP
+        ) VALUES (
+            #{ORD_MST_IDX},
+            #{ORD_MST_GRP_IDX},
+            #{PRD_MST_NO},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            DECODE(#{PRD_MST_TYPE}, ${@common.code.Code@PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN}, #{PRD_MST_ISTM_SPT_PAY}, 0),
+            <if test="isDelivery != null and isDelivery == true">
+                '${@common.code.Code@DELIVERY_READY}',
+            </if>
+            <if test="PRD_MST_OPT_YN != null and PRD_MST_OPT_YN.equals('Y'.toString())">
+                #{PRD_OPT_IDX},
+            </if>
+            #{ORD_MST_AGT},
+            FN_AGE('${@common.session.SessionsUser@getSessionValue('USER_BIRTHDAY')}'),
+            '${@common.code.Code@RENTAL_TM}',
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{ORD_MST_REG_IP}
+        )
+    </insert>
+    
+    <!-- 프론트 > 간편가입 > 가입정보 등록 > 약관 이력 등록 -->
+    <insert id="insertContractTerm" parameterType="HashMap">
+        <selectKey keyProperty="MEM_AGR_IDX" keyColumn="MEM_AGR_IDX" resultType="java.lang.Integer" order="BEFORE">
+            SELECT SEQ_MEM_AGR_IDX.NEXTVAL AS MEM_AGR_IDX FROM DUAL
+        </selectKey>
+        /* Contract.insertContractTerm */
+        INSERT INTO T_MEM_AGR (
+            MEM_AGR_IDX,
+            ORD_MST_IDX,
+            AGR_MST_IDX,
+            MEM_AGR_TRM_YN,
+            MEM_AGR_REG_DT,
+            MEM_AGR_REG_IP
+        ) VALUES (
+            #{MEM_AGR_IDX},
+            #{ORD_MST_IDX},
+            #{AGR_MST_IDX},
+            #{MEM_AGR_TRM_YN},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{MEM_AGR_REG_IP}
+        )
+    </insert>
+    
+    <!-- 프론트 > 간편가입 > 가입정보 등록 > DLCC 등록 -->
+    <insert id="insertContractDlcc" parameterType="HashMap">
+        /* Contract.insertContractDlcc */
+        INSERT INTO T_ORD_DLCC (
+            ORD_MST_IDX,
+            RDP_MST_IDX,
+            COM_CD,
+            PROD_CD,
+            PROD_KIND,
+            MODEL_CD,
+            CI_VAL,
+            MEM_NM,
+            CELL,
+            BRTH_MON_DAY,
+            SEX,
+            HOME_ZIP,
+            HOME_ADDR,
+            HOME_ADDR2,
+            HOME_TEL,
+            EMAIL,
+            REG_DM,
+            INSPL_MEM_NM,
+            INSPL_CELL,
+            INSPL_ZIP,
+            INSPL_ADDR,
+            INSPL_ADDR2,
+            HPCALL_TIME,
+            MAIN_CONTRACT,
+            ORD_MST_VDR_BNF_ID,
+            MARKT_AGR_YN,
+            SALE_TYPE,
+            DLCC_SEND_YN,
+            UPD_YN,
+            UTM_SOURCE,
+            UTM_MEDIUM,
+            UTM_CAMPAIGN,
+            UTM_TERM,
+            UTM_CONTENT,
+            PRD_MST_MD,
+            SELLER_NAME
+        ) VALUES (
+            #{ORD_MST_IDX},
+            ${@common.session.SessionsUser@getSessionValue('RDP_MST_IDX')},
+            #{VDR_MST_DLCC_B2B},
+            #{PROD_CD},
+            #{PROD_KIND},
+            #{MODEL_CD},
+            '${@common.session.SessionsUser@getSessionValue('USER_CI')}',
+            '${@common.session.SessionsUser@getSessionValue('USER_NM')}',
+            '${@common.session.SessionsUser@getSessionValue('USER_HP')}',
+            '${@common.session.SessionsUser@getSessionValue('USER_BIRTHDAY')}',
+            '${@common.session.SessionsUser@getSessionValue('USER_SEX')}',
+            #{HOME_ZIP},
+            #{HOME_ADDR},
+            #{HOME_ADDR2},
+            REPLACE(#{HOME_TEL}, '-', ''),
+            #{EMAIL},
+            CURRENT_TIMESTAMP,
+            #{INSPL_MEM_NM},
+            #{INSPL_CELL},
+            #{INSPL_ZIP},
+            #{INSPL_ADDR},
+            #{INSPL_ADDR2},
+            #{HPCALL_TIME},
+            #{MAIN_CONTRACT},
+            #{ORD_MST_VDR_BNF_ID},
+            #{MARKT_AGR_YN},
+            DECODE(${@common.session.SessionsUser@getSessionValue('RDP_MST_IDX')}, NULL, #{PRD_MST_CMS_CD}, #{PRD_MST_RDP_CMS_CD}),
+            'N',
+            'N',
+            '${@common.session.SessionsUtm@getSessionValue('UTM_SOURCE')}',
+            '${@common.session.SessionsUtm@getSessionValue('UTM_MEDIUM')}',
+            '${@common.session.SessionsUtm@getSessionValue('UTM_CAMPAIGN')}',
+            '${@common.session.SessionsUtm@getSessionValue('UTM_TERM')}',
+            '${@common.session.SessionsUtm@getSessionValue('UTM_CONTENT')}',
+            (select PRD_MST_MD from T_PRD_MST where PRD_MST_CD=(select PRD_MST_CD from C_PRD_MST where PRD_MST_NO=(select PRD_MST_NO from T_ORD_MST where ORD_MST_IDX=#{ORD_MST_IDX}))),
+            '${@common.session.SessionsUser@getSessionValueIgnoreNull('SELLER_NAME')}'
+        )
+        
+    </insert>
+    <!-- 프론트 > 간편가입 > 가입 완료 > 가입 정보 상세 -->
+    <resultMap id="resultContractInfo" type="HashMap">
+        <result property="ORD_MST_GRP_IDX" column="ORD_MST_GRP_IDX"/>
+        <result property="MEM_NM" column="MEM_NM"/>
+        <result property="CELL" column="CELL"/>
+        <result property="BRTH_MON_DAY" column="BRTH_MON_DAY"/>
+        <result property="SEX" column="SEX"/>
+        <result property="HOME_ZIP" column="HOME_ZIP"/>
+        <result property="HOME_ADDR" column="HOME_ADDR"/>
+        <result property="HOME_ADDR2" column="HOME_ADDR2"/>
+        <result property="HOME_TEL" column="HOME_TEL"/>
+        <result property="EMAIL" column="EMAIL"/>
+        <result property="HPCALL_TIME" column="HPCALL_TIME"/>
+        <result property="HPCALL_TIME_NM" column="HPCALL_TIME_NM"/>
+        <result property="P_AMT" column="P_AMT"/>
+        <result property="P_CARD_NUM" column="P_CARD_NUM"/>
+        <result property="P_FN_NM" column="P_FN_NM"/>
+        <result property="P_RMESG2" column="P_RMESG2"/>
+        <result property="ORD_MST_REG_DT" column="ORD_MST_REG_DT"/>
+        <collection property="detailList" javaType="java.util.ArrayList" ofType="HashMap">
+            <result property="ORD_MST_IDX" column="ORD_MST_IDX"/>
+            <result property="MAIN_CONTRACT" column="MAIN_CONTRACT"/>
+            <result property="MAIN_CONTRACT_NM" column="MAIN_CONTRACT_NM"/>
+            <result property="INSPL_MEM_NM" column="INSPL_MEM_NM"/>
+            <result property="INSPL_CELL" column="INSPL_CELL"/>
+            <result property="INSPL_ZIP" column="INSPL_ZIP"/>
+            <result property="INSPL_ADDR" column="INSPL_ADDR"/>
+            <result property="INSPL_ADDR2" column="INSPL_ADDR2"/>
+            <result property="PRD_OPT_DTL" column="PRD_OPT_DTL"/>
+            <result property="ORD_MST_VDR_BNF_ID" column="ORD_MST_VDR_BNF_ID"/>
+        </collection>
+    </resultMap>
+    <select id="selectContractInfo" parameterType="HashMap" resultMap="resultContractInfo">
+        /* Contract.selectContractInfo */
+        SELECT
+            OM.ORD_MST_GRP_IDX,
+            OD.MEM_NM,
+            OD.CELL,
+            OD.BRTH_MON_DAY,
+            OD.SEX,
+            OD.HOME_ZIP,
+            OD.HOME_ADDR,
+            OD.HOME_ADDR2,
+            OD.HOME_TEL,
+            OD.EMAIL,
+            OD.HPCALL_TIME,
+            (SELECT CC.CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_UP_IDX = ${@common.code.Code@HAPP_CALL} AND CC.CMN_COM_ETC1 = OD.HPCALL_TIME) AS HPCALL_TIME_NM,
+            PM.P_AMT,
+            PM.P_CARD_NUM,
+            PM.P_FN_NM,
+            PM.P_RMESG2,
+            (SELECT MIN(S1.ORD_MST_REG_DT) FROM T_ORD_MST S1 WHERE S1.ORD_MST_GRP_IDX = OM.ORD_MST_GRP_IDX) AS ORD_MST_REG_DT,
+            OM.ORD_MST_IDX,
+            OD.MAIN_CONTRACT,
+            (SELECT CC.CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_UP_IDX = ${@common.code.Code@LIFE_SERVICE} AND CC.CMN_COM_ETC1 = OD.MAIN_CONTRACT) AS MAIN_CONTRACT_NM,
+            OD.INSPL_MEM_NM,
+            OD.INSPL_CELL,
+            OD.INSPL_ZIP,
+            OD.INSPL_ADDR,
+            OD.INSPL_ADDR2,
+            PO.PRD_OPT_DTL,
+            OD.ORD_MST_VDR_BNF_ID
+        FROM T_ORD_DLCC OD, T_ORD_MST OM,
+            (
+                SELECT TPM.ORD_MST_IDX, PPM.P_AMT, PPM.P_CARD_NUM, PPM.P_FN_NM, PPM.P_RMESG2
+                FROM T_PAY_MST TPM, P_PAY_MST PPM
+                WHERE TPM.PAY_MST_IDX = PPM.PAY_MST_IDX
+                    AND TPM.PAY_MST_GBN = '${@common.code.PaymentGate@STATE_NORMAL}'
+            ) PM, T_PRD_OPT PO
+        WHERE OD.ORD_MST_IDX = OM.ORD_MST_IDX
+            AND OM.ORD_MST_IDX = PM.ORD_MST_IDX (+)
+            AND OM.PRD_OPT_IDX = PO.PRD_OPT_IDX (+)
+            AND OM.ORD_MST_GRP_IDX = #{ORD_MST_GRP_IDX}
+            AND EXISTS (
+                SELECT *
+                FROM C_PRD_MST CPM
+                WHERE CPM.PROD_CD = OD.PROD_CD
+                    AND CPM.PROD_KIND = OD.PROD_KIND
+                    AND CPM.MODEL_CD = OD.MODEL_CD
+                    AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+            )
+    </select>
+    <!-- 프론트 > 간편가입 > 가입 완료 > 해피콜 시간대 조회-->
+    <select id="selectContractHappyCallTimeStr" parameterType="HashMap" resultType="String">
+        /* Contract.selectContractHappyCallTimeStr */
+        SELECT CMN_COM_NM
+        FROM T_CMM_COM
+        WHERE CMN_COM_UP_IDX = ${@common.code.Code@HAPP_CALL}
+            AND CMN_COM_ETC1 = #{HPCALL_TIME}
+    </select>
+    
+    <!-- 프론트 > 로그인 > 계약 번호 목록 조회 -->
+    <select id="selectContractUserAccountNoList" parameterType="HashMap" resultType="String">
+        /* Contract.selectContractUserAccountNoList */
+        SELECT ACCNT_NO
+        FROM V_ORD_MST
+        WHERE CI_VAL = '${@common.session.SessionsUser@getSessionValue('USER_CI')}'
+        GROUP BY ACCNT_NO
+    </select>
+</mapper>

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MyPlannerCommunity">
+       
+    <!-- 마이플래너 커뮤니티 관리 조건절 -->
+    <sql id="plannerCommunityWhere">
+        WHERE RDP_BBS_USE_YN = 'Y'
+    </sql>
+    
+    <!-- 마이플래너 커뮤니티 목록 개수 -->
+    <select id="selectCommunityListCount" parameterType="HashMap" resultType="Integer">
+        /* MyPlannerCommunity.selectCommunityListCount */ 
+        SELECT COUNT(RDP_BBS_IDX) 
+        FROM T_RDP_BBS S JOIN T_RDP_MST M ON M.RDP_MST_ID = S.RDP_BBS_REG_ID
+        <include refid="plannerCommunityWhere" />
+    </select>
+    
+    <!-- 마이플래너 커뮤니티 목록 -->
+    <select id="selectCommunityList" parameterType="HashMap" resultType="HashMap">
+        /* MyPlannerCommunity.selectCommunityList */
+        SELECT
+        
+            RNUM,
+            
+            RDP_BBS_IDX,
+            RDP_BBS_TITLE,
+            RDP_BBS_READ_CNT,
+            RDP_BBS_REG_DT,
+            
+            RDP_MST_MEM_NM,
+            RDP_MST_IDX,
+            RDP_MST_NO,
+            RDP_MST_ID,
+            (SELECT TCF.CMM_FLE_ATT_PATH || TCF.CMM_FLE_SYS_NM FROM T_CMM_FLE TCF WHERE TCF.CMM_FLE_TB_NM = 'T_RDP_MST' AND TCF.CMM_FLE_USE_YN = 'Y' AND TCF.CMM_FLE_TB_PK = RDP_MST_IDX AND TCF.CMM_FLE_TB_TYPE = 'I' AND ROWNUM <![CDATA[<=]]> 1) AS RDP_MST_PROFILE_IMAGE
+            
+        FROM (
+            SELECT
+                ROWNUM AS RNUM,
+                S2.*
+            FROM (
+                SELECT
+                    S.*,
+                    M.*
+                FROM 
+                    T_RDP_BBS S 
+                    JOIN T_RDP_MST M ON M.RDP_MST_ID = S.RDP_BBS_REG_ID
+                <include refid="plannerCommunityWhere"/>
+                <if test="searchOrderType == null or searchOrderType == '' or searchOrderType == '1'.toString()">
+                    ORDER BY RDP_BBS_REG_DT DESC
+                </if>
+                <if test="searchOrderType != null and searchOrderType == '2'.toString()">
+                    ORDER BY RDP_BBS_READ_CNT DESC
+                </if>
+            ) S2
+        ) S1
+        <if test="startNum != null and startNum != '' and endNum != null and endNum != ''">
+            WHERE RNUM BETWEEN #{startNum} AND #{endNum}
+        </if>
+    </select>
+    
+    <!-- 마이플래너 커뮤니티 조회수 증가 -->
+    <update id="updateReadCount" parameterType="HashMap">
+        /* MyPlannerCommunity.updateReadCount */
+        UPDATE T_RDP_BBS SET
+            RDP_BBS_READ_CNT = (SELECT RDP_BBS_READ_CNT + 1 FROM T_RDP_BBS WHERE RDP_BBS_IDX = #{RDP_BBS_IDX})
+        WHERE 
+            RDP_BBS_IDX = #{RDP_BBS_IDX}
+    </update>
+    
+    <!-- 마이플래너 커뮤니티 상세 -->
+    <resultMap id="resultCommunityInfo" type="HashMap">
+        <result property="RDP_BBS_IDX" column="RDP_BBS_IDX"/> <!-- 레디플래너 게시판 IDX -->
+        <result property="RDP_BBS_TITLE" column="RDP_BBS_TITLE"/> <!-- 제목 -->
+        <result property="RDP_BBS_CONTENTS" column="RDP_BBS_CONTENTS" jdbcType="CLOB" javaType="java.lang.String"/> <!-- 내용 -->
+        <result property="RDP_BBS_YTB_URL" column="RDP_BBS_YTB_URL"/> <!-- 유튜브링크 -->
+        <result property="RDP_BBS_READ_CNT" column="RDP_BBS_READ_CNT"/> <!-- 조회수 -->
+        <result property="RDP_BBS_USE_YN" column="RDP_BBS_USE_YN"/> <!-- 사용여부 -->
+        <result property="RDP_BBS_REG_DT" column="RDP_BBS_REG_DT"/> <!-- 최초_등록일 -->
+        <result property="RDP_BBS_REG_IP" column="RDP_BBS_REG_IP"/> <!-- 최초_등록_IP -->
+        <result property="RDP_BBS_REG_ID" column="RDP_BBS_REG_ID"/> <!-- 최초_등록자_아이디 -->
+        <result property="RDP_BBS_UPD_DT" column="RDP_BBS_UPD_DT"/> <!-- 최종_수정일 -->
+        <result property="RDP_BBS_UPD_IP" column="RDP_BBS_UPD_IP"/> <!-- 최종_수정_IP -->
+        <result property="RDP_BBS_UPD_ID" column="RDP_BBS_UPD_ID"/> <!-- 최종_수정자_아이디 -->
+
+        <result property="RDP_BBS_REG_NM" column="RDP_BBS_REG_NM"/> <!-- 최초_등록자_이름 -->
+        <result property="RDP_BBS_UPD_NM" column="RDP_BBS_UPD_NM"/> <!-- 최종_수정자_이름 -->
+        
+    </resultMap>
+    <select id="selectCommunityInfo" parameterType="HashMap" resultMap="resultCommunityInfo">
+        /* MyPlannerCommunity.selectCommunityInfo */
+        SELECT
+            S.*,
+            
+            RDP_MST_MEM_NM,
+            RDP_MST_IDX,
+            RDP_MST_NO,
+            RDP_MST_ID,
+            (SELECT TCF.CMM_FLE_ATT_PATH || TCF.CMM_FLE_SYS_NM FROM T_CMM_FLE TCF WHERE TCF.CMM_FLE_TB_NM = 'T_RDP_MST' AND TCF.CMM_FLE_USE_YN = 'Y' AND TCF.CMM_FLE_TB_PK = RDP_MST_IDX AND TCF.CMM_FLE_TB_TYPE = 'I' AND ROWNUM <![CDATA[<=]]> 1) AS RDP_MST_PROFILE_IMAGE
+        FROM 
+            T_RDP_BBS S
+            JOIN T_RDP_MST M ON M.RDP_MST_ID = S.RDP_BBS_REG_ID
+        WHERE
+            RDP_BBS_IDX = #{RDP_BBS_IDX}
+            AND RDP_BBS_USE_YN = 'Y'
+    </select>
+    
+    <!-- 마이플래너 커뮤니티 등록 -->
+    <insert id="insertCommunity" parameterType="HashMap">
+        <selectKey keyProperty="RDP_BBS_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_RDP_BBS_IDX.NEXTVAL AS RDP_BBS_IDX FROM DUAL
+        </selectKey> 
+        /* MyPlannerCommunity.insertCommunity */
+        INSERT INTO T_RDP_BBS (
+            RDP_BBS_IDX,
+            RDP_BBS_TITLE,
+            RDP_BBS_CONTENTS,
+            RDP_BBS_YTB_URL,
+            RDP_BBS_READ_CNT,
+            RDP_BBS_USE_YN,
+            RDP_BBS_REG_DT,
+            RDP_BBS_REG_IP,
+            RDP_BBS_REG_ID
+        ) VALUES (
+            #{RDP_BBS_IDX},
+            #{RDP_BBS_TITLE},
+            #{RDP_BBS_CONTENTS},
+            #{RDP_BBS_YTB_URL},
+            0,
+            'Y',
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{RDP_BBS_REG_IP},
+            #{RDP_BBS_REG_ID}
+        )
+    </insert>
+    
+    <!-- 마이플래너 커뮤니티 수정 -->
+    <update id="updateCommunity" parameterType="HashMap">
+        /* MyPlannerCommunity.updateCommunity */
+        UPDATE T_RDP_BBS SET
+            RDP_BBS_TITLE = #{RDP_BBS_TITLE},
+            RDP_BBS_CONTENTS = #{RDP_BBS_CONTENTS},
+            RDP_BBS_YTB_URL = #{RDP_BBS_YTB_URL},
+            RDP_BBS_UPD_DT = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            RDP_BBS_UPD_IP = #{RDP_BBS_UPD_IP},
+            RDP_BBS_UPD_ID = #{RDP_BBS_UPD_ID}
+        WHERE 
+            RDP_BBS_IDX = #{RDP_BBS_IDX}
+            AND RDP_BBS_REG_ID = #{RDP_BBS_UPD_ID}
+    </update>
+    
+    <!-- 마이플래너 커뮤니티 삭제 -->
+    <update id="deleteCommunity" parameterType="HashMap">
+        /* MyPlannerCommunity.deleteCommunity */
+        UPDATE T_RDP_BBS SET
+            RDP_BBS_USE_YN = 'N',
+            RDP_BBS_UPD_DT = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            RDP_BBS_UPD_IP = #{RDP_BBS_UPD_IP},
+            RDP_BBS_UPD_ID = #{RDP_BBS_UPD_ID}
+        WHERE 
+            RDP_BBS_IDX = #{RDP_BBS_IDX}
+            AND RDP_BBS_REG_ID = #{RDP_BBS_UPD_ID}
+    </update>
+    
+</mapper>

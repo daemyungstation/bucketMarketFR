@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PopupDisplay">
+    
+    <!-- 팝업 목록 -->
+    <select id="selectPopupDisplayList" parameterType="hashMap" resultType="hashMap">
+        /* PopupDisplay.selectPopupDisplayList */
+        SELECT
+            PM.POP_MST_IDX,
+            PM.POP_MST_TITLE,
+            PM.POP_MST_MDE,
+            PM.POP_MST_DAY_YN,
+            PM.POP_MST_LNK,
+            PM.POP_MST_X,
+            PM.POP_MST_Y,
+            PM.POP_MST_W,
+            PM.POP_MST_H,
+            CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH
+        FROM 
+            T_POP_MST PM, T_CMM_FLE CF
+        WHERE
+            PM.POP_MST_IDX = CF.CMM_FLE_TB_PK
+            AND CF.CMM_FLE_TB_NM = 'T_POP_MST'
+            AND CF.CMM_FLE_USE_YN = 'Y'
+            AND PM.POP_MST_USE_YN = 'Y'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') BETWEEN PM.POP_MST_ST_DT || PM.POP_MST_ST_HH || PM.POP_MST_ST_MI || '00' AND
+                PM.POP_MST_ED_DT || PM.POP_MST_ED_HH || PM.POP_MST_ED_MI || '59'
+            AND PM.POP_MST_CHN_GBN = #{POP_MST_CHN_GBN}
+    </select>
+    
+</mapper>

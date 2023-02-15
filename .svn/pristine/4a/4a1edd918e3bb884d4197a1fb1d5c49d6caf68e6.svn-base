@@ -1,0 +1,159 @@
+package web.fr.product.controller;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.annotation.CommandMap;
+import common.code.Code;
+import common.code.Const;
+import common.code.Product;
+import common.exception.CustomHandleException;
+import common.model.Paging;
+import common.session.SessionsBoardUser;
+import common.support.ControllerSupport;
+import common.util.StringUtil;
+import common.viewer.JSON;
+import web.fr.display.service.BannerDisplayService;
+import web.fr.display.service.CategoryProductDisplayService;
+import web.fr.product.service.BasicProductService;
+
+@Controller
+public class BasicProductController extends ControllerSupport {
+    
+    @Resource(name="basicProductService")
+    private BasicProductService basicProductService;
+    
+    @Resource(name="bannerDisplayService")
+    private BannerDisplayService bannerDisplayService;
+    
+    @Resource(name="categoryProductDisplayService")
+    private CategoryProductDisplayService categoryProductDisplayService;
+    /**
+     * <pre>
+     * 1. MethodName : basicProductList
+     * 2. ClassName  : BasicProductController.java
+     * 3. Comment    : 프론트 > 전시 상품 > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 21.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${product.basic.list}", method=RequestMethod.GET)
+    public ModelAndView basicProductList(@CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            
+            String PRD_CTG_IDX = (String) commandMap.get("PRD_CTG_IDX");
+            if(!"".equals(PRD_CTG_IDX)) {
+                Map<String, String[]> seoMetaMap = Code.SEO;
+                String[] seoMeta = (String[]) seoMetaMap.get("PRD_CTG_IDX_"+ PRD_CTG_IDX);
+                mv.addObject("seoMeta", seoMeta);
+            }
+
+            commandMap.put("prdMstOdr", StringUtil.getString(commandMap, "prdMstOdr", Product.ORDER_BY_HIT_CNT_DESC));
+            // 카테고리 네비게이션 정보
+            Map<String, Object> naviInfo = categoryProductDisplayService.selectCategoryProductDisplayNaviInfo(commandMap);
+            mv.addAllObjects(naviInfo);
+            if ("".equals(StringUtil.getString(commandMap, "searchPrdMstKwd", ""))) {
+                int categoryProductDisplayLevel = StringUtil.getInt(naviInfo, "categoryProductDisplayLevel");
+                // 카테고리, 키워드 정보
+                mv.addAllObjects(categoryProductDisplayService.selectCategoryProductDisplayInfo(commandMap, categoryProductDisplayLevel));
+                if (categoryProductDisplayLevel == Const.CATEGORY_TOP_LEVEL) {
+                    // 배너 목록
+                    commandMap.put("CMN_COM_IDX", Code.BANNER_PRODUCT_LIST);
+                    mv.addObject("bannerList", bannerDisplayService.selectBannerDisplayList(commandMap));
+                }
+            }
+            // 상품 목록 개수
+            int totalCount = basicProductService.selectBasicProductListCount(commandMap);
+            mv.addObject("totalCount", totalCount);
+            mv.addObject("paging", new Paging(totalCount, commandMap));
+            if (totalCount > 0) {
+                // 상품 목록
+                mv.addObject("list", basicProductService.selectBasicProductList(commandMap));
+            }
+            mv.addObject("commandMap", commandMap);
+            setViewName(mv, "product.basic.list");
+        } catch (CustomHandleException e) {
+            setErrorView(mv, e, Product.class);
+        }
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : basicProductListAjax
+     * 2. ClassName  : BasicProductController.java
+     * 3. Comment    : 프론트 > 전시 상품 > 목록 (ajax)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 14.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${product.basic.list.ajax}", method=RequestMethod.POST)
+    public JSON basicProductListAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        String PAGING_YN = StringUtil.getString(commandMap, "PAGING_YN", "N");
+        int totalCount = basicProductService.selectBasicProductListCount(commandMap);
+        json.put("totalCount", totalCount);
+        if ("Y".equals(PAGING_YN)) {
+            json.put("paging", new Paging(totalCount, commandMap));
+        }
+        if (totalCount > 0) {
+            json.put("list", basicProductService.selectBasicProductList(commandMap));
+        }
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : basicProductView
+     * 2. ClassName  : BasicProductController.java
+     * 3. Comment    : 프론트 > 전시 상품 > 상세
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 4. 23.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${product.basic.view}", method=RequestMethod.GET)
+    public ModelAndView basicProductView(HttpServletRequest request, HttpServletResponse response, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+
+            String PRD_MST_NO = (String) commandMap.get("PRD_MST_NO");
+            if(!"".equals(PRD_MST_NO)) {
+                Map<String, String[]> seoMetaMap = Code.SEO;
+                String[] seoMeta = (String[]) seoMetaMap.get(PRD_MST_NO);
+                mv.addObject("seoMeta", seoMeta);
+            }
+            
+            SessionsBoardUser.setSessionBoardUserClear(request);
+            basicProductService.setBasicProductPlannerKey(commandMap);
+            mv.addAllObjects(basicProductService.selectBasicProductInfo(request, response, commandMap));
+            mv.addObject("commandMap", commandMap);
+            setViewName(mv, "product.basic.view");
+        } catch (CustomHandleException e) {
+            setErrorView(mv, e, Product.class);
+        }
+        return mv;
+    }
+}

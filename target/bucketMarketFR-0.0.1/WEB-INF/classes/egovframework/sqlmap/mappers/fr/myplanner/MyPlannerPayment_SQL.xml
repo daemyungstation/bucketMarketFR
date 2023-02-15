@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MyPlannerPayment">
+
+    <!-- 조건절 -->
+    <sql id="myPlannerPaymentWhere">
+    </sql>
+    
+    <!-- 마이플래너 > 지급 내역 -->
+    <select id="selectPaymentList" parameterType="HashMap" resultType="HashMap">
+        /* MyPlannerPayment.selectPaymentList */
+        SELECT
+            VRO.ALOW_DT,
+            TRO.RMT_ORD_YN,
+            SUM(VRO.ALOW_AMT) AS TOTAL_ALOW_AMT,
+            NVL(MAX(TRO.RMT_ORD_PAY_DT), '') AS RMT_ORD_PAY_DT
+        FROM
+            T_RDP_MST TRM,
+            T_ORD_DLCC TOD,
+            V_RMT_ORD VRO,
+            T_RMT_ORD TRO
+        WHERE
+            TRM.RDP_MST_IDX = TOD.RDP_MST_IDX
+            AND TOD.ORD_MST_IDX = VRO.ORD_MST_IDX 
+            AND VRO.RMT_ORD_IDX = TRO.RMT_ORD_IDX
+            AND TRM.RDP_MST_IDX = #{RDP_MST_IDX}
+            AND VRO.ALOW_DT <![CDATA[>=]]> #{paymentYear} || '01'
+            AND VRO.ALOW_DT <![CDATA[<=]]> #{paymentYear} || '12'
+        GROUP BY VRO.ALOW_DT, TRO.RMT_ORD_YN
+    </select>
+    
+    <!-- 마이플래너 > 지급 상세 -->
+    <select id="selectPaymentDetailSummary" parameterType="HashMap" resultType="HashMap">
+        /* MyPlannerPayment.selectPaymentDetailSummary */
+        SELECT
+            VRO.ALOW_DT,
+            SUM(VRO.ALOW_AMT) AS TOTAL_ALOW_AMT,
+            NVL(MAX(TRO.RMT_ORD_PAY_DT), '') AS RMT_ORD_PAY_DT
+        FROM
+            T_RDP_MST TRM,
+            T_ORD_DLCC TOD,
+            V_RMT_ORD VRO,
+            T_RMT_ORD TRO
+        WHERE
+            TRM.RDP_MST_IDX = TOD.RDP_MST_IDX
+            AND TOD.ORD_MST_IDX = VRO.ORD_MST_IDX 
+            AND VRO.RMT_ORD_IDX = TRO.RMT_ORD_IDX
+            AND TRM.RDP_MST_IDX = #{RDP_MST_IDX}
+            AND VRO.ALOW_DT = #{ALLOW_DT}
+        GROUP BY VRO.ALOW_DT
+    </select>
+    
+    <!-- 마이플래너 > 지급 상세 -->
+    <select id="selectPaymentDetailList" parameterType="HashMap" resultType="HashMap">
+        /* MyPlannerPayment.selectPaymentDetailList */
+        SELECT 
+            VOM.MEM_NM, -- 이름
+            CPM.PRD_MST_NM, -- 온라인상품명
+            VOM.KSTBIT, -- 가입상태
+            TOM.ORD_MST_REG_DT AS RECEIPT_DT, -- 접수일자
+            VOM.JOIN_DT, -- 가입일자
+            TRO.RDP_MST_BNK_CD,
+            TRO.RDP_MST_BNK_ACT,
+            VRO.ALOW_AMT,
+            (SELECT CMN_COM_NM FROM T_CMM_COM WHERE CMN_COM_IDX = TRO.RDP_MST_BNK_CD) AS RDP_MST_BNK_CD_NM
+        FROM 
+            T_RDP_MST TRM,
+            V_RMT_ORD VRO,
+            T_RMT_ORD TRO,
+            T_ORD_DLCC TOD,
+            V_ORD_MST VOM,
+            T_ORD_MST TOM,
+            C_PRD_MST CPM
+        WHERE
+            VRO.RMT_ORD_IDX = TRO.RMT_ORD_IDX
+            AND TRM.RDP_MST_IDX = TOD.RDP_MST_IDX
+            AND TOD.ORD_MST_IDX = VRO.ORD_MST_IDX 
+            AND VOM.ORD_MST_IDX = TOD.ORD_MST_IDX
+            AND TOM.ORD_MST_IDX = TOD.ORD_MST_IDX
+            AND TOM.PRD_MST_NO = CPM.PRD_MST_NO
+            AND TRM.RDP_MST_IDX = #{RDP_MST_IDX}
+            AND VRO.ALOW_DT = #{ALLOW_DT}
+            AND TRO.RMT_ORD_YN = 'Y'
+    </select>
+    
+</mapper>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CategoryProductDisplay">
+
+    <!-- 프론트 > 전시 > 카테고리 > 계층형 목록 -->
+    <select id="selectCategoryProductDisplayHierarchicalList" parameterType="HashMap" resultType="HashMap">
+        /* CategoryProductDisplay.selectCategoryProductDisplayHierarchicalList */
+        SELECT
+            PRD_CTG_IDX,
+            PRD_CTG_UP_IDX,
+            PRD_CTG_LEVEL,
+            PRD_CTG_NM
+        FROM T_PRD_CTG
+        WHERE PRD_CTG_USE_YN = 'Y'
+            AND PRD_CTG_DSP_YN = 'Y'
+        START WITH PRD_CTG_UP_IDX = ${@common.code.Const@CATEGORY_TOP_LEVEL}
+        CONNECT BY PRIOR PRD_CTG_IDX = PRD_CTG_UP_IDX
+        ORDER SIBLINGS BY PRD_CTG_SORT
+    </select>
+
+    <!-- 프론트 > 전시 > 카테고리 > 목록  -->
+    <select id="selectCategoryProductDisplayList" parameterType="HashMap" resultType="HashMap">
+        /* CategoryProductDisplay.selectCategoryProductDisplayList */
+        SELECT
+            <if test="PRD_CTG_IDX != null and PRD_CTG_IDX != ''">
+            #{PRD_CTG_IDX} AS PRD_CTG_CRT_IDX,
+            </if>
+            PC.PRD_CTG_IDX,
+            PC.PRD_CTG_NM
+        FROM T_PRD_CTG PC
+        WHERE PC.PRD_CTG_USE_YN = 'Y'
+            AND PC.PRD_CTG_DSP_YN = 'Y'
+            <if test="PRD_CTG_IDX != null and PRD_CTG_IDX != ''">
+                AND EXISTS (
+                    SELECT *
+                    FROM T_PRD_CTG TPC
+                    WHERE TPC.PRD_CTG_UP_IDX = PC.PRD_CTG_UP_IDX
+                        AND TPC.PRD_CTG_IDX = #{PRD_CTG_IDX}
+                )
+            </if>
+            <if test="PRD_CTG_UP_IDX != null and PRD_CTG_UP_IDX != ''">
+                AND PC.PRD_CTG_UP_IDX = #{PRD_CTG_UP_IDX}
+            </if>
+        ORDER BY PC.PRD_CTG_SORT ASC
+    </select>
+    <!-- 프론트 > 전시 > 카테고리 > 네비게이션 목록  -->
+    <select id="selectCategoryProductDisplayNaviList" parameterType="HashMap" resultType="HashMap">
+        /* CategoryProductDisplay.selectCategoryProductDisplayNaviList */
+        SELECT
+            PC.PRD_CTG_IDX,
+            PC.PRD_CTG_NM,
+            PC.PRD_CTG_LEVEL
+        FROM T_PRD_CTG PC
+        WHERE PC.PRD_CTG_USE_YN = 'Y'
+            AND PC.PRD_CTG_DSP_YN = 'Y'
+        START WITH PC.PRD_CTG_IDX = #{PRD_CTG_IDX}
+        CONNECT BY PC.PRD_CTG_IDX = PRIOR PC.PRD_CTG_UP_IDX
+        ORDER BY PC.PRD_CTG_LEVEL, PC.PRD_CTG_SORT
+    </select>
+    <!-- 프론트 > 전시 > 카테고리 > 키워드 목록  -->
+    <select id="selectCategoryProductDisplayKeywordList" parameterType="HashMap" resultType="HashMap">
+        /* CategoryProductDisplay.selectCategoryProductDisplayKeywordList */
+        SELECT S1.*
+        FROM (
+            SELECT DISTINCT TRIM(REPLACE(PRD_CTG_KWD, '#', '')) AS PRD_CTG_KWD
+            FROM T_PRD_CTG
+            WHERE PRD_CTG_USE_YN = 'Y'
+                AND PRD_CTG_DSP_YN = 'Y'
+                AND PRD_CTG_KWD <![CDATA[<>]]> ' '
+                AND PRD_CTG_IDX = #{PRD_CTG_IDX}
+            MODEL 
+                RETURN UPDATED ROWS
+                PARTITION BY (ROWNUM RN)
+                DIMENSION BY (0 POSITION)
+                MEASURES (PRD_CTG_KWD, NVL(LENGTH(REGEXP_REPLACE(PRD_CTG_KWD, '[^,]+', '')), 0) + 1 NB_MOT)
+                RULES (PRD_CTG_KWD[FOR POSITION FROM 1 TO NB_MOT[0] INCREMENT 1] = REGEXP_SUBSTR(PRD_CTG_KWD[0], '[^,]+', 1, CV(POSITION)))
+        ) S1
+        WHERE S1.PRD_CTG_KWD <![CDATA[<>]]> ' '
+    </select>
+</mapper>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProductNotificationInfo">
+    <!-- 프론트 > 상품  > 고시정보 > 조건절 -->
+    <sql id="productNotificationInfoWhere">
+        WHERE TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND VM.VDR_MST_USE_YN = 'Y'
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+            )
+    </sql>
+    <!-- 프론트 > 상품  > 고시정보 > 목록 -->
+    <select id="selectProductNotificationInfoList" parameterType="HashMap" resultType="HashMap">
+        /* ProductNotificationInfo.selectProductNotificationInfoList */
+        SELECT
+            PN.PRD_NFI_IDX, 
+            PN.PRD_NFI_NM,
+            PN.PRD_NFI_INFO
+        FROM T_PRD_NFI PN
+        WHERE PN.PRD_NFI_USE_YN = 'Y'
+            AND EXISTS (
+                SELECT TPM.*
+                FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                <include refid="productNotificationInfoWhere"/>
+                    AND TPM.PRD_MST_NFI_IDX = PN.PRD_NFI_UP_IDX
+                    AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+            )
+        ORDER BY PN.PRD_NFI_REG_DT ASC
+    </select>
+</mapper>

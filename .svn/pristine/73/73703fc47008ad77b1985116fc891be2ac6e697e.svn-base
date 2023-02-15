@@ -1,0 +1,517 @@
+package web.fr.contract.service.impl;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import common.code.Code;
+import common.code.Contract;
+import common.code.Contract.JOIN_STEP;
+import common.code.PaymentGate;
+import common.code.Product;
+import common.dao.CommonDefaultDAO;
+import common.exception.CustomHandleException;
+import common.model.User.ROLE_USER;
+import common.session.SessionsContract;
+import common.session.SessionsUser;
+import common.util.DeviceUtil;
+import common.util.IPUtil;
+import common.util.StringUtil;
+import lombok.extern.log4j.Log4j2;
+import web.dozn.signature.service.DoznSignatureService;
+import web.fr.common.service.CommonService;
+import web.fr.contract.service.ContractService;
+import web.fr.product.service.BasicProductService;
+import web.message.MessageType;
+import web.message.service.MessageService;
+import web.pg.service.IniPayService;
+
+@Log4j2
+@Service("contractService")
+public class ContractServiceImpl implements ContractService {
+    
+    @Resource(name="defaultDAO")
+    private CommonDefaultDAO defaultDAO;
+    
+    @Resource(name="commonService")
+    private CommonService commonService;
+    
+    @Resource(name="basicProductService")
+    private BasicProductService basicProductService;
+    
+    @Resource(name="doznSignatureService")
+    private DoznSignatureService doznSignatureService;
+    
+    @Resource(name="iniPayService")
+    private IniPayService iniPayService;
+    
+    @Resource(name = "messageService")
+    private MessageService messageService;
+    
+    /**
+     * <pre>
+     * 1. MethodName : isMainLifeService
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 라이프서비스 주 계약 필수 여부 ( 즉발이 아닐 경우 필수 )
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 29.
+     * </pre>
+     *
+     * @param info
+     * @return
+     * @throws Exception
+     */
+    private boolean isMainLifeService(Map<String, Object> info) throws Exception {
+        return (StringUtil.getInt(info, "PRD_MST_TYPE", 0) != Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE);
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : isDelivery
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 배송 / 설치 정보 필수 여부 ( 즉발(현물), 할부지원형 일 경우 필수 )
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 29.
+     * </pre>
+     *
+     * @param info
+     * @return
+     * @throws Exception
+     */
+    private boolean isDelivery(Map<String, Object> info) throws Exception {
+        boolean isDelivery = false;
+        int PRD_MST_TYPE = StringUtil.getInt(info, "PRD_MST_TYPE", 0);
+        if (PRD_MST_TYPE == Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE && "Y".equals(StringUtil.getString(info, "PRD_MST_BND_YN", "N"))) { // 즉발(현물)
+            isDelivery = true;
+        } else if (PRD_MST_TYPE == Code.PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN) { // 할부지원형
+            isDelivery = true;
+        }
+        return isDelivery;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : isEtc
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 추가 정보 필수 여부 ( 월지원, 즉발(포인트), 렌탈 일 경우 필수 )
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 29.
+     * </pre>
+     *
+     * @param info
+     * @return
+     * @throws Exception
+     */
+    private boolean isEtc(Map<String, Object> info) throws Exception {
+        boolean isEtc = false;
+        if (!"".equals(StringUtil.getString(info, "PRD_MST_BND_ID"))) {
+            int PRD_MST_TYPE = StringUtil.getInt(info, "PRD_MST_TYPE", 0);
+            if (PRD_MST_TYPE == Code.PRODUCT_TYPE_MONTHLY_SUPPORT) { // 월지원
+                isEtc = true;
+            } else if (PRD_MST_TYPE == Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE && "N".equals(StringUtil.getString(info, "PRD_MST_BND_YN", "N"))) { // 즉발(포인트)
+                isEtc = true;
+            } else if (PRD_MST_TYPE == Code.PRODUCT_TYPE_RENTAL) { // 렌탈
+                isEtc = true;
+            }
+        }
+        return isEtc;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : validContractJoin
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 유효성 검증
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 27.
+     * </pre>
+     *
+     * @param commandMap
+     * @param info
+     * @param joinStep
+     * @throws Exception
+     */
+    private void validContractJoin(Map<String, Object> commandMap, Map<String, Object> info, JOIN_STEP joinStep) throws Exception {
+        if ("".equals(StringUtil.getString(commandMap, "PRD_MST_NO", ""))) {
+            throw new CustomHandleException(Contract.ERROR.E450, Contract.JOIN_STEP.INDEX, Contract.class);
+        }
+        if (info == null) {
+            throw new CustomHandleException(Contract.ERROR.E404, Contract.JOIN_STEP.INDEX, Contract.class);
+        }
+        if (!Product.DISPLAY_SHOW.equals(StringUtil.getString(info, "PRD_MST_DPL_YN", Product.DISPLAY_HIDE))) {
+            throw new CustomHandleException(Contract.ERROR.E404, Contract.JOIN_STEP.INDEX, Contract.class);
+        }
+        if ("Y".equals(StringUtil.getString(info, "PRD_MST_OPT_YN", "N")) && StringUtil.getArray(commandMap, "PRD_OPT_IDXs").length == 0) {
+            throw new CustomHandleException(Contract.ERROR.E451, Contract.JOIN_STEP.VIEW, Contract.class);
+        }
+        if (StringUtil.getInt(commandMap, "ORD_MST_CNT", 0) == 0) {
+            throw new CustomHandleException(Contract.ERROR.E453, Contract.JOIN_STEP.VIEW, Contract.class);
+        }
+        
+        if (joinStep.equals(Contract.JOIN_STEP.STEP2)) {
+            if (!SessionsContract.isExists("HPCALL_TIME")) {
+                log.debug("{} 정보 누락", "HPCALL_TIME");
+                throw new CustomHandleException(Contract.ERROR.E454, Contract.JOIN_STEP.STEP1, Contract.class);
+            }
+            if (this.isEtc(info) && !SessionsContract.isExists("ORD_MST_VDR_BNF_ID")) {
+                log.debug("ORD_MST_VDR_BNF_ID 정보 누락");
+                throw new CustomHandleException(Contract.ERROR.E457, Contract.JOIN_STEP.STEP1, Contract.class);
+            }
+            if (this.isDelivery(info)) {
+                String [] deliveryKeys = {"INSPL_MEM_NM", "INSPL_CELL", "INSPL_ZIP", "INSPL_ADDR", "INSPL_ADDR2"};
+                for (String deliveryKey : deliveryKeys) {
+                    if (!SessionsContract.isExists(deliveryKey)) {
+                        log.debug("{} 정보 누락", deliveryKey);
+                        throw new CustomHandleException(Contract.ERROR.E456, Contract.JOIN_STEP.STEP2, Contract.class);
+                    }
+                }
+            }
+        }
+        
+        if (joinStep.equals(Contract.JOIN_STEP.STEP3) && !SessionsUser.isLogin(ROLE_USER.contractor)) {
+            throw new CustomHandleException(Contract.ERROR.E403, Contract.JOIN_STEP.STEP1, Contract.class);
+        }
+        
+        if (joinStep.equals(Contract.JOIN_STEP.STEP3) || joinStep.equals(Contract.JOIN_STEP.REGIST)) {
+            String [] commonKeys = {"HPCALL_TIME"};
+            for (String commonKey : commonKeys) {
+                if (!SessionsContract.isExists(commonKey)) {
+                    log.debug("{} 정보 누락", commonKey);
+                    throw new CustomHandleException(Contract.ERROR.E454, Contract.JOIN_STEP.STEP2, Contract.class);
+                }
+            }
+            if (this.isDelivery(info)) {
+                String [] deliveryKeys = {"INSPL_MEM_NM", "INSPL_CELL", "INSPL_ZIP", "INSPL_ADDR", "INSPL_ADDR2"};
+                for (String deliveryKey : deliveryKeys) {
+                    if (!SessionsContract.isExists(deliveryKey)) {
+                        log.debug("{} 정보 누락", deliveryKey);
+                        throw new CustomHandleException(Contract.ERROR.E456, Contract.JOIN_STEP.STEP2, Contract.class);
+                    }
+                }
+            }
+            if (this.isEtc(info) && !SessionsContract.isExists("ORD_MST_VDR_BNF_ID")) {
+                log.debug("ORD_MST_VDR_BNF_ID 정보 누락");
+                throw new CustomHandleException(Contract.ERROR.E457, Contract.JOIN_STEP.STEP2, Contract.class);
+            }
+            if (joinStep.equals(Contract.JOIN_STEP.REGIST) &&
+                    Code.PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN == StringUtil.getInt(info, "PRD_MST_TYPE") &&
+                    "".equals(StringUtil.getString(commandMap, "ORD_MST_IDX"))) {
+                log.debug("주문번호 누락");
+                throw new CustomHandleException(Contract.ERROR.E459, Contract.JOIN_STEP.STEP4, Contract.class);
+            }
+        }
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectContractTermList
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 간편가입 > 약관동의 > 약관 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 27.
+     * </pre>
+     *
+     * @see web.fr.contract.service.ContractService#selectContractTermList(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectContractTermList(Map<String, Object> commandMap) throws Exception {
+        return (List<Map<String, Object>>) defaultDAO.selectList("Contract.selectContractTermList", commandMap);
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectContractInfo
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 간편가입 > 계약 상품 정보
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 27.
+     * </pre>
+     *
+     * @see web.fr.contract.service.ContractService#selectContractInfo(java.util.Map, common.code.Contract.JOIN_STEP)
+     * @param commandMap
+     * @param joinStep
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectContractInfo(Map<String, Object> commandMap, JOIN_STEP joinStep) throws Exception {
+        Map<String, Object> returnMap = new HashMap<>();
+        // 상품 상세 정보
+        Map<String, Object> info = this.basicProductService.selectBasicProductInfo(commandMap);
+        // 유효성 검증
+        this.validContractJoin(commandMap, info, joinStep);
+        // 옵션목록
+        if ("Y".equals(StringUtil.getString(info, "PRD_MST_OPT_YN", "N"))) {
+            commandMap.put("PRD_OPT_IDXs", StringUtil.getArray(commandMap, "PRD_OPT_IDXs"));
+            returnMap.put("optionList", this.basicProductService.selectBasicProductOptionList(commandMap));
+        }
+        if (joinStep.equals(Contract.JOIN_STEP.STEP1))
+        {
+            returnMap.put("happCallList", this.commonService.selectCode("HAPP_CALL"));
+            returnMap.put("isEtc", this.isEtc(info)); // 추가 정보 필수 여부 ( 월지원, 즉발(포인트) 일 경우 필수 )
+            returnMap.put("isDelivery", this.isDelivery(info)); // 배송 / 설치 정보 필수 여부 ( 즉발(현물), 렌탈, 할부지원형 일 경우 필수 )
+        }
+        
+        returnMap.put("info", info);
+        return returnMap;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectContractMasterKeyStr
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 간편가입 > 주문번호 생성
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 2.
+     * </pre>
+     *
+     * @see web.fr.contract.service.ContractService#selectContractMasterKeyStr(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public String selectContractMasterKeyStr(Map<String, Object> commandMap) throws Exception {
+        commandMap.put("ORD_MST_AGT", DeviceUtil.getDeviceChar()); // DEVICE 구분
+        return this.defaultDAO.selectStr("Contract.selectContractMasterKeyStr", commandMap);
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : cancelRequset
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 간편가입 > PG 취소 요청
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 16.
+     * </pre>
+     *
+     * @param prdMstType
+     * @param ordMstIdx
+     * @throws Exception
+     */
+    private void cancelRequset(int prdMstType, String ordMstIdx) throws Exception {
+        if (Code.PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN == prdMstType) {
+            Map<String, Object> cancelReqMap = new HashMap<>();
+            cancelReqMap.put("ORD_MST_IDX", ordMstIdx);
+            cancelReqMap.put("MSG", PaymentGate.DB_ERROR_MESSAGE);
+            Map<String, Object> cancelResMap = this.iniPayService.insertIniPayCnlReq(cancelReqMap);
+            boolean isSuccess = (boolean) cancelResMap.get("isSuccess");
+            if (!isSuccess) {
+                String errorCode = StringUtil.getString(cancelResMap, "resultMsg");
+                String errorMsg = StringUtil.getString(cancelResMap, "resultCode");
+                String resultMsg = MessageFormat.format(Contract.ERROR.E497.getMessage(), new Object [] {errorCode, errorMsg});
+                throw new CustomHandleException(Contract.ERROR.E497, resultMsg, Contract.JOIN_STEP.STEP4, Contract.class);
+            }
+        }
+    }
+    /**
+     * <pre>
+     * 1. MethodName : insertContractJoin
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 간편가입 > 가입정보 등록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 27.
+     * </pre>
+     *
+     * @see web.fr.contract.service.ContractService#insertContractJoin(java.util.Map)
+     * @param commandMap
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public void insertContractJoin(Map<String, Object> commandMap) throws Exception {
+        Map<String, Object> contract = this.selectContractInfo(commandMap, Contract.JOIN_STEP.REGIST);
+        Map<String, Object> info = (Map<String, Object>) contract.get("info");
+        Map<String, Object> formData = SessionsContract.getSessionContractData();
+        
+        String ordMstIdx = StringUtil.getString(commandMap, "ORD_MST_IDX", ""); // 계약 번호
+        int prdMstType = StringUtil.getInt(info, "PRD_MST_TYPE"); // 상품 유형
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("ORD_MST_AGT", DeviceUtil.getDeviceChar()); // DEVICE 구분
+            params.put("ORD_MST_REG_IP", IPUtil.getClientIP()); // 접속자 IP
+            params.put("ORD_MST_GRP_IDX", this.defaultDAO.selectStr("Contract.selectContractGroupKeyStr", params)); // 계약 그룹 번호 생성
+            params.put("isDelivery", this.isDelivery(info));
+            params.putAll(info);
+            params.putAll(formData);
+            
+            String [] prdOptIdx = StringUtil.getArray(formData, "PRD_OPT_IDXs"); // 상품 옵션 일련번호
+            String [] memAgrTrmCd = StringUtil.getArray(formData, "MEM_AGR_TRM_CD"); // 약관에 동의한 코드
+            List<Map<String, Object>> tremList = this.selectContractTermList(params); // 약관 목록
+            
+            String [] insplMemNm = StringUtil.getArray(formData, "INSPL_MEM_NM"); // 배송/설치 > 이름
+            String [] insplCell = StringUtil.getArray(formData, "INSPL_CELL"); // 배송/설치 > 연락처
+            String [] insplZip = StringUtil.getArray(formData, "INSPL_ZIP"); // 배송/설치 > 우편번호
+            String [] insplAddr = StringUtil.getArray(formData, "INSPL_ADDR"); // 배송/설치 > 주소
+            String [] inspladdr2 = StringUtil.getArray(formData, "INSPL_ADDR2"); // 배송/설치 > 상세주소
+            String [] mainContract = StringUtil.getArray(formData, "MAIN_CONTRACT"); // 주계약 코드
+            String [] ordMstVdrBnfId = StringUtil.getArray(formData, "ORD_MST_VDR_BNF_ID"); // 제휴사 계정 ID
+            
+            /****************************************************
+             * 상품유형이 즉발 일 경우 주계약 코드를 강제로 넣어 준다.
+             ****************************************************/
+            String immediatelyIssueMainContract = "";
+            if (prdMstType == Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE) { // 즉발
+                Map<String, Object> codeParams = new HashMap<>();
+                String prdMstMainCtrt = StringUtil.getString(info , "PRD_MST_MAIN_CTRT");
+                if (prdMstMainCtrt.contains(",")) {
+                    codeParams.put("CMN_COM_IDX", prdMstMainCtrt.split(",")[0]);
+                } else {
+                    codeParams.put("CMN_COM_IDX", prdMstMainCtrt);
+                }
+                Map<String, Object> mainContractCodeInfo = this.commonService.selectCodeInfo(codeParams);
+                immediatelyIssueMainContract = StringUtil.getString(mainContractCodeInfo, "CMN_COM_ETC1");
+            }
+            
+            String marktAgrYn = "N"; // 마케팅 동의 여부
+            for (int i = 0; i < StringUtil.getInt(formData, "ORD_MST_CNT", 1); i++) {
+                if (!"".equals(ordMstIdx)) {
+                    params.put("ORD_MST_IDX", ordMstIdx); // PG 결제 시 계약 번호 생성
+                } else {
+                    params.put("ORD_MST_IDX", this.selectContractMasterKeyStr(params)); // 계약 번호 생성 
+                }
+                if ("Y".equals(StringUtil.getString(info, "PRD_MST_OPT_YN", "N")) && prdOptIdx.length > 0) {
+                    log.debug("PRD_OPT_IDX : {}", prdOptIdx[i]);
+                    params.put("PRD_OPT_IDX", prdOptIdx[i]); // 상품 옵션 일련번호
+                }
+                // 마스터 정보 등록
+                this.defaultDAO.insert("Contract.insertContractMaster", params);
+                
+                String termYn = "";
+                for (Map<String, Object> term : tremList) {
+                    String cmnComIdx = StringUtil.getString(term, "CMN_COM_IDX");
+                    if (StringUtil.getInt(cmnComIdx) == Code.TERM_MARKETING) {
+                        marktAgrYn = "Y";
+                    }else {
+                        termYn += "Y";
+                    }
+                    term.put("ORD_MST_IDX", StringUtil.getString(params, "ORD_MST_IDX")); // 약관 동의 대상 가입 번호
+                    term.put("MEM_AGR_TRM_YN", Arrays.asList(memAgrTrmCd).contains(cmnComIdx) ? "Y" : "N"); // 약관 동의 여부
+                    term.put("MEM_AGR_REG_IP", IPUtil.getClientIP()); // 접속자 IP
+                    // 약관 이력 등록
+                    this.defaultDAO.insert("Contract.insertContractTerm", term);
+                }
+                if (insplMemNm.length > 0) {
+                    params.put("INSPL_MEM_NM", insplMemNm[i]); // 배송/설치 > 이름
+                    params.put("INSPL_CELL", insplCell[i]); // 배송/설치 > 연락처
+                    params.put("INSPL_ZIP", insplZip[i]); // 배송/설치 > 우편번호
+                    params.put("INSPL_ADDR", insplAddr[i]); // 배송/설치 > 주소
+                    params.put("INSPL_ADDR2", inspladdr2[i]); // 배송/설치 > 상세주소
+                }
+                /****************************************************
+                 * 상품유형이 즉발 일 경우 주계약 코드를 강제로 넣어 준다.
+                 ****************************************************/
+                if (prdMstType == Code.PRODUCT_TYPE_IMMEDIATELY_ISSUE) { // 즉발
+                    params.put("MAIN_CONTRACT", immediatelyIssueMainContract); // 주계약 코드
+                } else if (mainContract.length > 0) {
+                    params.put("MAIN_CONTRACT", mainContract[i]); // 주계약 코드
+                }
+                
+                if (ordMstVdrBnfId.length > 0) {
+                    params.put("ORD_MST_VDR_BNF_ID", ordMstVdrBnfId[i]); // 제휴사 계정 ID
+                }
+                params.put("MARKT_AGR_YN", marktAgrYn); // 마케팅 동의 여부
+                params.put("TERMS_YN", termYn); // 약관동의여부
+                // Dlcc 데이터 등록
+                this.defaultDAO.insert("Contract.insertContractDlcc", params);
+                if (Code.PRODUCT_TYPE_RENTAL != prdMstType) {
+                    // Dlcc 가입 상품 정보 등록
+                    this.defaultDAO.getSqlSessionForDlcc().insert("DlccOrderMapper.insertOrderDetailDlcc", params);
+                }
+            }
+            if (Code.PRODUCT_TYPE_RENTAL != prdMstType) {
+                // Dlcc 회원정보 등록/수정
+                this.defaultDAO.getSqlSessionForDlcc().insert("DlccOrderMapper.mergeOrderMasterDlcc", params);
+            }
+            
+            try {
+                log.debug("====================== 알림톡 ======================");
+                String userNm = SessionsUser.getSessionValue("USER_NM");
+                String userHp = SessionsUser.getSessionValue("USER_HP");
+                long reqTime = System.currentTimeMillis();
+                String prdMstNm = StringUtil.getString(info, "PRD_MST_NM");
+                String prdMstSplNm = StringUtil.getString(info, "PRD_MST_SPL_NM");
+                String happyCallTime = this.defaultDAO.selectStr("Contract.selectContractHappyCallTimeStr", params);
+                log.debug("userNm : [{}]", userNm);
+                log.debug("reqTime : [{}]", reqTime);
+                log.debug("prdMstNm : [{}]", userNm);
+                log.debug("prdMstSplNm : [{}]", prdMstSplNm);
+                log.debug("happyCallTime : [{}]", happyCallTime);
+                if (Code.PRODUCT_TYPE_MONTHLY_INSTALLMENT_PLAN != prdMstType) {
+                    this.messageService.sendAlimTalk(MessageType.CONTRACT_COMPLETE_TYPE1, userHp, userNm, reqTime, prdMstNm, prdMstSplNm, happyCallTime);
+                } else {
+                    Map<String, Object> payApvInfo = this.iniPayService.selectIniPayApvInfo(params);
+                    String fnNm = StringUtil.getString(payApvInfo, "P_FN_NM");
+                    String quotabase = StringUtil.getString(PaymentGate.QUOTABASE, StringUtil.getString(payApvInfo, "P_RMESG2"));
+                    String authDt = StringUtil.getString(payApvInfo, "P_AUTH_DT_STR");
+                    log.debug("fnNm : [{}]", fnNm);
+                    log.debug("quotabase : [{}]", quotabase);
+                    log.debug("authDt : [{}]", authDt);
+                    this.messageService.sendAlimTalk(MessageType.CONTRACT_COMPLETE_TYPE2, userHp, userNm, reqTime, prdMstNm, prdMstSplNm, fnNm, quotabase, authDt, happyCallTime);
+                }
+                log.debug("=================================================");
+                
+            } catch (Exception e) {
+                if (log.isDebugEnabled()) {
+                    e.printStackTrace();
+                }
+            }
+            
+            commandMap.put("ORD_MST_GRP_IDX", StringUtil.getString(params, "ORD_MST_GRP_IDX"));
+        } catch (RuntimeException e) {
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            // PG 취소 요청
+            this.cancelRequset(prdMstType, ordMstIdx);
+            throw new CustomHandleException(Contract.ERROR.E499, Contract.JOIN_STEP.STEP2, Contract.class);
+        }
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectContractInfo
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 간편가입 > 가입 완료 > 가입 정보 상세
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 1.
+     * </pre>
+     *
+     * @see web.fr.contract.service.ContractService#selectContractInfo(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectContractInfo(Map<String, Object> commandMap) throws Exception {
+        Map<String, Object> info = this.basicProductService.selectBasicProductInfo(commandMap);
+        info.putAll(defaultDAO.select("Contract.selectContractInfo", commandMap));
+        info.put("isMainLifeService", this.isMainLifeService(info));
+        info.put("isDelivery", this.isDelivery(info));
+        info.put("isEtc", this.isEtc(info));
+        return info;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectContractUserAccountNoList
+     * 2. ClassName  : ContractServiceImpl.java
+     * 3. Comment    : 프론트 > 로그인 > 계약 번호 목록 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 22.
+     * </pre>
+     *
+     * @see web.fr.contract.service.ContractService#selectContractUserAccountNoList()
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> selectContractUserAccountNoList() throws Exception {
+        return (List<String>) this.defaultDAO.selectList("Contract.selectContractUserAccountNoList", null);
+    }
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DlccViewMapper">
+    
+    <resultMap id="OrderDtlResultMap" type="web.fr.dlcc.model.OrderDtlModel">
+        <result property="ordMstIdx"        column="ORD_MST_IDX" />
+        <result property="payNo"            column="PAY_NO" />
+        <result property="accntNo"          column="ACCNT_NO" />
+        <result property="payDay"           column="PAY_DAY" />
+        <result property="payAmt"           column="PAY_AMT" />
+        <result property="payAmt1"          column="PAY_AMT1" />
+        <result property="payAmt2"          column="PAY_AMT2" />
+        <result property="payMthd"          column="PAY_MTHD" />
+        <result property="paySum"           column="PAY_SUM" />
+        <result property="resnAmt"          column="RESN_AMT" />
+        <result property="delFg"          column="DEL_FG" />
+    </resultMap>
+    
+    <select id="selectOrderDtlList" parameterType="java.util.List" resultMap="OrderDtlResultMap">
+        /* DlccViewMapper.selectOrderDtlList */
+        SELECT 
+              ORD_MST_IDX
+            , PAY_NO
+            , ACCNT_NO
+            , PAY_DAY
+            , PAY_AMT
+            , PAY_AMT1
+            , PAY_AMT2
+            , PAY_MTHD
+            , PAY_SUM
+            , RESN_AMT
+            , DEL_FG
+        FROM DLCCSUB.DR_V_ORD_DTL
+        WHERE
+        <if test="accntNoList =! null">
+            ACCNT_NO IN
+            <foreach collection="list" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+    
+</mapper>

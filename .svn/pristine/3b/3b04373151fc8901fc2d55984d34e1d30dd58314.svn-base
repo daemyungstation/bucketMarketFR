@@ -1,0 +1,234 @@
+package common.session;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import common.model.Request;
+import common.model.User;
+import common.model.User.ROLE_USER;
+import common.util.StringUtil;
+import lombok.extern.log4j.Log4j2;
+
+/**
+ * <pre>
+ * &#64;PackageName: common.session
+ * &#64;FileName : SessionsUser.java
+ * &#64;Date : 2020. 4. 29.
+ * &#64;프로그램 설명 : 사용자 세션을 처리하는 Class
+ * &#64;author upleat
+ * </pre>
+ */
+@Log4j2
+public class SessionsUser {
+
+    // 버킷마켓 사용자
+    private static final String USER_OBJECT = "__USER_OBJECT__";
+    private static final String USER_INFO = "__USER_INFO__";
+    
+    /**
+     * <pre>
+     * 1. MethodName : getSessionValue
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 세션 정보 중 요청한 세션명에 대한 값만 반환한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param name
+     * @return
+     */
+    public static String getSessionValue(String name) {
+        return getSessionValue(Request.getCurrentRequest(), name);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : getSessionValue
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 세션 정보 중 요청한 세션명에 대한 값만 반환한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param request
+     * @param name
+     * @return
+     */
+    public static String getSessionValue(HttpServletRequest request, String name) {
+        if (getSessionUserMap(request) == null) {
+            return "";
+        } else {
+            try {
+//                Object obj = getSessionUserMap(request).get(name);
+//                if( obj == null ) {
+//                    return "";
+//                }
+                return String.valueOf(getSessionUserMap(request).get(name));
+            } catch (Exception e) {
+                return "";
+            }
+        }
+    }
+
+    public static String getSessionValueIgnoreNull(String name) {
+        HttpServletRequest request  = Request.getCurrentRequest();
+        if (getSessionUserMap(request) == null) {
+            return "";
+        } else {
+            try {
+                Object obj = getSessionUserMap(request).get(name);
+                if( obj == null ) {
+                    return "";
+                }
+                return String.valueOf(obj);
+            } catch (Exception e) {
+                return "";
+            }
+        }
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : setSessionUserMap
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 사용자 정보를 세션에 저장한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param request
+     * @param map
+     */
+    private static void setSessionUserMap(HttpServletRequest request, Map<String, Object> map) {
+        HttpSession session = request.getSession();
+        session.setAttribute(USER_INFO, map);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : setSessionUser
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 사용자 정보를 세션에 저장한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param request
+     * @param user
+     */
+    public static void setSessionUser(HttpServletRequest request, User user) {
+        HttpSession session = request.getSession();
+        session.setAttribute(USER_OBJECT, user);
+        Map<String, Object> map = new HashMap<>();
+        map.put("USER_CI", user.getUSER_CI());
+        map.put("USER_NM", user.getUSER_NM());
+        map.put("USER_HP", user.getUSER_HP());
+        map.put("USER_BIRTHDAY", user.getUSER_BIRTHDAY());
+        map.put("USER_SEX", user.getUSER_SEX());
+        map.put("RDP_MST_IDX", user.getRDP_MST_IDX());
+        map.put("SELLER_NAME", user.getSELLER_NAME());
+        setSessionUserMap(request, map);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : setSessionClear
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 세션을 삭제한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param request
+     */
+    public static void setSessionClear(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        session.setAttribute(USER_OBJECT, null);
+        session.setAttribute(USER_INFO, null);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : getSessionMap
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 세션에 담긴 정보를 Map 형태로 반환한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param request
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, Object> getSessionUserMap(HttpServletRequest request) {
+        try {
+            if (getSessionUser(request) == null) {
+                return null;
+            }
+            return (Map<String, Object>) request.getSession().getAttribute(USER_INFO);
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : getSessionUser
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 사용자 세션 정보를 반환한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param request
+     * @return
+     */
+    public static User getSessionUser(HttpServletRequest request) {
+        try {
+            HttpSession session = request.getSession();
+            User user = (User) session.getAttribute(USER_OBJECT);
+            if (user == null) {
+                return new User();
+            } else {
+                return user;
+            }
+
+        } catch (Exception e) {
+            log.error(Arrays.toString(e.getStackTrace()));
+            return new User();
+        }
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : isLogin
+     * 2. ClassName  : SessionUser.java
+     * 3. Comment    : 로그인 유무를 반환한다. 
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2014. 4. 1.
+     * </pre>
+     *
+     * @param type
+     * @return
+     */
+    public static boolean isLogin(ROLE_USER type) {
+        HttpServletRequest request = Request.getCurrentRequest();
+        User user = getSessionUser(request);
+        boolean isLogin = false;
+        switch (type) {
+            case contractor:
+                isLogin = !"".equals(StringUtil.getString(user.getUSER_CI(), ""));
+                break;
+            case guest:
+                break;
+            default:
+                break;
+        }
+        return isLogin;
+    }
+}

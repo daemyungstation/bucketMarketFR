@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대명 아임레디</title>
+    <link rel='stylesheet' type='text/css' href='../css/common.css'>
+    <script type="text/javascript" src="../js/lib.js"></script>
+    <script type="text/javascript" src="../js/style.js"></script>
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />    
+</head>
+<body>
+
+<!-- 본문 -->
+<div class="area-content">
+    <div class="area-inner">
+
+                
+
+    </div>
+</div>
+<!-- //본문 -->
+
+<!-- 팝업 : 약관레이어 -->
+<div class="layer-popup1 layer-agreement2 active"><!-- 활성화 시 active 클래스 추가 -->
+    <div class="layer-inner">
+        <!-- 헤더 -->
+        <header class="area-header-layer">
+            <div class="area-inner">
+                <h1 class="title">ㅁㅁ</h1>
+                <span class="btn-close"><button>닫기</button></span>
+            </div>
+        </header>
+        <!-- //헤더 -->
+        <!-- 본문 -->
+        <div class="area-content-layer">
+            <div class="area-inner">
+
+                <span class="head-title">ㅁㅁ</span>
+                <div class="box-agreement full">                    
+                    <div class="box-inner">      
+                        <!-- start -->              
+                        <div class="content-terms">
+
+                            <p class="box-top-line">ㅇㅇ</p>
+                            <p class="text-normal-type1">ㅇㅇ</p>
+                            
+                            <div class="box-privacy">
+                                <dl>
+                                    <dt>ㅇㅇ</dt>
+                                    <dd>
+                                        ㅇㅇ
+                                    </dd>
+                                </dl>
+                            </div>
+
+                            <div class="box-privacy">
+                                <dl>
+                                    <dt>ㅇㅇ</dt>
+                                    <dd>
+                                        ㅇㅇ
+                                    </dd>
+                                </dl>
+                            </div>
+
+                            <div class="box-privacy">
+                                <dl>
+                                    <dt>ㅇㅇ</dt>
+                                    <dd>
+                                        ㅇㅇ
+                                    </dd>
+                                </dl>
+                            </div>
+
+                        </div>
+                        <!-- end --> 
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- //본문 -->
+    </div>
+</div>
+<!-- //팝업 : 약관레이어 -->
+
+<script src="../js/dom.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>대명 아임레디</title>
+    <link rel='stylesheet' type='text/css' href='../css/common.css'>
+    <script src="../js/lib.js"></script>
+    <script src="../js/style.js"></script>
+    <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="../images/favicon.png" type="image/x-icon" />   
+</head>
+<body>
+
+    <!-- 레이어 팝업 -->
+<div class="layer-popup1 active"><!-- 활성화 시 active 클래스 추가 -->
+    <div class="layer-inner">
+        <!-- 헤더 -->
+        <header class="area-header-layer">
+            <div class="area-inner">
+                <h1 class="title">중요정보고시사항</h1>
+                <span class="btn-close"><button>닫기</button></span>
+            </div>
+        </header>
+        <!-- //헤더 -->
+        <!-- 본문 -->
+        <div class="area-content-layer">
+            <div class="area-inner">
+
+                <!-- 팝업본문 -->
+                <div class="contain-provision-layer">
+                    <h2 class="title">중요정보고시사항</h2>
+                    <div class="box-agreement scroll">
+                        <div class="box-inner">
+                            <!-- start -->
+                            <div class="content-terms">
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>환급기준 및 환급시기</dt>
+                                        <dd>
+                                            - 중도해약에 대한 환급기준은 상조서비스 약관 규정에 의해 환급됩니다.<br />     
+                                            - 환급금은 신청완료일로부터 3영업일 이내에 수령하실 수 있습니다.<br />          
+                                            - 구체적인 제공물품 및 서비스 내용은 상품정보에서 확인하실 수 있습니다.   
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>총 고객환급의무액, 상조 관련 자산(2019년 12월말 기준)</dt>
+                                        <dd>
+                                            <div class="box-scroll-table table-type3 type2">
+                                                <table>
+                                                    <colgroup>
+                                                        <col width="308px">
+                                                        <col width="308px">
+                                                    </colgroup>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>총 고객환급의무액</th>
+                                                            <th>상조 관련 자산</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>374,109,810천원</td>
+                                                            <td>355,638,175천원</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td colspan="2">※ 공인회계사 회계감사를 받았습니다 (인덕회계법인)</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>고객 불입금 관리방법</dt>
+                                        <dd>
+                                            [할부거래에 관한 법률] 제 18조에 의거 선불식 할부거래업 등록하였으며, 동법 제 27조에 따라 고객불입금의 50%는 상조보증공제조합에 소비자피해보상을 위한 공제계약을 체결하고 있습니다. 
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <p class="privacy-title">상조서비스 이용 관련 참고사항</p>
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>주요장의상품 상제정보</dt>
+                                        <dd>
+                                            본 내용은 2020년 7월 상품 기준으로 작성되었으며, 가입시점 및 가입상품 특성에 따라 일부 예외사항이 있음을 밝힙니다.
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>1. 수의</dt>
+                                        <dd>
+                                            <div class="box-scroll-table table-type3 type2">
+                                                <table>
+                                                    <caption></caption>
+                                                    <colgroup>
+                                                        <col width="154px">
+                                                        <col width="154px">
+                                                        <col width="154px">
+                                                        <col width="154px">
+                                                    </colgroup>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>구분</th>
+                                                            <th>297 상품</th>
+                                                            <th>399 상품</th>
+                                                            <th>498 상품</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>수의명</th>
+                                                            <td>대명 참2호</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>원사종류</th>
+                                                            <td>마혼용(대마,아마,저마)</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>원사 원산지</th>
+                                                            <td>중국</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>제조</th>
+                                                            <td>기계직 중국산</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            ※ 대명 참2호(수의) 원사비율<br />
+                                            - 마혼용 (대마 약 60%, 아마 및 저마 약 40%) 
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>2. 관</dt>
+                                        <dd>
+                                            <div class="box-scroll-table table-type3 type2">
+                                                <table>
+                                                    <colgroup>
+                                                        <col width="154px">
+                                                        <col width="154px">
+                                                        <col width="154px">
+                                                        <col width="154px">
+                                                    </colgroup>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>구분</th>
+                                                            <th>297 상품</th>
+                                                            <th>399 상품</th>
+                                                            <th>498 상품</th>
+                                                        </tr>
+                                                    </thead>
+                
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>매장시</th>
+                                                            <td>오동나무(45mm)</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>화장시</th>
+                                                            <td>오동나무(18mm) 횡대</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>원사 원산지</th>
+                                                            <td>중국</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>제조</th>
+                                                            <td>한국</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>3. 장의차량</dt>
+                                        <dd>
+                                            <div class="box-scroll-table table-type3 type2">
+                                                <table>
+                                                    <colgroup>
+                                                        <col width="116px">
+                                                        <col width="250px">
+                                                        <col width="250px">
+                                                    </colgroup>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>구분</th>
+                                                            <th>내용</th>
+                                                            <th>비고</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>유족전용 장의버스</th>
+                                                            <td>대형버스(45인승)/현대유니버스/2008~2019년식 장의차량</td>
+                                                            <td>지역에 따라 변경될 수 있음</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>고인전용 리무진</th>
+                                                            <td>리무진/링컨MKX/2012년 이후 출고차량</td>
+                                                            <td>1차 장지까지만 제공 / 지역에 따라 변경될 수 있음 </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>무료차량거리</th>
+                                                            <td>- 297 상품 : 버스, 리무진 왕복 200km 택1&nbsp;<br>- 399 상품 : 버스, 리무진 왕복 200km 이내<br>- 498 상품 : 버스, 리무진 왕복 200km 이내</td>
+                                                            <td>1km 추가 시마다 2천원 추가비용 부담</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>4. 인력</dt>
+                                        <dd>
+                                            <div class="box-scroll-table table-type3 type2">
+                                                <table summary="">
+                                                    <caption></caption>
+                                                    <colgroup>
+                                                        <col width="115px">
+                                                        <col width="123px">
+                                                        <col width="123px">
+                                                        <col width="123px">
+                                                        <col width="132px">
+                                                    </colgroup>
+                                                    <thead>
+                                                        <tr>
+                                                            <th>구분</th>
+                                                            <th>297 상품</th>
+                                                            <th>399 상품</th>
+                                                            <th>498 상품</th>
+                                                            <th>비고</th>
+                                                        </tr>
+                                                    </thead>
+                
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>의전관(C.P)</th>
+                                                            <td>1명</td>
+                                                            <td>좌동</td>
+                                                            <td>좌동</td>
+                                                            <td>입관 시 의전관 1명 추가 지원</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <th>장례의전 도우미</th>
+                                                            <td>3명</td>
+                                                            <td>4명</td>
+                                                            <td>5명</td>
+                                                            <td>1인 10시간 기준</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            ※ 지역에 따라 의전관이 상례사 역할을 대체할 수 있습니다.<br />
+                                            ※ 도우미 인원 추가 시 1일 9만원, 시간 추가 시 1시간 1만 5천원
+                                        </dd>
+                                    </dl>
+                                </div>
+                
+                                <div class="box-privacy">
+                                    <dl>
+                                        <dt>소비자 유의사항</dt>
+                                        <dd>
+                                            1. 상조서비스 용품은 생산국가, 지역의 사정 및 해당법률의 개정 등 사정에 따라 대체용품으로 교체될 수 있습니다.<br />
+                                            2. 고인전용 리무진은 출상지에서 일차 장지까지만 서비스 됩니다.(화장 시, 화장장까지)<br />
+                                            3. 장의차량 운행시 발생되는 도로비용은 고객이 부담하셔야 합니다.<br />
+                                            4. 규정 이하로 행사 시, 차액은 권리포기로 간주합니다(단, 수의 준비고객은 대체용품 지급)<br />
+                                            5. 제공 품목에 대한 초과 수량 및 규격으로 주문 시, 추가금액을 부담해야 합니다.<br />
+                                            6. 추가 사항에 대한 비용은 물가상승에 따라 변동 가능합니다.<br />
+                                            7. 제단 꽃 장식은 장례식장 현장 사정에 따라 현금으로 지급 될 수 있습니다.<br />
+                                            8. 장례식장 대여료 및 접객용 음식료는 불포함된 내용입니다.<br />
+                                            9. 회비납입 도중 장례 발생 시에는 발인 전에 잔여회비를 일시불로 납부해야 합니다.<br />
+                                            10. 장례서비스 기간은 3일장을 기준으로 합니다.
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <!-- end -->
+                        </div>
+                    </div>
+                </div>
+                <!-- //팝업본문 -->
+
+            </div>
+        </div>
+        <!-- //본문 -->
+    </div>
+</div>
+<!-- //레이어 팝업 -->
+
+<script src="../js/dom.js"></script>
+
+</body>
+</html>

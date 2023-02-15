@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NoticeBoard">
+
+    <!-- 프론트 > 고객센터 > 공지사항 > 조건절 -->
+    <sql id="noticeBoardWhere">
+        WHERE BRD_NTS_USE_YN = 'Y'
+        <if test="BRD_NTS_TOP_YN != null and BRD_NTS_TOP_YN != ''">
+            AND NVL(BRD_NTS_TOP_YN, 'N') = #{BRD_NTS_TOP_YN}
+        </if>
+        <if test="BRD_NTS_IDX != null and BRD_NTS_IDX != ''">
+            AND BRD_NTS_IDX = #{BRD_NTS_IDX}
+        </if>
+    </sql>
+
+    <!-- 프론트 > 고객센터 > 공지사항 > 목록 개수 -->
+    <select id="selectNoticeBoardListCount" parameterType="HashMap" resultType="Integer">
+        /* NoticeBoard.selectNoticeBoardListCount */
+        SELECT COUNT(BRD_NTS_IDX)
+        FROM T_BRD_NTS
+        <include refid="noticeBoardWhere"/>
+    </select>
+    
+    <!-- 프론트 > 고객센터 > 공지사항 > 목록 -->
+    <select id="selectNoticeBoardList" parameterType="HashMap" resultType="HashMap">
+        /* NoticeBoard.selectNoticeBoardList */
+        SELECT S2.*,
+            (SELECT CC.CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_IDX = S2.BRD_CMN_COM_IDX) AS BRD_CMN_COM_NM
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    BRD_NTS_IDX,
+                    BRD_CMN_COM_IDX,
+                    BRD_NTS_TITLE,
+                    BRD_NTS_READ_CNT,
+                    BRD_NTS_REG_DT
+                FROM T_BRD_NTS
+                <include refid="noticeBoardWhere"/>
+                ORDER BY BRD_NTS_REG_DT DESC
+            ) S1
+            <if test="endNum != null and endNum != ''">
+                WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+            </if>
+        ) S2
+        <if test="startNum != null and startNum != ''">
+            WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+        </if>
+    </select>
+    
+    <!-- 프론트 > 고객센터 > 공지사항 > 상세정보  -->
+    <resultMap id="resultNoticeBoardInfo" type="HashMap">
+        <result property="BRD_NTS_IDX" column="BRD_NTS_IDX"/>
+        <result property="BRD_CMN_COM_NM" column="BRD_CMN_COM_NM"/>
+        <result property="BRD_NTS_TITLE" column="BRD_NTS_TITLE"/>
+        <result property="BRD_NTS_READ_CNT" column="BRD_NTS_READ_CNT"/>
+        <result property="BRD_NTS_CONTENTS" column="BRD_NTS_CONTENTS" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="BRD_NTS_REG_DT" column="BRD_NTS_REG_DT"/>
+    </resultMap>
+    <select id="selectNoticeBoardInfo" parameterType="HashMap" resultMap="resultNoticeBoardInfo">
+        /* NoticeBoard.selectNoticeBoardInfo */
+        SELECT
+            BRD_NTS_IDX,
+            (SELECT CC.CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_IDX = BRD_CMN_COM_IDX) AS BRD_CMN_COM_NM,
+            BRD_NTS_TITLE,
+            BRD_NTS_CONTENTS,
+            BRD_NTS_READ_CNT,
+            BRD_NTS_REG_DT
+        FROM T_BRD_NTS
+        <include refid="noticeBoardWhere"/>
+    </select>
+    
+    <!-- 프론트 > 고객센터 > 공지사항 > 조회수 수정 -->
+    <update id="updateNoticeBoardReadCount" parameterType="HashMap">
+        /* NoticeBoard.updateNoticeBoardReadCount */
+        UPDATE T_BRD_NTS SET
+            BRD_NTS_READ_CNT = NVL(BRD_NTS_READ_CNT, 0) + 1
+        <include refid="noticeBoardWhere"/>
+    </update>
+</mapper>

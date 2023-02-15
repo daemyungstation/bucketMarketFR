@@ -1,0 +1,397 @@
+package web.fr.contract.controller;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.annotation.AccessRole;
+import common.annotation.CommandMap;
+import common.code.Contract;
+import common.code.Contract.JOIN_STEP;
+import common.exception.CustomHandleException;
+import common.model.User.ROLE_USER;
+import common.session.SessionsContract;
+import common.session.SessionsUser;
+import common.support.ControllerSupport;
+import common.util.DeviceUtil;
+import common.util.StringUtil;
+import common.viewer.JSON;
+import lombok.extern.log4j.Log4j2;
+import web.fr.board.service.CommentBoardService;
+import web.fr.common.service.CommonService;
+import web.fr.contract.service.ContractService;
+import web.pg.service.IniPayService;
+import web.fr.mycontract.service.MyContractCommonService;
+
+@Log4j2
+@Controller
+public class ContractController extends ControllerSupport {
+
+    @Resource(name="contractService")
+    private ContractService contractService;
+    
+    @Resource(name="iniPayService")
+    private IniPayService iniPayService;
+    
+    @Resource(name="commonService")
+    private CommonService commonService;
+    
+    @Resource(name="commentBoardService")
+    private CommentBoardService commentBoardService;
+    
+    @Resource(name = "myContractCommonService")
+    private MyContractCommonService myContractCommonService;
+        
+    /**
+     * <pre>
+     * 1. MethodName : getErrorReturnKey
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 스텝에 맞는 URL key를 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 2.
+     * </pre>
+     *
+     * @param step
+     * @return
+     */
+    private String getErrorReturnKey(JOIN_STEP step) {
+        String errorReturnKey = "main.index";
+        switch (step) {
+            case VIEW : 
+                errorReturnKey = "product.basic.list";
+                break;
+            case STEP1 : 
+                errorReturnKey = "contract.join.step1.form";
+                break;
+            case STEP2 : 
+                errorReturnKey = "contract.join.step2.form";
+                break;
+            case STEP3 : 
+                errorReturnKey = "contract.join.step3.form";
+                break;
+            case STEP4 : 
+                errorReturnKey = "contract.join.step4.form";
+                break;
+            default : 
+                errorReturnKey = "main.index";
+                break;
+        }
+        return errorReturnKey;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : getErrorParams
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 기본 파라메터를 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 2.
+     * </pre>
+     *
+     * @param commandMap
+     * @param step
+     * @return
+     * @throws Exception
+     */
+    private Map<String, Object> getErrorParams (Map<String, Object> commandMap, JOIN_STEP step) throws Exception {
+        Map<String, Object> returnMap = new HashMap<>();
+        List<String> keyList = new ArrayList<>();
+        if (Contract.JOIN_STEP.INDEX.equals(step)) {
+            return returnMap;
+        } else if (Contract.JOIN_STEP.VIEW.equals(step)) {
+            keyList.add("PRD_MST_NO");
+        } else {
+            keyList.add("PRD_MST_NO");
+            if (StringUtil.getArray(commandMap, "PRD_OPT_IDXs").length > 0) {
+                keyList.add("PRD_OPT_IDXs");
+            }
+            keyList.add("ORD_MST_CNT");
+        }
+        for (String key : keyList) {
+            if (commandMap.get(key) != null) {
+                if (commandMap.get(key).getClass().isArray()) {
+                    returnMap.put(key, StringUtil.getArray(commandMap, key));
+                } else {
+                    returnMap.put(key, StringUtil.getString(commandMap, key));
+                }
+            }
+        }
+        return returnMap;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinStep1Form
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 가입정보 입력
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 26.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${contract.join.step1.form}", method=RequestMethod.GET)
+    public ModelAndView joinStep1Form(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            // 계약 정보
+            mv.addAllObjects(this.contractService.selectContractInfo(commandMap, Contract.JOIN_STEP.STEP1));
+            // 약관 목록
+            mv.addObject("termList", this.contractService.selectContractTermList(commandMap));
+            // 해약 환급금 목록 
+            mv.addObject("cancellationAmountList", this.commonService.selectCommonCancellationAmountList(commandMap));
+            mv.addObject("commandMap", commandMap);
+            setViewName(mv, "contract.join.step1.form");
+        } catch (CustomHandleException e) {
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            Contract.JOIN_STEP step = (Contract.JOIN_STEP) e.getStep();
+            setErrorView(mv, getErrorReturnKey(step), getErrorParams(commandMap, step), e, Contract.class);
+        }
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinStep2Form
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 약관동의, 본인확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 26.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    //@AccessRole(value=ROLE_USER.contractor, key="contract.join.step1.form", isAttachParameter=true)
+    @RequestMapping(value="${contract.join.step2.form}", method=RequestMethod.GET)
+    public ModelAndView joinStep2Form(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            // 계약 정보
+            mv.addAllObjects(this.contractService.selectContractInfo(commandMap, Contract.JOIN_STEP.STEP2));
+            // 약관 목록
+            mv.addObject("termList", this.contractService.selectContractTermList(commandMap));
+            // 해약 환급금 목록 
+            mv.addObject("cancellationAmountList", this.commonService.selectCommonCancellationAmountList(commandMap));
+            mv.addObject("commandMap", commandMap);
+            setViewName(mv, "contract.join.step2.form");
+        } catch (CustomHandleException e) {
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            Contract.JOIN_STEP step = (Contract.JOIN_STEP) e.getStep();
+            setErrorView(mv, getErrorReturnKey(step), getErrorParams(commandMap, step), e, Contract.class);
+        }
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinStep2FormComplete
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 본인확인 페이지 완료시 이동
+     * 4. 작성자       : inuscomm
+     * 5. 작성일       : 2021. 01. 26.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @AccessRole(value=ROLE_USER.contractor, key="contract.join.step1.form", isAttachParameter=true)
+    @RequestMapping(value="${contract.join.step2.complete}", method=RequestMethod.GET)
+    public ModelAndView joinStep2Complete(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            Map<String, Object> tempMap = SessionsContract.getSessionContractData();
+            commandMap.put("PRD_MST_NO", StringUtil.getString(tempMap, "PRD_MST_NO", ""));
+            commandMap.put("PRD_OPT_IDXs", StringUtil.getArray(tempMap, "PRD_OPT_IDXs"));
+            commandMap.put("ORD_MST_CNT", StringUtil.getString(tempMap, "ORD_MST_CNT", ""));
+            
+            //계약 정보
+            mv.addAllObjects(this.contractService.selectContractInfo(commandMap, Contract.JOIN_STEP.STEP2));
+            
+            mv.addObject("commandMap", commandMap);
+            
+            setViewName(mv, "contract.join.step2.complete");
+        } catch (CustomHandleException e) {
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            Contract.JOIN_STEP step = (Contract.JOIN_STEP) e.getStep();
+            setErrorView(mv, getErrorReturnKey(step), getErrorParams(commandMap, step), e, Contract.class);
+        }
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinStep3Form
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 카카오페이 인증
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 26.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @AccessRole(value=ROLE_USER.contractor, key="contract.join.step1.form", isAttachParameter=true)
+    @RequestMapping(value="${contract.join.step3.form}", method=RequestMethod.GET)
+    public ModelAndView joinStep3Form(@CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            // 계약 정보
+            mv.addAllObjects(this.contractService.selectContractInfo(commandMap, Contract.JOIN_STEP.STEP3));
+            if (DeviceUtil.isNormal()) {
+                mv.addObject("contract", SessionsContract.getSessionContractData());
+            }
+            mv.addObject("commandMap", commandMap);
+            setViewName(mv, "contract.join.step3.form");
+        } catch (CustomHandleException e) {
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            Contract.JOIN_STEP step = (Contract.JOIN_STEP) e.getStep();
+            setErrorView(mv, getErrorReturnKey(step), getErrorParams(commandMap, step), e, Contract.class);
+        }
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinFormSaveAjax
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 입력정보 저장
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 29.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${contract.join.form.save.ajax}", method=RequestMethod.POST)
+    public JSON joinFormSaveAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        SessionsContract.setSessionContractAddData(commandMap);
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinFormSaveAjax
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 입력정보 세션 존재 유무
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 29.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${contract.join.data.exists.ajax}", method=RequestMethod.POST)
+    public JSON joinDataExistsAjax(@CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("isLogin", SessionsUser.isLogin(ROLE_USER.contractor));
+        json.put("isDataExists", !SessionsContract.getSessionContractData().isEmpty());
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinRegist
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 가입
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 26.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @AccessRole(value=ROLE_USER.contractor, key="contract.join.step1.form", isAttachParameter=true)
+    @RequestMapping(value="${contract.join.regist}", method=RequestMethod.POST)
+    public ModelAndView joinRegist(@CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            boolean isSuccess = true;
+            if (!"".equals(StringUtil.getString(commandMap, "ORD_MST_IDX", ""))) {
+                // PG 승인 처리
+                Map<String, Object> payApvMap = this.iniPayService.insertIniPayApv(commandMap);
+                isSuccess = (boolean) payApvMap.get("isSuccess");
+                if (!isSuccess) {
+                    String errorCode = StringUtil.getString(payApvMap, "P_STATUS");
+                    String errorMsg = StringUtil.getString(payApvMap, "P_RMESG1");
+                    String resultMsg = MessageFormat.format(Contract.ERROR.E498.getMessage(), new Object [] {errorCode, errorMsg});
+                    throw new CustomHandleException(Contract.ERROR.E498, resultMsg, Contract.JOIN_STEP.STEP4, Contract.class);
+                }
+            }
+            if (isSuccess) {
+                // 계약 데이터 등록
+                this.contractService.insertContractJoin(commandMap);
+            }
+            setRedirectView(mv, "contract.join.complete.view", commandMap);
+        } catch (CustomHandleException e) {
+            if (log.isDebugEnabled()) {
+                e.printStackTrace();
+            }
+            Contract.JOIN_STEP step = (Contract.JOIN_STEP) e.getStep();
+            setErrorView(mv, getErrorReturnKey(step), getErrorParams(commandMap, step), e, Contract.class);
+        }
+        return mv;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : joinCompleteView
+     * 2. ClassName  : ContractController.java
+     * 3. Comment    : 프론트 > 간편가입 신청 > 가입 완료
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 26.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @AccessRole(value=ROLE_USER.contractor)
+    @RequestMapping(value="${contract.join.complete.view}", method=RequestMethod.GET)
+    public ModelAndView joinCompleteView(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+       
+        mv.addObject("contractor", SessionsUser.getSessionUser(request));
+        if (!"".equals(StringUtil.getString(commandMap, "ORD_MST_IDX", ""))) {
+            // 가입내역 정보
+            mv.addObject("info", this.myContractCommonService.selectContractInfo(request, commandMap));
+        } else if (!"".equals(StringUtil.getString(commandMap, "ORD_MST_GRP_IDX", ""))) {
+            // 가입내역 정보
+            mv.addObject("info", this.myContractCommonService.selectContractGroupInfo(commandMap));
+        }
+        
+        SessionsContract.setSessionContractDataClear();
+        mv.addObject("commandMap", commandMap);
+        setViewName(mv, "contract.join.complete.view");        
+        return mv;
+    }
+}

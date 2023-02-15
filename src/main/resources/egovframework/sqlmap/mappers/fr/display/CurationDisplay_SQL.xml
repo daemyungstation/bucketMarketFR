@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CurationDisplay">
+    <!-- 프론트 > 큐레이션 > 목록  -->
+    <resultMap id="resultCurationDisplayList" type="HashMap">
+        <result property="CRT_MST_IDX" column="CRT_MST_IDX"/>
+        <result property="CRT_MST_QST" column="CRT_MST_QST"/>
+        <collection property="keywordList" javaType="java.util.ArrayList" ofType="HashMap">
+            <result property="CRT_KWD_IDX" column="CRT_KWD_IDX"/>
+            <result property="CRT_KWD_SLT" column="CRT_KWD_SLT"/>
+            <result property="CRT_KWD_RLT" column="CRT_KWD_RLT"/>
+        </collection>
+    </resultMap>
+    <select id="selectCurationDisplayList" parameterType="HashMap" resultMap="resultCurationDisplayList">
+        /* CurationDisplay.selectCurationDisplayList */
+        SELECT
+            CM.CRT_MST_IDX,
+            CM.CRT_MST_QST,
+            CK.CRT_KWD_IDX,
+            CK.CRT_KWD_SLT,
+            CK.CRT_KWD_RLT
+        FROM T_CRT_MST CM, T_CRT_KWD CK
+        WHERE CM.CRT_MST_IDX = CK.CRT_MST_IDX
+        ORDER BY CM.CRT_MST_SRT, CK.CRT_KWD_SRT
+    </select>
+    <!-- 프론트 > 큐레이션 > 키워드 목록  -->
+    <select id="selectCurationDisplayKeywordList" parameterType="HashMap" resultType="HashMap">
+        /* CurationDisplay.selectCurationDisplayList */
+        SELECT CRT_KWD_SLT
+        FROM T_CRT_KWD
+        WHERE CRT_KWD_IDX IN
+            <foreach item="searchCrtKwdIdx" collection="searchCrtKwdIdxs" open="(" close=")" separator=",">
+                #{searchCrtKwdIdx}
+            </foreach>
+        ORDER BY CRT_KWD_SRT ASC
+    </select>
+    <!-- 프론트 > 큐레이션 > 선택 키워드 히스토리 > 등록  -->
+    <insert id="insertCurationDisplayHistory" parameterType="HashMap">
+        /* CurationDisplay.insertCurationDisplayHistory */
+        INSERT INTO T_CRT_RCD (
+            CRT_RCD_IDX,
+            CRT_MST_QST,
+            CRT_KWD_SLT,
+            CRT_RCD_AGT,
+            CRT_RCD_REG_DT,
+            CRT_RCD_REG_IP
+        )
+        SELECT
+            SEQ_CRT_RCD_IDX.NEXTVAL,
+            CM.CRT_MST_QST,
+            CK.CRT_KWD_SLT,
+            '${@common.util.DeviceUtil@getDeviceChar()}',
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            '${@common.util.IPUtil@getClientIP()}'
+        FROM T_CRT_MST CM, T_CRT_KWD CK
+        WHERE CM.CRT_MST_IDX = CK.CRT_MST_IDX
+            AND CK.CRT_KWD_IDX IN
+            <foreach item="searchCrtKwdIdx" collection="searchCrtKwdIdxs" open="(" close=")" separator=",">
+                #{searchCrtKwdIdx}
+            </foreach>
+    </insert>
+</mapper>

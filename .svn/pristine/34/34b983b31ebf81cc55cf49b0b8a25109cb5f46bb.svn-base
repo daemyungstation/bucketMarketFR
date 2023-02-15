@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>무제 문서</title>
+</head>
+
+<body>
+<!-- 
+&lt;
+&gt;
+--> 
+
+<!-- 큰배너 -->
+<div style="display:block; width:100%; min-width:340px; text-decoration: none; margin: 10px auto; overflow: hidden;">
+  <dl style="width:100%; margin:0px">
+    <dd style="margin: 0 0 10px 0; width:100%; text-align: left; display: block;"> <a href="#" title="새창열림" target="_blank" style="text-decoration: none;"><img src="https://tbucket.upleat.com/resources/mo/images/img_photo_sample2.png" alt="" style="margin:0; padding:0; text-align: left; width:100%; height:auto;"></a> </dd>
+    <dt style="text-align:left;"> <a href="#" title="새창열림" target="_blank" style="text-decoration: none;"> <span style="display:block; width:95%; font-size:14px; font-weight:700; color: #222; margin-bottom:5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">SK매직 정수기 렌탈비 70만원 지원</span> <span style="font-size: 13px; color: #222;">상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 </span> </a></dt>
+  </dl>
+</div>
+<!-- //큰배너 --> 
+
+<!-- 카드배너 -->
+<div style="display:block; width:100%; min-width:340px; text-decoration: none; margin: 10px auto; overflow: hidden;">
+  <dl style="float: left; width: calc(50% - 12px); margin:0px">
+    <dd style="margin: 0 0 10px 0;"> <a href="#" title="새창열림" target="_blank" style="text-decoration: none;"> <img src="https://tbucket.upleat.com/resources/mo/images/img_photo_sample2.png" alt="" style="width:100%; height: auto;"> </a></dd>
+    <dt style="text-align:left;"> <a href="#" title="새창열림" target="_blank" style="text-decoration: none;"> <span style="display:block; width:95%; font-size:14px; font-weight:700; color: #222; margin-bottom:5px; overflow: hidden; text-overflow: ellipsis; height: 40px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height:1.4;">SK매직 정수기 렌탈비 70만원 지원 SK매직 정수기 렌탈비 70만원 지원 SK매직 정수기 렌탈비 70만원 지원</span></a></dt>
+  </dl>
+  <dl style="float: right; width: calc(50% - 12px); margin:0px">
+    <dd style="margin: 0 0 10px 0;"><a href="#" title="새창열림" target="_blank" style="text-decoration: none;"><img src="https://tbucket.upleat.com/resources/mo/images/img_photo_sample2.png" alt="" style="width:100%; height: auto;"></a></dd>
+    <dt style="text-align:left;"><a href="#" title="새창열림" target="_blank" style="text-decoration: none;"><span style="display:block; width:95%; font-size:14px; font-weight:700; color: #222; margin-bottom:5px; overflow: hidden; text-overflow: ellipsis; height: 40px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height:1.4;">SK매직 정수기 렌탈비 70만원 지원</span></a></dt>
+  </dl>
+</div>
+<!-- //카드배너 --> 
+
+<!-- 리스트배너 -->
+<div style="display:block; width:100%; min-width:340px; text-decoration: none; margin: 10px auto 2px; overflow: hidden;"> <dl style="margin:0px;"> <dd style="float:left; width:100px; height:100px; margin:0px;"> <a href="#" title="새창열림" target="_blank" style="text-decoration: none;"><img src="https://tbucket.upleat.com/resources/mo/images/img_photo_sample2.png" alt="" style="width:100%; height: auto;"> </a> </dd> <dt style="float: right; width: calc(100% - 115px); margin-bottom: 8px;"> <a href="#" title="새창열림" target="_blank" style="text-decoration: none;"> <span style="display:block; width:95%; font-size:14px; font-weight:700; color: #222; margin: 12px 0 5px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">SK매직 정수기 렌탈비 70만원 지원지원지원지원지원지원지원지원지원지원지원지원</span> <span style="display:block; font-size: 13px; overflow: hidden; text-overflow: ellipsis; width:95%; max-height: 39px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height:1.4; color: #222;">상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 상품 관리자에서 텍스트 입력한 광고문구 출력 </span> </a></dt> </dl> </div>
+<!-- //리스트배너 -->
+</body>
+</html>

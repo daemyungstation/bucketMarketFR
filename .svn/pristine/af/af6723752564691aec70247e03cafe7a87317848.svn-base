@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProductDisplay">
+    <!-- 프론트 > 베스트 랭킹 > 전시 상품 > 목록  -->
+    <select id="selectProductDisplayList" parameterType="HashMap" resultType="HashMap">
+        /* ProductDisplay.selectProductDisplayList */
+        SELECT S2.*
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNK
+            FROM (
+                SELECT
+                    TPM.PRD_MST_CD,
+                    CPM.PRD_MST_NO,
+                    CPM.PRD_MST_TYPE,
+                    CPM.PRD_MST_BND_YN,
+                    DM.DSP_MST_TXT AS PRD_MST_NM,
+                    CPM.PRD_MST_SEL_TXT,
+                    CPM.PRD_MST_SPT_TXT,
+                    CPM.PRD_MST_DPL_YN,
+                    VPM.MON_PAY_AMT,
+                    VPM.EXPR_NO,
+                    VPM.REL_AMT,
+                    VPM.REL_CNT,
+                    VPM.MON_REL_AMT,
+                    VM.VDR_MST_NM
+                FROM T_DSP_MST DM, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                WHERE DM.PRD_MST_NO = CPM.PRD_MST_NO 
+                    AND TPM.PRD_MST_CD = CPM.PRD_MST_CD
+                    AND CPM.PROD_CD = VPM.PROD_CD
+                    AND CPM.MODEL_CD = VPM.MODEL_CD
+                    AND CPM.PROD_KIND = VPM.PROD_KIND
+                    AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+                    AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+                    AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+                    AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+                    AND CPM.PRD_MST_DEL_YN = 'N'
+                    AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+                    AND EXISTS (
+                        SELECT PC.*
+                        FROM T_PRD_CTG PC
+                        WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                            AND PC.PRD_CTG_DSP_YN = 'Y'
+                            AND PC.PRD_CTG_USE_YN = 'Y'
+                    )
+                    AND EXISTS (
+                        SELECT CC.*
+                        FROM T_CMM_COM CC
+                        WHERE CC.CMN_COM_IDX =  DM.CMN_COM_IDX
+                        AND CMN_COM_USE_YN = 'Y'
+                        START WITH CC.CMN_COM_IDX = #{searchCmnComIdx} OR CC.CMN_COM_UP_IDX = #{searchCmnComIdx}
+                        CONNECT BY PRIOR CC.CMN_COM_IDX = CC.CMN_COM_UP_IDX
+                    )
+                ORDER BY DM.DSP_MST_SRT ASC
+            ) S1
+            WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+        ) S2
+        WHERE S2.RNK <![CDATA[>=]]> #{startNum}
+    </select>
+    
+    <!-- 프론트 > 메인 > 전시 상품 > 목록 -->
+    <select id="selectProductDisplayListByCode" parameterType="HashMap" resultType="HashMap">
+        /* ProductDisplay.selectProductDisplayList */
+        SELECT
+            *
+        FROM (
+            SELECT
+                ROWNUM AS RNUM,
+                S1.*,
+                COUNT(1) OVER() AS S1_COUNT
+            FROM (
+                SELECT
+                    TPM.PRD_MST_CD,
+                    CPM.PRD_MST_NO,
+                    CPM.PRD_MST_TYPE,
+                    CPM.PRD_MST_BND_YN,
+                    DM.DSP_MST_TXT AS PRD_MST_NM,
+                    CPM.PRD_MST_SEL_TXT,
+                    CPM.PRD_MST_SPT_TXT,
+                    CPM.PRD_MST_DPL_YN,
+                    VPM.MON_PAY_AMT,
+                    VPM.EXPR_NO,
+                    VPM.REL_AMT,
+                    VPM.REL_CNT,
+                    VPM.MON_REL_AMT,
+                    VM.VDR_MST_NM
+                FROM T_DSP_MST DM, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+                WHERE DM.PRD_MST_NO = CPM.PRD_MST_NO 
+                    AND TPM.PRD_MST_CD = CPM.PRD_MST_CD
+                    AND CPM.PROD_CD = VPM.PROD_CD
+                    AND CPM.MODEL_CD = VPM.MODEL_CD
+                    AND CPM.PROD_KIND = VPM.PROD_KIND
+                    AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+                    AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+                    AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+                    AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+                    AND CPM.PRD_MST_DEL_YN = 'N'
+                    AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+                    AND EXISTS (
+                        SELECT PC.*
+                        FROM T_PRD_CTG PC
+                        WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                            AND PC.PRD_CTG_DSP_YN = 'Y'
+                            AND PC.PRD_CTG_USE_YN = 'Y'
+                    )
+                    AND DM.CMN_COM_IDX = #{CMN_COM_IDX}
+                
+                <if test="limit == null or random == false">
+                    ORDER BY DM.DSP_MST_SRT ASC
+                </if>
+                <if test="limit != null and random == true">
+                    ORDER BY DBMS_RANDOM.RANDOM
+                </if>
+            ) S1
+        ) S2
+        <if test="limit != null and limit != ''">
+            WHERE RNUM <![CDATA[<=]]> #{limit}
+        </if>
+        <if test="nTimes != null">
+            WHERE RNUM <![CDATA[<=]]> TRUNC(S1_COUNT/#{nTimes}) * #{nTimes}
+        </if>
+    </select>
+    
+    <!-- 지원금 별 상품 출력 대상 카테고리 목록 -->
+    <select id="selectProductDisplayCategoryList" parameterType="HashMap" resultType="HashMap">
+        SELECT 
+            * 
+        FROM 
+            T_CMM_COM TCC
+        WHERE 
+            CMN_COM_UP_IDX = ${@common.code.Code@PRODUCT_MAIN_RECOMMEND_GROUP} 
+            AND CMN_COM_USE_YN = 'Y'
+            AND (
+                SELECT
+                    COUNT(1)
+                FROM
+                    T_DSP_MST TDM,
+                    T_PRD_MST TPM,
+                    C_PRD_MST CPM,
+                    V_PRD_MST VPM,
+                    T_VDR_MST VM
+                WHERE
+                    TDM.PRD_MST_NO = CPM.PRD_MST_NO
+                    AND TPM.PRD_MST_CD = CPM.PRD_MST_CD
+                    AND CPM.PROD_CD = VPM.PROD_CD
+                    AND CPM.MODEL_CD = VPM.MODEL_CD
+                    AND CPM.PROD_KIND = VPM.PROD_KIND
+                    AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+                    AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> 'N'
+                    AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+                    AND TPM.PRD_MST_APV_STATE = 'A'
+                    AND CPM.PRD_MST_DEL_YN = 'N'
+                    AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+                    AND EXISTS (
+                        SELECT
+                            PC.*
+                        FROM
+                            T_PRD_CTG PC
+                        WHERE
+                            PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                            AND PC.PRD_CTG_DSP_YN = 'Y'
+                            AND PC.PRD_CTG_USE_YN = 'Y' 
+                    )
+                    AND TDM.CMN_COM_IDX = TCC.CMN_COM_IDX
+            ) <![CDATA[>=]]> 6
+        ORDER BY
+            CMN_COM_SORT ASC 
+    </select>
+    
+</mapper>

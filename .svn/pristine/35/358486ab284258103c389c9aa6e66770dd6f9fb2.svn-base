@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlannerJoin">
+
+    <!-- 조건절 -->
+    <sql id="plannerJoinWhere">
+    </sql>
+
+    <!-- 플래너 이메일 중복 확인 -->
+    <select id="checkDuplicateEmail" parameterType="HashMap" resultType="Integer">
+        /* PlannerJoin.checkDuplicateEmail */
+        SELECT 
+            COUNT(1) 
+        FROM 
+            T_RDP_MST 
+        WHERE 
+            RDP_MST_MAIL = #{RDP_MST_MAIL}
+            <if test="RDP_MST_NO != null and RDP_MST_NO != ''">
+                AND RDP_MST_NO <![CDATA[<>]]> UPPER(#{RDP_MST_NO})
+            </if>
+    </select>
+    
+    <!-- 플래너 CI 중복 확인 -->
+    <select id="checkDuplicateCi" parameterType="HashMap" resultType="Integer">
+        /* PlannerJoin.checkDuplicateCi */
+        SELECT 
+            COUNT(1) 
+        FROM 
+            T_RDP_MST 
+        WHERE 
+            RDP_MST_CI = #{RDP_MST_CI}
+    </select>
+    
+    <!-- 플래너 아이디 중복 확인 -->
+    <select id="checkDuplicateId" parameterType="HashMap" resultType="Integer">
+        /* PlannerJoin.checkDuplicateId */
+        SELECT 
+            COUNT(1) 
+        FROM 
+            T_RDP_MST 
+        WHERE 
+            RDP_MST_ID = #{RDP_MST_ID}
+            <if test="RDP_MST_NO != null and RDP_MST_NO != ''">
+                AND RDP_MST_NO <![CDATA[<>]]> UPPER(#{RDP_MST_NO})
+            </if>
+    </select>
+    
+    <!-- 플래너 홍보사이트 중복 확인 -->
+    <select id="checkDuplicateSite" parameterType="HashMap" resultType="Integer">
+        /* PlannerJoin.checkDuplicateSite */
+        SELECT 
+            COUNT(1) 
+        FROM 
+            T_RDP_SIT 
+        WHERE 
+            RDP_SIT_ADR = TRIM(#{RDP_SIT_ADR})
+    </select>
+    
+    <!-- 플래너 IDX 조회 -->
+    <select id="selectPlannerIdx" parameterType="HashMap" resultType="String">
+        /* PlannerJoin.selectPlannerIdx */
+        SELECT SEQ_RDP_MST_IDX.NEXTVAL AS RDP_MST_IDX FROM DUAL
+    </select>
+    
+    <!-- 신청 플래너 등록 -->
+    <insert id="insertApplyPlanner" parameterType="HashMap">
+        <bind name="PLANNER_STATE_APPLY" value="@common.code.Code@PLANNER_STATE_APPLY"/>
+        /* PlannerJoin.insertApplyPlanner */
+        INSERT INTO T_RDP_MST (
+            RDP_MST_IDX,
+            RDP_MST_NO,
+            RDP_MST_MEM_NM,
+            RDP_MST_DM_YN,
+            RDP_MST_DM_NO,
+            RDP_MST_MAIL,
+            RDP_MST_HP1,
+            RDP_MST_HP2,
+            RDP_MST_HP3,
+            RDP_MST_CI,
+            RDP_MST_SIT_DSC,
+            RDP_MST_ANS1,
+            RDP_MST_ANS2,
+            RDP_MST_ANS3,
+            RDP_MST_ANS4,
+            RDP_MST_ANS5,
+            RDP_MST_ANS6,
+            RDP_MST_AGR_DT,
+            RDP_MST_STATE,
+            RDP_MST_REG_DT,
+            RDP_MST_REG_IP,
+            RDP_MST_REG_ID
+        ) VALUES (
+            #{RDP_MST_IDX},
+            #{RDP_MST_NO},
+            #{RDP_MST_MEM_NM},
+            NVL(#{RDP_MST_DM_YN}, 'N'),
+            #{RDP_MST_DM_NO},
+            #{RDP_MST_MAIL},
+            #{RDP_MST_HP1},
+            #{RDP_MST_HP2},
+            #{RDP_MST_HP3},
+            #{RDP_MST_CI},
+            #{RDP_MST_SIT_DSC},
+            #{RDP_MST_ANS1},
+            #{RDP_MST_ANS2},
+            #{RDP_MST_ANS3},
+            #{RDP_MST_ANS4},
+            #{RDP_MST_ANS5},
+            #{RDP_MST_ANS6},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{PLANNER_STATE_APPLY},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{RDP_MST_REG_IP},
+            #{RDP_MST_IDX}
+        )
+    </insert>
+    
+    <!-- 신청 플래너 수정 -->
+    <update id="updateApplyPlanner" parameterType="HashMap">
+        <bind name="PLANNER_STATE_APPLY" value="@common.code.Code@PLANNER_STATE_APPLY"/>
+        /* PlannerJoin.updateApplyPlanner */
+        UPDATE T_RDP_MST 
+        SET
+            RDP_MST_DM_YN = #{RDP_MST_DM_YN},
+            RDP_MST_DM_NO = #{RDP_MST_DM_NO},
+            RDP_MST_MAIL = #{RDP_MST_MAIL},
+            RDP_MST_SIT_DSC = #{RDP_MST_SIT_DSC},
+            RDP_MST_ANS1 = #{RDP_MST_ANS1},
+            RDP_MST_ANS2 = #{RDP_MST_ANS2},
+            RDP_MST_ANS3 = #{RDP_MST_ANS3},
+            RDP_MST_ANS4 = #{RDP_MST_ANS4},
+            RDP_MST_ANS5 = #{RDP_MST_ANS5},
+            RDP_MST_ANS6 = #{RDP_MST_ANS6},
+            RDP_MST_STATE = #{PLANNER_STATE_APPLY},
+            RDP_MST_RJT_RSN = #{RDP_MST_RJT_RSN}
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 신청 플래너 홍보사이트 등록 -->
+    <insert id="insertApplyPlannerSite" parameterType="HashMap">
+        <selectKey keyProperty="RDP_SIT_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_RDP_SIT_IDX.NEXTVAL AS RDP_SIT_IDX FROM DUAL
+        </selectKey> 
+        /* PlannerJoin.insertApplyPlannerSite */
+        INSERT INTO T_RDP_SIT (
+            RDP_SIT_IDX,
+            RDP_MST_IDX,
+            RDP_SIT_ADR,
+            RDP_SIT_REG_DT,
+            RDP_SIT_REG_IP,
+            RDP_SIT_REG_ID
+        ) VALUES (
+            #{RDP_SIT_IDX},
+            #{RDP_MST_IDX},
+            #{RDP_SIT_ADR},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{RDP_SIT_REG_IP},
+            #{RDP_MST_IDX}
+        )
+    </insert>
+    
+    <!-- 신청 플래너 주제 등록 -->
+    <insert id="insertApplyPlannerSubject" parameterType="HashMap">
+        <selectKey keyProperty="RDP_SUB_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_RDP_SUB_IDX.NEXTVAL AS RDP_SUB_IDX FROM DUAL
+        </selectKey> 
+        /* PlannerJoin.insertApplyPlannerSubject */
+        INSERT INTO T_RDP_SUB (
+            RDP_SUB_IDX,
+            RDP_MST_IDX,
+            RDP_SUB_CD,
+            RDP_SUB_REG_DT,
+            RDP_SUB_REG_IP,
+            RDP_SUB_REG_ID
+        ) VALUES (
+            #{RDP_SUB_IDX},
+            #{RDP_MST_IDX},
+            #{RDP_SUB_CD},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{RDP_SIT_REG_IP},
+            #{RDP_MST_IDX}
+        )
+    </insert>
+    
+    <!-- 신청 플래너 기본 정보 조회 -->
+    <select id="selectApplyPlannerInfo" parameterType="HashMap" resultType="HashMap">
+        /* PlannerJoin.selectApplyPlannerInfo */
+        SELECT
+            *
+        FROM 
+            T_RDP_MST
+        WHERE
+            RDP_MST_NO = UPPER(#{RDP_MST_NO})
+    </select>
+    
+    <!-- 신청 플래너 홍보사이트 조회 -->
+    <select id="selectApplyPlannerSiteInfo" parameterType="HashMap" resultType="String">
+        /* PlannerJoin.selectApplyPlannerSiteInfo */
+        SELECT
+            RDP_SIT_ADR
+        FROM 
+            T_RDP_SIT
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </select>
+    
+    <!-- 신청 플래너 주제 조회 -->
+    <select id="selectApplyPlannerSubInfo" parameterType="HashMap" resultType="String">
+        /* PlannerJoin.selectApplyPlannerSubInfo */
+        SELECT
+            RDP_SUB_CD
+        FROM 
+            T_RDP_SUB
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </select>
+    
+    <!-- 신청 플래너 홍보사이트 삭제 -->
+    <delete id="deleteApplyPlannerSiteInfo" parameterType="HashMap">
+        /* PlannerJoin.deleteApplyPlannerSiteInfo */
+        DELETE FROM 
+            T_RDP_SIT
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </delete>
+    
+    <!-- 신청 플래너 주제 삭제 -->
+    <delete id="deleteApplyPlannerSubInfo" parameterType="HashMap">
+        /* PlannerJoin.deleteApplyPlannerSubInfo */
+        DELETE FROM 
+            T_RDP_SUB
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </delete>
+    
+    <!-- 신청 플래너 추가정보 수정 -->
+    <update id="updateApplyPlannerAdditionalInfo" parameterType="HashMap">
+        <bind name="PLANNER_STATE_INACTIVE" value="@common.code.Code@PLANNER_STATE_INACTIVE"/>
+        /* PlannerJoin.updateApplyPlannerAdditionalInfo */
+        UPDATE T_RDP_MST 
+        SET
+            RDP_MST_ID = #{RDP_MST_ID},
+            RDP_MST_PW = #{RDP_MST_PW},
+            RDP_MST_BUSI_CLS = #{RDP_MST_BUSI_CLS},
+            RDP_MST_STATE = #{PLANNER_STATE_INACTIVE},
+            RDP_MST_BUSI_NM = #{RDP_MST_BUSI_NM},
+            RDP_MST_BUSI1 = #{RDP_MST_BUSI1},
+            RDP_MST_BUSI2 = #{RDP_MST_BUSI2},
+            RDP_MST_BUSI3 = #{RDP_MST_BUSI3},
+            RDP_MST_CEO_NM = #{RDP_MST_CEO_NM},
+            RDP_MST_BUSI_CDT = #{RDP_MST_BUSI_CDT},
+            RDP_MST_BUSI_TYPE = #{RDP_MST_BUSI_TYPE},
+            RDP_MST_ZIP_CODE = #{RDP_MST_ZIP_CODE},
+            RDP_MST_DR_ADDR1 = #{RDP_MST_DR_ADDR1},
+            RDP_MST_DR_ADDR2 = #{RDP_MST_DR_ADDR2},
+            RDP_MST_SSN1 = #{RDP_MST_SSN1},
+            RDP_MST_SSN2 = #{RDP_MST_SSN2},
+            RDP_MST_BNK_CD = #{RDP_MST_BNK_CD},
+            RDP_MST_BNK_ACT = #{RDP_MST_BNK_ACT},
+            RDP_MST_ACT_HDR = #{RDP_MST_ACT_HDR}
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 교육이수 목록 -->
+    <resultMap id="resultPlannerQuiz" type="HashMap">
+        <result property="RDP_EDU_IDX" column="RDP_EDU_IDX"/> <!-- 교육관리 IDX -->
+        <result property="RDP_EDU_NM" column="RDP_EDU_NM"/> <!-- 그룹명 -->
+        <result property="RDP_EDU_YN" column="RDP_EDU_YN"/> <!-- 사용여부 -->
+        <result property="RDP_EDU_REG_DT" column="RDP_EDU_REG_DT"/> <!-- 최초_등록일 -->
+        <result property="RDP_EDU_REG_IP" column="RDP_EDU_REG_IP"/> <!-- 최초_등록_IP -->
+        <result property="RDP_EDU_REG_ID" column="RDP_EDU_REG_ID"/> <!-- 최초_등록자_아이디 -->
+        <result property="RDP_EDU_UPD_DT" column="RDP_EDU_UPD_DT"/> <!-- 최종_등록일 -->
+        <result property="RDP_EDU_UPD_IP" column="RDP_EDU_UPD_IP"/> <!-- 최종_등록_IP -->
+        <result property="RDP_EDU_UPD_ID" column="RDP_EDU_UPD_ID"/> <!-- 최종_등록자_아이디 -->
+        
+        <collection property="QUIZ" javaType="java.util.ArrayList" ofType="HashMap">
+            <id property="RDP_QUIZ_IDX" column="RDP_QUIZ_IDX"/> <!-- 퀴즈 IDX -->
+            <result property="RDP_EDU_IDX" column="RDP_EDU_IDX"/> <!-- 교육관리 IDX -->
+            <result property="RDP_QUIZ_NM" column="RDP_QUIZ_NM"/> <!-- 질문 -->
+            <result property="RDP_QUIZ_SORT" column="RDP_QUIZ_SORT"/> <!-- 노출순서 -->
+            <result property="RDP_QUIZ_REG_DT" column="RDP_QUIZ_REG_DT"/> <!-- 최초_등록일 -->
+            <result property="RDP_QUIZ_REG_IP" column="RDP_QUIZ_REG_IP"/> <!-- 최초_등록_IP -->
+            <result property="RDP_QUIZ_REG_ID" column="RDP_QUIZ_REG_ID"/> <!-- 최초_등록자_아이디 -->
+            <result property="RDP_QUIZ_UPD_DT" column="RDP_QUIZ_UPD_DT"/> <!-- 최종_등록일 -->
+            <result property="RDP_QUIZ_UPD_IP" column="RDP_QUIZ_UPD_IP"/> <!-- 최종_등록_IP -->
+            <result property="RDP_QUIZ_UPD_ID" column="RDP_QUIZ_UPD_ID"/> <!-- 최종_등록자_아이디 -->
+            
+            <collection property="ITEM" javaType="java.util.ArrayList" ofType="HashMap">
+                <id property="RDP_ITEM_IDX" column="RDP_ITEM_IDX"/> <!-- 퀴즈문항 IDX -->
+                <result property="RDP_QUIZ_IDX" column="RDP_QUIZ_IDX"/> <!-- 퀴즈 IDX -->
+                <result property="RDP_ITEM_NM" column="RDP_ITEM_NM"/> <!-- 선택문항 -->
+                <result property="RDP_ITEM_YN" column="RDP_ITEM_YN"/> <!-- 정답여부 -->
+                <result property="RDP_ITEM_SORT" column="RDP_ITEM_SORT"/> <!-- 노출순서 -->
+                <result property="RDP_ITEM_REG_DT" column="RDP_ITEM_REG_DT"/> <!-- 최초_등록일 -->
+                <result property="RDP_ITEM_REG_IP" column="RDP_ITEM_REG_IP"/> <!-- 최초_등록_IP -->
+                <result property="RDP_ITEM_REG_ID" column="RDP_ITEM_REG_ID"/> <!-- 최초_등록자_아이디 -->
+                <result property="RDP_ITEM_UPD_DT" column="RDP_ITEM_UPD_DT"/> <!-- 최종_등록일 -->
+                <result property="RDP_ITEM_UPD_IP" column="RDP_ITEM_UPD_IP"/> <!-- 최종_등록_IP -->
+                <result property="RDP_ITEM_UPD_ID" column="RDP_ITEM_UPD_ID"/> <!-- 최종_등록자_아이디 -->
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="selectPlannerQuizGroupList" parameterType="HashMap" resultMap="resultPlannerQuiz">
+        /* PlannerJoin.selectPlannerQuizList */
+        SELECT 
+            * 
+        FROM 
+            T_RDP_EDU RE, 
+            T_RDP_QUIZ RQ, 
+            T_RDP_ITEM RI
+        WHERE 
+            RE.RDP_EDU_IDX = RQ.RDP_EDU_IDX 
+            AND RQ.RDP_QUIZ_IDX = RI.RDP_QUIZ_IDX
+        ORDER BY RDP_QUIZ_SORT ASC, RDP_ITEM_SORT ASC
+    </select>
+    
+    <!-- 신청 플래너 교육이수 완료 및 활동플래너로 상태 수정 -->
+    <update id="updateApplyPlannerQuizComplete" parameterType="HashMap">
+        <bind name="PLANNER_STATE_ACTIVE" value="@common.code.Code@PLANNER_STATE_ACTIVE"/>
+        /* PlannerJoin.updateApplyPlannerQuizComplete */
+        UPDATE T_RDP_MST 
+        SET
+            RDP_MST_STATE = #{PLANNER_STATE_ACTIVE},
+            RDP_MST_EDU_YN = 'Y',
+            RDP_MST_ATV_DT = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+        WHERE
+            RDP_MST_IDX = #{RDP_MST_IDX}
+    </update>
+    
+    <!-- 플래너 번호 생성 -->
+    <select id="selectNewPlannerNo" parameterType="HashMap" resultType="String">
+        /* PlannerJoin.selectNewPlannerNo */
+        SELECT 
+            DIRECT.NEXT_PLANNER_NO
+        FROM 
+            DUAL
+    </select>
+ 
+</mapper>

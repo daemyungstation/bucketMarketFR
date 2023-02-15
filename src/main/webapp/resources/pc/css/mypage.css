@@ -1,0 +1,239 @@
+@charset "utf-8";
+
+/* 본인확인 안내 */
+.box-information-mypage {margin:0px;padding:0; position: relative;}
+.box-information-mypage .text-information-type2 {font-size:18px; line-height:28px; text-align:left;}
+.box-information-certifiphone {margin:60px auto 30px;padding:50px;border:1px solid #d9d9d9;border-radius:10px; width:620px;}
+.box-information-certifiphone p {font-size:18px; line-height:28px; text-align:center;}
+.box-information-certifiphone p::before {content:'';display:block;margin:0 auto 25px auto;width:200px;height:200px;background:#f9f9f9 url(../images/img_information_type3.png) no-repeat 55%;background-size:80px auto;border-radius:100%;}
+.box-information-certifiphone .box-btn {margin-top:20px;}
+.box-information-certifiphone .box-btn .btn-type-text1{height:44px;}
+.box-information-certifiphone .box-btn .btn-type-text1 button {line-height:44px;}
+
+/* 가입내역 조회 */
+.area-mypage {margin: 0px;}
+.box-information {padding-bottom:20px; margin-bottom:40px; border-bottom:1px solid #d9d9d9;}
+.box-information .text-information-list1 li {font-size:18px; line-height: 25px;  margin: 0 0 3px 0;}
+.box-information .text-information-list1 li::before {content:''; left:0px; top:14px;}
+.box-mypage-list .table-type2 {margin-bottom:30px; border-top:1px solid #000;}
+.box-mypage-list .table-type2 th,
+.box-mypage-list .table-type2 td {border: none; font-size: 16px; padding: 13px 10px 15px 10px; vertical-align: middle;}
+.box-mypage-list .table-type2 th {background: #f8f8f8;}
+.box-mypage-list .table-type2 td {border-bottom:1px solid #d9d9d9; padding:28px 10px 30px 10px;}
+.box-mypage-list .member-num a {color: #fd5490; font-size: 16px;}
+.box-mypage-list .member-state,
+.box-mypage-list .join-state,
+.box-mypage-list .deliver-state {color: #364d8e !important;}
+.box-mypage-list .member-product {text-align: left !important;}
+.box-mypage-list .member-product span {display: inline-block; line-height: 95px;}
+.box-mypage-list .member-product img {width:95px; height:95px; border: 1px solid #e1e1e1; box-sizing: border-box;}
+.box-mypage-list .member-product a {display: inline-block; width:calc(90% - 135px); margin-left:40px; font-size:16px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+.btn-member {width:100%; margin:-20px 0 60px 0; text-align: right;}
+span[class^='btn-type-'].btn-type-text7 {min-width:120px; padding: 0 20px; margin: 0 0 0 5px; box-sizing: border-box;}
+span[class^='btn-type-'].btn-type-text7 button {font-size:14px; padding: 0;}
+span[class^='btn-type-'].btn-type-text7.type2 {border:none; background: #fd5490; margin: 0 0 0 5px;}
+span[class^='btn-type-'].btn-type-text7.type2 button {color: #fff;}
+.box-member-note > span {display:block; font-size:13px; color: #666; margin-bottom:3px;}
+.box-member-note li {font-size:13px; color: #999; line-height:16px; margin:3px 0;}
+.box-member-note li::before {top: 8px;}
+
+/* 가입내역 조회-상세페이지 */
+.box-mypage-list h4 {font-size:20px; font-weight:300; color: #222; line-height:30px; margin-bottom:10px; float:left;}
+.box-mypage-list .text-notice-type2.form2 {margin-top:10px;}
+.box-mypage-list .table-type1 {margin: 0 0 40px 0; width:100%; overflow: hidden;}
+.box-mypage-list .table-type1 th,
+.box-mypage-list .table-type1 td {font-size:16px; line-height:20px; vertical-align: middle; padding: 20px 30px;} 
+.box-mypage-list .table-type1 th {text-align: center; background: #f8f8f8;}
+.box-mypage-list .table-type1 tr:last-child th {border-bottom:none;}
+.box-mypage-list .table-type1 td:last-child {border-bottom:none;}
+.box-mypage-list .box-btn {margin-top:60px;}
+
+/* 가입내역-가입후기 작성(레이어팝업) */
+.area-content-layer .mypage {padding-bottom:30px;}
+.box-information-member {padding:0 15px; margin-bottom:30px;}
+.box-information-member dl {position:relative;padding:0px;}
+.box-information-member dt {position:absolute;left:70px;top:0; font-size:18px;color:#999;line-height:55px; height:55px; overflow: hidden;}
+.box-information-member dd {width:100%;}
+.box-information-member dd.profile {width:55px; height:55px; margin: 0 0 6px 0;}
+.box-information-member dd.profile img {display:block;width:100%; height:100%; border-radius: 100%;}
+.box-information-member dd li {position: relative; font-size:14px; margin-bottom:8px; padding-left:8px;}
+.box-information-member dd li::before {content:''; position: absolute; left:0px; top:8px; display:inline-block;margin:0px;width:2px;height:2px;border-radius:100%; background: #364d8e;}
+
+.box-reviewmark {margin:0 15px;padding:25px 0;border-bottom:1px solid #f0f0f0;}
+.box-reviewmark .text-normal-type2 {font-size:18px;}
+.box-meta-review .form-radio:before {margin: 3px 8px 0 0;} /* 별checked 위치 */
+.box-meta-review {position:relative;margin:0 auto;width:185px;height:37px;background:url(../images/img_star_gray.png) no-repeat 0 0;background-size:auto 37px;}
+.box-meta-review .form-radio {position:absolute;left:0;top:0;height:37px;z-index:0;}
+.box-meta-review .form-radio:before {display:block;width:100%;height:30px;background:none;}
+.box-meta-review .form-radio.checked:before {background:url(../images/img_star_red.png) no-repeat left 50%;background-size:auto 37px;}
+.box-meta-review .form-radio.star1 {width:20%;z-index:5;}
+.box-meta-review .form-radio.star2 {width:40%;z-index:4;}
+.box-meta-review .form-radio.star3 {width:60%;z-index:3;}
+.box-meta-review .form-radio.star4 {width:80%;z-index:2;}
+.box-meta-review .form-radio.star5 {width:100%;z-index:1;}
+
+.box-reviewwrite {margin:0 15px;padding:25px 0 8px 0;}
+.box-reviewwrite .text-normal-type2 {margin-bottom:25px;font-size:18px;}
+.box-addphoto {margin: 0 15px;}
+.box-addphoto .btn-addphoto button {font-size:16px;}
+
+/* 가입내역 - 계약안내(레이어팝업) */
+.layer-popup1.layer-member1 .layer-inner,
+.layer-popup4.layer-member1 .layer-inner {width:750px; margin-left: -375px; /* height:650px; overflow-y: auto; overflow-x: none; padding: 30px 0 0 0; */}
+
+/* 가입내역 - 해지신청(레이어팝업) */
+.layer-popup1 .area-mypage {margin: 0 15px;}
+.layer-popup1.layer-member2 .layer-inner {/* height:520px; */}
+.box-cancel-app {margin: 0px;}
+.box-cancel-app th {text-align: center;}
+.box-cancel-app td {padding: 13px 20px;}
+
+/* 납입/환급금 조회 - 납입상세(레이어팝업) */
+.box-member-payment {margin: 0 15px;}
+.layer-popup1 .table-type2 {margin-bottom:20px; border-top:1px solid #000;}
+.layer-popup1 .table-type2 th,
+.layer-popup1 .table-type2 td {border: none;}
+.layer-popup1 .table-type2 td {border-bottom:1px solid #eaeaea; padding: 20px 10px;}
+.layer-popup1 .table-type2 td.member-num a {color: #fd5490;}
+.layer-popup1 .table-type2 td.member-state,
+.layer-popup1 .table-type2 td.join-state,
+.layer-popup1 .table-type2 td.deliver-state {color: #364d8e;}
+.layer-popup1 .table-type2 td.member-product a {float:left; width:95%; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;}
+.layer-popup1 .table-type2.type2 th,
+.layer-popup1 .table-type2.type2 td,
+.layer-popup1 .table-type2.type2 td > a {font-size: 16px; vertical-align: middle; line-height: 20px;}
+.layer-popup1 .table-type2.type3 th,
+.layer-popup1 .table-type2.type3 td,
+.layer-popup1 .table-type2.type3 td > a {font-size: 12px; vertical-align: middle;}
+.layer-popup1 .table-type2.type3 th,
+.layer-popup1 .table-type2.type3 td {padding: 13px 0px;}
+
+/* 납입/환급금 조회 - 환급금 조회(레이어팝업) */
+.box-member-note.type2 {margin-bottom:20px;}
+.box-member-note.type2 > span {font-size:14px; color: #666; margin-bottom:10px;}
+.box-member-note.type2 li {font-size:12px; padding-left: 7px; line-height:14px;}
+.box-member-note.type3 {margin: -20px 0 20px;}
+.layer-popup1 .table-type3.type2,
+.layer-popup4 .table-type3.type2 {margin-bottom:30px; border-top:1px solid #000;}
+
+.layer-popup1 .table-type3.type2 th:nth-child(odd),
+.layer-popup1 .table-type3.type2 td:nth-child(odd),
+.layer-popup4 .table-type3.type2 th:nth-child(odd),
+.layer-popup4 .table-type3.type2 td:nth-child(odd) {background: #eaeaea; border-top: 1px solid #e1e1e1; border-bottom:none;}
+
+.layer-popup1 .table-type3.type2 th,
+.layer-popup4 .table-type3.type2 th {background: #f8f8f8;}
+
+.layer-popup1 .table-type3.type2 th,
+.layer-popup1 .table-type3.type2 td,
+.layer-popup4 .table-type3.type2 th,
+.layer-popup4 .table-type3.type2 td {border-top:1px solid #eaeaea; border-bottom:none;}
+
+.layer-popup1 .table-type3.type2 td,
+.layer-popup4 .table-type3.type2 td {color: #222;}
+
+.layer-popup1 .table-type3.type2 th:nth-child(odd):last-child,
+.layer-popup4 .table-type3.type2 th:nth-child(odd):last-child {border-bottom:none;}
+
+.layer-popup1 .table-type3.type2 th.on,
+.layer-popup1 .table-type3.type2 td.on,
+.layer-popup4 .table-type3.type2 th.on,
+.layer-popup4 .table-type3.type2 td.on {color: #fd5490;}
+
+/* 배송/지원혜택 조회 */
+span[class^='btn-type-'].btn-type-text7.type3 {background: #fff; border:1px solid #d9d9d9; min-width:100px; height:30px;box-sizing: border-box; margin:14px 0 0 0; padding:0px;}
+span[class^='btn-type-'].btn-type-text7.type3 button {font-size:13px;}
+
+/* 배송/지원혜택 조회 - 환급금 조회(레이어) */
+.layer-popup1 .table-type3.type3 {margin-bottom:30px; border-top:1px solid #000;}
+.layer-popup1 .table-type3.type3 th:nth-child(3n+1),
+.layer-popup1 .table-type3.type3 td:nth-child(3n+1) {background: #eaeaea; border-top: 1px solid #e1e1e1; border-bottom:none;}
+.layer-popup1 .table-type3.type3 th {background: #f8f8f8;}
+.layer-popup1 .table-type3.type3 th,
+.layer-popup1 .table-type3.type3 td {border-top:1px solid #eaeaea; border-bottom:none;}
+.layer-popup1 .table-type3.type3 td {color: #222;}
+.layer-popup1 .table-type3.type3 th:nth-child(odd):last-child {border-bottom:none;}
+.layer-popup1 .table-type3.type3 th.on,
+.layer-popup1 .table-type3.type3 td.on {color: #fd5490;}
+
+/* 배송/지원혜택 조회 - 배송현황 조회(레이어) */
+.layer-popup1 .table-type1.type2 {border-top:1px solid #000;}
+.layer-popup1 .table-type1.type2 th,
+.layer-popup1 .table-type1.type2 td {font-size:16px; line-height: 20px; vertical-align: middle; color: #222;}
+.layer-popup1 .table-type1.type2 th {text-align: center;}
+.layer-popup1 .table-type1.type2 td {padding: 13px 10px 13px 30px;}
+
+/* 결제수단변경 신청(레이어) */
+.contain-changepayment {padding:0px; margin:30px 0 0 0;}
+.contain-changepayment h2 {display: inline-block; margin:0; padding:0;}
+.contain-changepayment .text-normal-type1 {display: inline-block; margin:0 0 0 35px; padding:0; color: #666; font-size:14px;}
+.contain-changepayment .box-form {width:100%; position:relative; margin: 0 0 20px 0;}
+.contain-changepayment .box-form dt {position:absolute;left:0;top:0;width:95px;height:44px;line-height:44px;}
+.contain-changepayment .box-form dt span {display:inline-block;vertical-align:middle;line-height:20px; font-size:16px;}
+.contain-changepayment .box-form dd {margin:0 0 0 95px;}
+.contain-changepayment .text-form-notice2 {display: inline-block; font-size:13px; margin-left:5px;}
+.contain-changepayment .form-select,
+.contain-changepayment .form-text {width:250px; display: inline-block;}
+.contain-changepayment .form-date-card,
+.contain-changepayment .form-date-pay {width: 250px;}
+.contain-changepayment .form-date-pay .form-radio {font-size:17px; margin-right:30px; display: inline-block;}
+.contain-changepayment .form-date-pay .form-radio:last-child {margin-right:0px;}
+.contain-changepayment .form-date-pay .form-radio::before {vertical-align: middle; margin: 0 8px 0 0px;}
+.contain-changepayment .box-agreement {margin: 10px 0 10px 0; padding:20px; font-size: 14px; height:180px; overflow-y: auto;}
+.box-member-payment .text-information-list1 {margin: 0 0 0 0;} /* 40 */
+.box-member-payment .text-information-list1 li {font-size: 13px; line-height:20px;}
+
+.form-date-card {display:flex;}
+.form-date-card .form-text {width:100%;}
+.form-date-card i {flex:auto;width:90px;font-style:normal;text-align:center;line-height:44px; font-size:17px;}
+
+.contain-changepayment .box-form.type2 {overflow: inherit;}
+.contain-changepayment .box-form.type2 dd{height: 44px;}
+.contain-changepayment .box-form.type2 dd .form-date-pay{padding-top:10px;}
+
+.contain-changepayment .box-form.fixed dt {position:static;margin-bottom:8px;width:auto;height:auto;line-height:120%;}
+.contain-changepayment .box-form.fixed dd {margin:0;padding:0;}
+.contain-changepayment .box-form .form-notice {display: block; font-size: 12px; margin: 4px 0 0 0;}
+
+/* 멤버십 카드 조회 - CMS 출금 결제수단변경 신청(레이어) */
+.contain-information-card1 {padding:0px; text-align: center; margin: 30px 0 0 0;}
+.contain-information-card1 .text-membership {margin-bottom:20px;font-size:22px;text-align:center;}
+.contain-information-card1 .text-membership i {font-style:normal;color:#fd5490;text-align:center;}
+.contain-information-card1 .text-membership span {display:block;padding-top:5px;font-size:14px;}
+.contain-information-card1 .box-card1 {display:inline-block;position:relative;margin:0 25px 0 0; width:234px;height:144px;font-size:14px;text-align:left;color:#fff;background:url(../images/img_card_default.png) no-repeat 50%;background-size:234px auto;}
+.contain-information-card1 .box-card1 .detail {display:block;position:absolute;left:19px;bottom:19px;}
+.contain-information-card1 .contain-card1 {display: inline-block; vertical-align: top;}
+.contain-information-card1 .box-card2 {position:relative;margin:0;padding:50px 0;width:234px;height:144px;text-align:center;box-sizing:border-box;font-size:14px;border:1px solid #d9d9d9;border-radius:5px;}
+.contain-information-card1 .box-card2 span {display:block;text-align:center;color:#999;}
+
+.contain-information-card1 span[class^='btn-type-'],
+.contain-information-card1 span[class^='btn-type-'].type2 {margin:0 6px;border-radius:0;height:30px;}
+.contain-information-card1 span[class^='btn-type-'] button {height:30px;line-height:30px;}
+.contain-information-card1 .box-button {margin:30px auto 0;padding:0;width:auto;text-align:center;}
+
+.text-information-list1.type3 li  {padding-left: 0px;}
+.text-information-list1.type3 li::before {display:none;}
+
+/* 라이프 서비스 신청(레이어) */
+.layer-popup1.layer-member3 .layer-inner {width:750px;margin-left: -375px;  /* height:600px; overflow-y: auto; overflow-x: none; padding: 30px 0 0 0; */}
+.contain-lifeservice {margin: 10px 0 0 0;}
+.contain-lifeservice .list-lifeservice {display:flex;flex-wrap:wrap;margin:0 0 30px 0;}
+.contain-lifeservice .list-lifeservice li {margin:18px 12px 0 0px;width:calc(25% - 9px);box-sizing: border-box;border-radius:10px;overflow:hidden;}
+.contain-lifeservice .list-lifeservice li:nth-child(4n) {margin: 18px 0 0 0;}
+.contain-lifeservice .list-lifeservice li button {display:block;font-size:15px;text-align:center; padding-bottom:8px;}
+.contain-lifeservice .list-lifeservice li img {display:block;margin-bottom:8px;width:100%;}
+.contain-lifeservice .list-lifeservice li.on button {border:3px solid #fd5490;color:#fd5490; border-radius: 10px;}
+
+/* 레이어-title */
+.title-paymentdetail {padding:0; margin:30px 0 10px 0; font-size:18px; font-weight:500; text-align:center;}
+.title-paymentdetail.type2{padding:0px;text-align:left;}
+
+/* 레이어-하단 안내문구 */
+.box-information-mypage .text-normal-type1 {text-align:left;font-size:12px; color: #999;}
+.box-information-mypage .text-normal-type2 {text-align:left;}
+.box-information-mypage .text-normal-type3 a {font-size:11px; color: #999;}
+
+/* 레이어-하단 버튼 */
+/* .layer-popup1 .layer-inner .fixed-box-button {width:180px; margin:0 auto;}
+.layer-popup1 .layer-inner .fixed-box-button > span {width:100% !important;}
+.layer-popup1 .layer-inner .btn-type-text1 {max-width:390px; margin: 0 auto;} */

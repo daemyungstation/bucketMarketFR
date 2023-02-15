@@ -1,0 +1,115 @@
+package web.fr.display.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Service;
+
+import common.dao.CommonDefaultDAO;
+import egovframework.rte.fdl.property.EgovPropertyService;
+import web.fr.display.service.ProductDisplayService;
+
+@Service("productDisplayService")
+public class ProductDisplayServiceImpl implements ProductDisplayService {
+
+    @Resource(name = "defaultDAO")
+    private CommonDefaultDAO defaultDAO;
+
+    @Resource(name = "filePropertiesService")
+    private EgovPropertyService fileProperties;
+
+    private static final int START_NUM = 1;
+    private static final int END_NUM = 10;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayList
+     * 2. ClassName  : ProductDisplayServiceImpl.java
+     * 3. Comment    : 프론트 > 베스트 랭킹 > 전시 상품 > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 25.
+     * </pre>
+     *
+     * @see web.fr.display.service.ProductDisplayService#selectProductDisplayList(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectProductDisplayList(Map<String, Object> commandMap) throws Exception {
+        commandMap.put("startNum", START_NUM);
+        commandMap.put("endNum", END_NUM);
+        return (List<Map<String, Object>>) defaultDAO.selectList("ProductDisplay.selectProductDisplayList", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayListByCode
+     * 2. ClassName  : ProductDisplayServiceImpl.java
+     * 3. Comment    : 메인 > 전시상품 목록 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 5.
+     * </pre>
+     *
+     * @see web.fr.display.service.ProductDisplayService#selectProductDisplayListByCode(java.lang.String)
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Map<String, Object>> selectProductDisplayListByCode(String cmmComIdx, Integer nTimes) throws Exception {
+        Map<String, Object> commandMap = new HashMap<>();
+        commandMap.put("CMN_COM_IDX", cmmComIdx);
+        commandMap.put("nTimes", nTimes);
+        return (List<Map<String, Object>>) defaultDAO.selectList("ProductDisplay.selectProductDisplayListByCode", commandMap);
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayListByCode
+     * 2. ClassName  : ProductDisplayServiceImpl.java
+     * 3. Comment    : 메인 > 전시상품 목록 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 5.
+     * </pre>
+     *
+     * @see web.fr.display.service.ProductDisplayService#selectProductDisplayListByCode(java.lang.String)
+     * @param code
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Map<String, Object>> selectProductDisplayListByCode(String cmmComIdx, Integer limit, boolean random) throws Exception {
+        Map<String, Object> commandMap = new HashMap<>();
+        commandMap.put("CMN_COM_IDX", cmmComIdx);
+        commandMap.put("limit", limit);
+        commandMap.put("random", random);
+        return (List<Map<String, Object>>) defaultDAO.selectList("ProductDisplay.selectProductDisplayListByCode", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductDisplayCategoryList
+     * 2. ClassName  : ProductDisplayServiceImpl.java
+     * 3. Comment    : 지원금 별 대상 카테고리 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 6. 8.
+     * </pre>
+     *
+     * @see web.fr.display.service.ProductDisplayService#selectProductDisplayCategoryList(java.lang.String)
+     * @param Code
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Map<String, Object>> selectProductDisplayCategoryList() throws Exception {
+        return (List<Map<String, Object>>) defaultDAO.selectList("ProductDisplay.selectProductDisplayCategoryList", null);
+    }
+
+}

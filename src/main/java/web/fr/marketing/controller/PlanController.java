@@ -1,0 +1,276 @@
+package web.fr.marketing.controller;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.annotation.CommandMap;
+import common.code.Code;
+import common.code.Const;
+import common.exception.CustomHandleException;
+import common.model.Paging;
+import common.support.ControllerSupport;
+import common.util.DeviceUtil;
+import common.viewer.JSON;
+import web.fr.common.service.CommonService;
+import web.fr.marketing.service.PlanService;
+
+@Controller
+public class PlanController extends ControllerSupport {
+
+    @Resource(name="planService")
+    private PlanService planService;
+    
+    @Resource(name="commonService")
+    private CommonService commonService;
+    
+    /**
+     * <pre>
+     * 1. MethodName : planList
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 목록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.list}", method=RequestMethod.GET)
+    public ModelAndView planList(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        
+        Map<String, String[]> seoMetaMap = Code.SEO;
+        String[] seoMeta = (String[]) seoMetaMap.get("planlist");
+        mv.addObject("seoMeta", seoMeta);
+
+        if (DeviceUtil.isNormal()) {
+            int totalCount = this.planService.selectPlanListCount(commandMap);
+            mv.addObject("totalCount", totalCount);
+            mv.addObject("paging", new Paging(totalCount, commandMap));
+        }
+        mv.addObject("list", this.planService.selectPlanList(commandMap));
+        mv.addObject("commandMap", commandMap);
+        this.setViewName(mv, "marketing.plan.list");
+        return mv;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planView
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 상세정보
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.view}", method=RequestMethod.GET)
+    public ModelAndView planView(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        try {
+            
+            String PLN_MST_IDX = (String) commandMap.get("PLN_MST_IDX");
+            if(!"".equals(PLN_MST_IDX)) {
+                Map<String, String[]> seoMetaMap = Code.SEO;
+                String[] seoMeta = (String[]) seoMetaMap.get("planview_"+ PLN_MST_IDX);
+                mv.addObject("seoMeta", seoMeta);
+            }
+            
+            mv.addAllObjects(this.planService.selectPlanInfo(commandMap));
+            mv.addObject("commandMap", commandMap);
+            this.setViewName(mv, "marketing.plan.view");
+        } catch (CustomHandleException e) {
+            setErrorView(mv, e, Const.class);
+        }
+        return mv;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyListAjax
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 목록 (ajax)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.list.ajax}", method=RequestMethod.POST)
+    public JSON planReplyListAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        int totalCount = this.planService.selectPlanReplyListCount(commandMap);
+        json.put("totalCount", totalCount);
+        json.put("paging", new Paging(totalCount, commandMap));
+        if (totalCount > 0) {
+            json.put("list", this.planService.selectPlanReplyList(commandMap));
+        }
+        return json;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyInfoAjax
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 상세  (ajax)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.info.ajax}", method=RequestMethod.POST)
+    public JSON planReplyInfoAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("info", this.planService.selectPlanReplyInfo(commandMap));
+        return json;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : planReplyLoginAjax
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 로그인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.login.ajax}", method=RequestMethod.POST)
+    public JSON planReplyLoginAjax(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("isSuccess", (this.planService.selectPlanReplyListCount(commandMap) > 0));
+        return json;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyFormLayer
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 등록 폼 (layer)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.form.layer}", method=RequestMethod.POST)
+    public ModelAndView planReplyFormLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        commandMap.put("AGR_MST_GBN", Code.TERM_PERSONAL_INFORMATION_USE_BASIC);
+        mv.addObject("personalInfomationUseTermInfo", commonService.selectCommonTermInfo(commandMap).get("term"));
+        commandMap.remove("AGR_MST_GBN");
+        commandMap.put("AGR_MST_TYPE", Code.TERM_MARKETING);
+        mv.addObject("marketingTermInfo", commonService.selectCommonTermInfo(commandMap).get("term"));
+        commandMap.remove("AGR_MST_TYPE");
+        mv.addObject("commandMap", commandMap);
+        this.setViewName(mv, "marketing.plan.reply.form.layer");
+        return mv;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyEditLayer
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 수정 폼 (layer)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.edit.layer}", method=RequestMethod.POST)
+    public ModelAndView planReplyEditLayer(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        ModelAndView mv = new ModelAndView();
+        mv.addObject("info", this.planService.selectPlanReplyInfo(commandMap));
+        mv.addObject("commandMap", commandMap);
+        this.setViewName(mv, "marketing.plan.reply.edit.layer");
+        return mv;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyRegist
+     * 2. ClassName  : PlanController.java
+     * 3. Comment   프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 등록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.regist.ajax}", method=RequestMethod.POST)
+    public JSON planReplyRegist(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        json.put("isSuccess", this.planService.insertPlanReply(commandMap));
+        return json;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyModify
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 수정
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.modify.ajax}", method=RequestMethod.POST)
+    public JSON planReplyModify(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        commandMap.put("method", "modify");
+        json.put("isSuccess", this.planService.updatePlanReply(commandMap));
+        return json;
+    }
+    /**
+     * <pre>
+     * 1. MethodName : planReplyRemove
+     * 2. ClassName  : PlanController.java
+     * 3. Comment    : 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 삭제
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 7.
+     * </pre>
+     *
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value="${marketing.plan.reply.remove.ajax}", method=RequestMethod.POST)
+    public JSON planReplyRemove(HttpServletRequest request, @CommandMap Map<String, Object> commandMap) throws Exception {
+        JSON json = new JSON();
+        commandMap.put("method", "remove");
+        json.put("isSuccess", this.planService.updatePlanReply(commandMap));
+        return json;
+    }
+}

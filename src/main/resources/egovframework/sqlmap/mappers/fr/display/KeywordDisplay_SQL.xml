@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KeywordDisplay">
+    <!-- 프론트 > 검색 > 인기키워드 > 목록  -->
+    <select id="selectKeywordDisplayList" parameterType="HashMap" resultType="HashMap">
+        /* KeywordDisplay.selectKeywordDisplayList */
+        SELECT
+            PPL_WRD_TEXT,
+            PPL_WRD_SCH,
+            PPL_WRD_URL
+        FROM T_PPL_WRD
+        WHERE PPL_WRD_TEXT <![CDATA[<>]]> ' '
+        ORDER BY PPL_WRD_SORT ASC
+    </select>
+</mapper>

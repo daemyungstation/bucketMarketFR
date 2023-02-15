@@ -1,0 +1,118 @@
+a,
+button {outline:none;}
+span[class^='btn-type-'] {display:block;height:44px;border-radius:4px;}
+span[class^='btn-type-'] a,
+span[class^='btn-type-'] button {display:block;width:100%;height:100%;text-align:center;line-height:44px; }
+.box-form dd span[class^='btn-type-'] {border-radius:0;}
+
+.btn-type-text1 {height:44px;background:#fd5490;}
+.btn-type-text1 a,
+.btn-type-text1 button {color:#fff;font-size:16px;}
+
+.btn-type-text2 {height:44px;background:#e4ddcb;}
+.btn-type-text2 a,
+.btn-type-text2 button {color:#333;font-size:13px;line-height:44px;}
+
+.btn-type-text3 {height:44px;background:#d9d9d9;}
+.btn-type-text3 a,
+.btn-type-text3 button {color:#222;font-size:16px;}
+
+.btn-type-text4 {height:44px;background:#eaeaea;}
+.btn-type-text4 a,
+.btn-type-text4 button {color:#222;font-size:16px;}
+
+.btn-type-text5[class^="btn-type-"] {height:23px;background:#fff;border:1px solid #444;}
+.btn-type-text5[class^="btn-type-"] a,
+.btn-type-text5[class^="btn-type-"] button {padding:0 10px;color:#444;font-size:12px;line-height:23px;box-sizing:border-box;}
+
+.btn-type-text6 {height:44px;background:#fff;border:1px solid #fd5490;box-sizing:border-box;}
+.btn-type-text6 a,
+.btn-type-text6 button {color:#fff;font-size:16px;color:#fd5490}
+
+.btn-arrow-type1 button::after {content: ''; display: inline-block; margin: 0 0 -1px 5px; width: 13px; height: 13px; background: url(../../images/img_button_arrow1.png) no-repeat 50%; background-size: 13px auto;}
+.btn-arrow-type2 button::after {content: ''; display: inline-block; margin: 0 0 -1px 5px; width: 13px; height: 13px; background: url(../../images/img_button_arrow2.png) no-repeat 50%; background-size: 13px auto;}
+.btn-arrow-type3 button::after {content: ''; display: inline-block; margin: 0 0 -1px 5px; width: 13px; height: 13px; background: url(../../images/img_button_arrow3.png) no-repeat 50%; background-size: 13px auto;}
+
+span[class^='btn-type-'].btn-type-text7 {display:inline-block;margin:0 4px 8px 0;height:auto;border-radius:0;background:#eaeaea;}
+span[class^='btn-type-'].btn-type-text7 a,
+span[class^='btn-type-'].btn-type-text7 button {padding:0 12px;height:30px;line-height:30px;font-size:13px;color:#222;}
+span[class^='btn-type-'].btn-type-text7.type2 {background: #fff; border:1px solid #fd5490; box-sizing:border-box; margin: 0 0 8px 0;}
+span[class^='btn-type-'].btn-type-text7.type2 button {color: #fd5490;}
+
+.btn-type-text8 {height:40px;background:#d9d9d9;box-sizing:border-box;}
+.btn-type-text8 a,
+.btn-type-text8 button {color:#222;font-size:16px;}
+
+.btn-type-icon1 {width:44px;background:#364d8e;}
+.btn-type-icon1 a,
+.btn-type-icon1 button {width:44px;height:44px;line-height:44px;text-indent:-1000px;overflow:hidden;}
+
+.btn-share {display:block;width:30px;height:30px;background:url(../../images/img_icon_share.png) no-repeat 50%;background-size:30px auto;}
+.btn-share button {display:block;width:30px;height:30px;text-indent:-1000px;overflow:hidden;}
+
+.btn-help {display:inline-block;position:relative;margin:0 5px 4px 5px;width:14px;height:14px;vertical-align:middle;background:url(../../images/img_icon_help.png) no-repeat 50%;background-size:14px auto;}
+.btn-help button {display:block;width:14px;height:14px;text-indent:-1000px;overflow:hidden;}
+
+.btn-type-text1.product-moreview {display:block;position:absolute;left:0;bottom:0;right:0;height:auto;background:linear-gradient(rgba(255,255,255,0),#fff,#fff,#fff);border-radius:0;;}
+.btn-type-text1.product-moreview button {display:block;width:100%;height:65px;text-align:center;font-size:14px;color:#222;line-height:100%;}
+.btn-type-text1.product-moreview button::after {content:'';display:inline-block;margin-left:6px;vertical-align:middle;width:13px;height:13px;background:url(../../images/img_moreview_type1.png) no-repeat 50%;background-size:13px auto;}
+.btn-type-text1.product-moreview.on button::after {background:url(../../images/img_moreview_type1_on.png) no-repeat 50%;background-size:13px auto;}
+
+.box-increase-type1 {position:relative;text-align:right;}
+.box-increase-type1 input[type^='number'] {display:inline-block;width:60px;height:32px;text-align:center;text-indent:0;vertical-align:top;border:1px solid #d9d9d9;box-sizing:border-box;}
+.box-increase-type1 span[class^='btn-'] {display:inline-block;vertical-align:top;border:1px solid #d9d9d9;box-sizing:border-box;}
+.box-increase-type1 span[class^='btn-'] button {display:block;width:32px;height:30px;text-align:center;line-height:30px;text-indent:-1000px;overflow:hidden;}
+.box-increase-type1 .btn-increase {background:url(../../images/img_icon_increase.png) no-repeat 50%;background-size:17px auto;}
+.box-increase-type1 .btn-decrease {background:url(../../images/img_icon_decrease.png) no-repeat 50%;background-size:17px auto;}
+
+/* SNS */
+.box-sns-share {padding:5px 0 20px 0;text-align:center;}
+.box-sns-share >span {display:inline-block;margin:0 5px 10px 5px;}
+.box-sns-share >span button {display:inline-block;font-size:11px;text-align:center;}
+.sns-kakaotalk button::before {content:'';display:block;margin:0 auto 8px auto;width:65px;height:65px;background:url(../../images/img_icon_sns_kakaotalk.png) no-repeat 50%;background-size:65px auto;}
+.sns-kakaostory button::before {content:'';display:block;margin:0 auto 8px auto;width:65px;height:65px;background:url(../../images/img_icon_sns_kakaostory.png) no-repeat 50%;background-size:65px auto;}
+.sns-twitter button::before {content:'';display:block;margin:0 auto 8px auto;width:65px;height:65px;background:url(../../images/img_icon_sns_twitter.png) no-repeat 50%;background-size:65px auto;}
+.sns-blog button::before {content:'';display:block;margin:0 auto 8px auto;width:65px;height:65px;background:url(../../images/img_icon_sns_blog.png) no-repeat 50%;background-size:65px auto;}
+.sns-facebook button::before {content:'';display:block;margin:0 auto 8px auto;width:65px;height:65px;background:url(../../images/img_icon_sns_facebook.png) no-repeat 50%;background-size:65px auto;}
+.sns-copyurl button::before {content:'';display:block;margin:0 auto 8px auto;width:65px;height:65px;background:url(../../images/img_icon_sns_url.png) no-repeat 50%;background-size:65px auto;}
+
+/* 레이어 */
+.layer-popup1 span[class^='btn-type-'] {border-radius:0;height:54px;}
+.layer-popup1 span[class^='btn-type-'] button {height:54px;line-height:54px;}
+
+/* Swiper navigation */
+.swiper-button-next.swiper-button-disabled, .swiper-button-prev.swiper-button-disabled {display:none;}
+.swiper-button-prev, .swiper-container-rtl .swiper-button-next {background:url(../../images/img_swiper_prev.png) no-repeat 50%;background-size:9px auto;}
+.swiper-button-prev:after, .swiper-container-rtl .swiper-button-next:after {display:none;}
+.swiper-button-next, .swiper-container-rtl .swiper-button-prev {background:url(../../images/img_swiper_next.png) no-repeat 50%;background-size:9px auto;}
+.swiper-button-next:after, .swiper-container-rtl .swiper-button-prev:after {display:none;}
+
+
+
+/* 하단 고정영역 */
+.fixed-box-button span[class^='btn-'] {height:54px;border-radius:0;}
+.fixed-box-button .btn-type-text1 {background:#fd5490;border-radius:0;}
+.fixed-box-button .btn-type-text1 a,
+.fixed-box-button .btn-type-text1 button {color:#fff;font-size:18px;line-height:54px;}
+.fixed-box-button .btn-type-text1.disabled {background:#cbcbcb;}
+.fixed-box-button .btn-type-text1.disabled a,
+.fixed-box-button .btn-type-text1.disable button {color:#999;}
+
+/* 버튼 아이콘 */
+.search {background:url() no-repeat 50%;background-size:0 auto;}
+
+/* 헤더 버튼 */
+.btn-historyback {float:left;margin-left:15px;background:url(../../images/img_head_previous.png) no-repeat 50%;background-size:24px auto;}
+.btn-navigation {float:left;margin-left:15px;background:url(../../images/img_head_navigation.png) no-repeat 50%;background-size:24px auto;}
+.btn-search {float:right;margin-right:15px;background:url(../../images/img_head_search.png) no-repeat 50%;background-size:24px auto;}
+.btn-home {float:right;margin-right:15px;background:url(../../images/img_head_home.png) no-repeat 50%;background-size:24px auto;}
+.btn-close {right:15px; background:url(../../images/img_close_layer.png) no-repeat 50%; background-size:24px auto;}
+.btn-close.btn-footer {clear:both;display:block;position:absolute;bottom:0;right:0;width:100%;height:50px;margin:auto;background:#FD5490;color:#ffffff;font-size: 18px;}
+
+.box-form dd span.btn-type-icon1.delete {display:inline-block; width:12px;height:12px; vertical-align: middle;}
+.box-form dd span.btn-type-icon1.delete button {background:url(../../images/img_btn_delete.png) no-repeat 50%; background-size:12px auto;}
+
+.box-button-certification {display:flex;}
+.box-button-certification span {flex:none;width:150px;}
+.box-button-certification span + span {flex:auto;}
+

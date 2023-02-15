@@ -1,0 +1,51 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PDDWT2X"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<%-- 헤더 : 하위카테고리 --%>
+<header class="area-header">
+    <div class="area-inner">
+        <c:if test="${fn:contains(param.headerGroup, 'logo') }">
+            <h1 class="logo-bkmarket">
+                <a href="javascript:$.requestPage($.action.main.index());">
+                    <img src="<spring:eval expression="@resource['img.ssl.domain']"/>/resources/mo/images/img_logo_mo.png" alt="버킷마켓" />
+                </a>
+            </h1>
+        </c:if>
+        <c:if test="${fn:contains(param.headerGroup, 'historyback') }">
+            <span class="btn-historyback"><button>이전으로</button></span>
+        </c:if>
+        <c:if test="${fn:contains(param.headerGroup, 'navigation') }">
+            <span class="btn-navigation"><button class="navi-button">메뉴</button></span>
+        </c:if>
+        <c:if test="${fn:contains(param.headerGroup, 'title') }">
+            <h1 class="title">
+                <c:if test="${fn:contains(param.headerGroup, 'title-btn') }">
+                    <button><c:out value="${param.headerTitle }"/></button>
+                </c:if>
+                <c:if test="${not fn:contains(param.headerGroup, 'title-btn') }">
+                    <c:out value="${param.headerTitle }"/>
+                </c:if>
+            </h1>
+        </c:if>
+        <c:if test="${fn:contains(param.headerGroup, 'search') }">
+            <c:if test="${fn:contains(param.headerGroup, 'form-header-search') }">
+                <span class="form-header-search">
+                    <input type="text" id="searchword" placeholder="검색어를 입력해 주세요" value="<c:out value="${param.searchword }"/>" maxlength="70"/>
+                </span>
+                <span class="btn-search"><button>검색</button></span>
+            </c:if>
+            <c:if test="${not fn:contains(param.headerGroup, 'form-header-search') }">
+                <span class="btn-search"><button onclick="$.requestPage($.action.common.search.list());">검색</button></span>
+            </c:if>
+        </c:if>
+        <%-- <c:if test="${fn:contains(param.headerGroup, 'home') }"> --%>
+            <span class="btn-home"><button onclick="javascript:$.requestPage($.action.main.index());">홈으로</button></span>
+        <%-- </c:if> --%>
+    </div>
+</header>
+<%--// 헤더 : 하위카테고리 --%>

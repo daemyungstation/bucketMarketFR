@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Plan">
+
+    <!-- 프론트 > 프로모션 > 기획전 > 목록 > 조건 절 -->
+    <sql id="planWhere">
+        WHERE PM.PLN_MST_IDX = CF.CMM_FLE_TB_PK
+            AND CF.CMM_FLE_TB_NM = 'T_PLN_MST'
+            AND CF.CMM_FLE_USE_YN = 'Y'
+            AND CF.CMM_FLE_TB_TYPE = #{CMM_FLE_TB_TYPE}
+            AND PM.PLN_MST_USE_YN = 'Y'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') BETWEEN PM.PLN_MST_ST_DT || PM.PLN_MST_ST_HH || PM.PLN_MST_ST_MI || '00' 
+                AND PM.PLN_MST_ED_DT || PM.PLN_MST_ED_HH || PM.PLN_MST_ED_MI || '59'
+            <if test="PLN_MST_IDX != null and PLN_MST_IDX != ''">
+                AND PLN_MST_IDX <![CDATA[<>]]> #{PLN_MST_IDX}
+            </if>
+    </sql>
+
+    <!-- 프론트 > 프로모션 > 기획전 > 목록 개수 -->
+    <select id="selectPlanListCount" parameterType="HashMap" resultType="Integer">
+        /* Plan.selectPlanListCount */
+        SELECT COUNT(PM.PLN_MST_IDX)
+        FROM T_PLN_MST PM, T_CMM_FLE CF
+        <include refid="planWhere"/>
+    </select>
+
+    <!-- 프론트 > 프로모션 > 기획전 > 목록 -->
+    <select id="selectPlanList" parameterType="HashMap" resultType="HashMap">
+        /* Plan.selectPlanList */
+        SELECT S2.*
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    PM.PLN_MST_IDX,
+                    PM.PLN_MST_TITLE,
+                    PM.PLN_MST_ST_DT,
+                    PM.PLN_MST_ED_DT,
+                    CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH
+                FROM T_PLN_MST PM, T_CMM_FLE CF
+                <include refid="planWhere"/>
+                ORDER BY PM.PLN_MST_REG_DT DESC
+            ) S1
+            <if test="endNum != null and endNum != ''">
+                WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+            </if>
+        ) S2
+        <if test="startNum != null and startNum != ''">
+            WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+        </if>
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 상세정보 -->
+    <resultMap id="resultPlanInfo" type="HashMap">
+        <result property="PLN_MST_IDX" column="PLN_MST_IDX"/>
+        <result property="PLN_MST_TITLE" column="PLN_MST_TITLE"/>
+        <result property="PLN_MST_ST_DT" column="PLN_MST_ST_DT"/>
+        <result property="PLN_MST_ED_DT" column="PLN_MST_ED_DT"/>
+        <result property="PLN_MST_RPL_YN" column="PLN_MST_RPL_YN"/>
+        <result property="PLN_MST_PRD_DPL_YN" column="PLN_MST_PRD_DPL_YN"/>
+        <result property="PLN_MST_PC_MDA" column="PLN_MST_PC_MDA" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PLN_MST_MB_MDA" column="PLN_MST_MB_MDA" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PLN_MST_PC_DTL" column="PLN_MST_PC_DTL" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="PLN_MST_MB_DTL" column="PLN_MST_MB_DTL" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="CMM_FLE_WEB_PC_PATH" column="CMM_FLE_WEB_PC_PATH"/>
+        <result property="CMM_FLE_WEB_MB_PATH" column="CMM_FLE_WEB_MB_PATH"/>
+        <result column="PLN_MST_PSN_YN" property="PLN_MST_PSN_YN"/>
+        <result column="PLN_MST_RPL_EXP_YN" property="PLN_MST_RPL_EXP_YN"/>
+    </resultMap>
+    <select id="selectPlanInfo" parameterType="HashMap" resultMap="resultPlanInfo">
+        /* Plan.selectPlanInfo */
+        SELECT
+            PM.PLN_MST_IDX,
+            PM.PLN_MST_TITLE,
+            PM.PLN_MST_ST_DT,
+            PM.PLN_MST_ED_DT,
+            PM.PLN_MST_RPL_YN,
+            PM.PLN_MST_PRD_DPL_YN,
+            PM.PLN_MST_PC_MDA,
+            PM.PLN_MST_MB_MDA,
+            PM.PLN_MST_PC_DTL,
+            PM.PLN_MST_MB_DTL,
+            PM.PLN_MST_PSN_YN,
+            PM.PLN_MST_RPL_EXP_YN,
+            (
+            SELECT CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM
+            FROM T_CMM_FLE CF
+            WHERE CF.CMM_FLE_TB_NM = 'T_PLN_MST'
+                AND CF.CMM_FLE_TB_PK = PM.PLN_MST_IDX
+                AND CF.CMM_FLE_USE_YN = 'Y'
+                AND CF.CMM_FLE_TB_TYPE = '${@common.code.Const@PC}'
+            ) AS CMM_FLE_WEB_PC_PATH,
+            (
+            SELECT CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM
+            FROM T_CMM_FLE CF
+            WHERE CF.CMM_FLE_TB_NM = 'T_PLN_MST'
+                AND CF.CMM_FLE_TB_PK = PM.PLN_MST_IDX
+                AND CF.CMM_FLE_USE_YN = 'Y'
+                AND CF.CMM_FLE_TB_TYPE = '${@common.code.Const@MOBILE}'
+            ) AS CMM_FLE_WEB_MB_PATH
+        FROM T_PLN_MST PM
+        WHERE PM.PLN_MST_IDX = #{PLN_MST_IDX}
+            AND PM.PLN_MST_USE_YN = 'Y'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') BETWEEN PM.PLN_MST_ST_DT || PM.PLN_MST_ST_HH || PM.PLN_MST_ST_MI || '00' 
+                AND PM.PLN_MST_ED_DT || PM.PLN_MST_ED_HH || PM.PLN_MST_ED_MI || '59'
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 상품그룹 제목 목록 -->
+    <select id="selectPlanGroupTitleList" parameterType="HashMap" resultType="HashMap">
+        /* Plan.selectPlanGroupTitleList */
+        SELECT
+            PLN_GRP_IDX,
+            PLN_GRP_TITLE
+        FROM T_PLN_GRP
+        WHERE PLN_MST_IDX = #{PLN_MST_IDX}
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 상품그룹 목록 -->
+    <resultMap id="resultPlanGroupList" type="HashMap">
+        <result property="PLN_GRP_IDX" column="PLN_GRP_IDX"/>
+        <result property="PLN_GRP_TITLE" column="PLN_GRP_TITLE"/>
+        <result property="PLN_GRP_COL" column="PLN_GRP_COL"/>
+        <result property="PLN_GRP_COL_NM" column="PLN_GRP_COL_NM"/>
+        <collection property="planDetailList" javaType="java.util.ArrayList" ofType="HashMap">
+            <result property="PLN_DTL_IDX" column="PLN_DTL_IDX"/>
+            <result property="PRD_MST_CD" column="PRD_MST_CD"/>
+            <result property="PRD_MST_NO" column="PRD_MST_NO"/>
+            <result property="PRD_MST_NM" column="PRD_MST_NM"/>
+            <result property="PRD_MST_SEL_TXT" column="PRD_MST_SEL_TXT"/>
+            <result property="PRD_MST_SPT_TXT" column="PRD_MST_SPT_TXT"/>
+            <result property="PRD_MST_DPL_YN" column="PRD_MST_DPL_YN"/>
+            <result property="MON_PAY_AMT" column="MON_PAY_AMT"/>
+            <result property="EXPR_NO" column="EXPR_NO"/>
+            <result property="REL_AMT" column="REL_AMT"/>
+            <result property="REL_CNT" column="REL_CNT"/>
+            <result property="MON_REL_AMT" column="MON_REL_AMT"/>
+            <result property="VDR_MST_NM" column="VDR_MST_NM"/>
+        </collection>
+    </resultMap>
+    <select id="selectPlanGroupList" parameterType="HashMap" resultMap="resultPlanGroupList">
+        /* Plan.selectPlanGroupList */
+        SELECT
+            PG.PLN_GRP_IDX,
+            PG.PLN_GRP_TITLE,
+            PG.PLN_GRP_COL,
+            (SELECT CC.CMN_COM_ETC1 FROM T_CMM_COM CC WHERE CC.CMN_COM_IDX = PG.PLN_GRP_COL) AS PLN_GRP_COL_NM,
+            PD.PLN_DTL_IDX,
+            TPM.PRD_MST_CD,
+            CPM.PRD_MST_NO,
+            CPM.PRD_MST_NM,
+            CPM.PRD_MST_TYPE,
+            CPM.PRD_MST_BND_YN,
+            CPM.PRD_MST_SEL_TXT,
+            CPM.PRD_MST_SPT_TXT,
+            CPM.PRD_MST_DPL_YN,
+            VPM.MON_PAY_AMT,
+            VPM.EXPR_NO,
+            VPM.REL_AMT,
+            VPM.REL_CNT,
+            VPM.MON_REL_AMT,
+            CASE
+                WHEN TPM.VDR_MST_NM IS NULL THEN VM.VDR_MST_NM
+                WHEN TPM.VDR_MST_NM IS NOT NULL THEN TPM.VDR_MST_NM
+            END AS VDR_MST_NM
+        FROM T_PLN_GRP PG, T_PLN_DTL PD, T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM
+        WHERE PG.PLN_GRP_IDX = PD.PLN_GRP_IDX
+            AND PG.PLN_MST_IDX = PD.PLN_MST_IDX
+            AND PD.PLN_PRD_MST_NO = CPM.PRD_MST_NO
+            AND TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+            )
+            AND PG.PLN_MST_IDX = #{PLN_MST_IDX}
+            <if test="searchPlnGrpIdx != null and searchPlnGrpIdx != ''">
+                AND PG.PLN_GRP_IDX = #{searchPlnGrpIdx}
+            </if>
+        ORDER BY PG.PLN_GRP_SORT, PD.PLN_DTL_ORDER
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 조건절 -->
+    <sql id="planReplyWhere">
+        WHERE PLN_MST_IDX = #{PLN_MST_IDX}
+            AND PLN_RPL_USE_YN = 'Y'
+            <if test="searchPlnRplIdx != null and searchPlnRplIdx != ''">
+                AND PLN_RPL_IDX = #{searchPlnRplIdx}
+            </if>
+            <if test="searchPlnRplNm != null and searchPlnRplNm != ''">
+                AND PLN_RPL_NM = #{searchPlnRplNm}
+            </if>
+            <if test="searchPlnRplPw != null and searchPlnRplPw != ''">
+                AND PLN_RPL_PW = #{searchPlnRplPw}
+            </if>
+    </sql>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 목록 개수 -->
+    <select id="selectPlanReplyListCount" parameterType="HashMap" resultType="Integer">
+        /* Plan.selectPlanReplyListCount */
+        SELECT COUNT(PLN_RPL_IDX)
+        FROM T_PLN_RPL
+        <include refid="planReplyWhere"/>
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 목록 -->
+    <select id="selectPlanReplyList" parameterType="HashMap" resultType="HashMap">
+        /* Plan.selectPlanReplyList */
+        SELECT S2.PLN_RPL_IDX,
+            FN_MASKING('USER_NM', S2.PLN_RPL_NM) AS PLN_RPL_NM,
+            S2.PLN_RPL_CTS,
+            S2.PLN_RPL_REG_DT,
+            (
+                SELECT
+                    CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM 
+                FROM T_CMM_FLE CF
+                WHERE CF.CMM_FLE_TB_PK = S2.PLN_RPL_IDX
+                    AND CF.CMM_FLE_TB_NM = 'T_PLN_RPL'
+                    AND CF.CMM_FLE_USE_YN = 'Y'
+            ) AS CMM_FLE_WEB_PATH
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    PLN_RPL_IDX,
+                    PLN_RPL_NM,
+                    PLN_RPL_CTS,
+                    PLN_RPL_REG_DT
+                FROM T_PLN_RPL
+                <include refid="planReplyWhere"/>
+                ORDER BY PLN_RPL_REG_DT DESC
+            ) S1
+            WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+        ) S2
+        WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 등록 -->
+    <insert id="insertPlanReply" parameterType="HashMap">
+        <selectKey keyProperty="PLN_RPL_IDX" keyColumn="PLN_RPL_IDX" order="BEFORE" resultType="Integer">
+            SELECT SEQ_PLN_RPL_IDX.NEXTVAL AS PLN_RPL_IDX FROM DUAL
+        </selectKey>
+        /* Plan.insertPlanReply */
+        INSERT INTO T_PLN_RPL (
+            PLN_RPL_IDX,
+            PLN_MST_IDX,
+            PLN_RPL_NM,
+            PLN_RPL_PW,
+            PLN_RPL_CTS,
+            PLN_RPL_USE_YN,
+            PLN_RPL_REG_DT,
+            PLN_RPL_REG_IP,
+            PLN_RPL_PSN_YN,
+            <if test="PLN_MST_PSN_YN != null and PLN_MST_PSN_YN.equals('Y'.toString())">
+                PLN_RPL_HP1,
+                PLN_RPL_HP2,
+                PLN_RPL_HP3,
+            </if>
+            PLN_RPL_MKT_YN
+        ) VALUES (
+            #{PLN_RPL_IDX},
+            #{PLN_MST_IDX},
+            #{PLN_RPL_NM},
+            #{PLN_RPL_PW},
+            #{PLN_RPL_CTS},
+            'Y',
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{PLN_RPL_REG_IP},
+            NVL(#{PLN_RPL_PSN_YN}, 'N'),
+            <if test="PLN_MST_PSN_YN != null and PLN_MST_PSN_YN.equals('Y'.toString())">
+                SUBSTR(REPLACE(#{PLN_RPL_HP}, '-', ''), 1, 3),
+                SUBSTR(REPLACE(#{PLN_RPL_HP}, '-', ''), 4, DECODE(LENGTH(REPLACE(#{PLN_RPL_HP}, '-', '')), 11, 4, 3)),
+                SUBSTR(REPLACE(#{PLN_RPL_HP}, '-', ''), -4),
+            </if>
+            NVL(#{PLN_RPL_MKT_YN}, 'N')
+        )
+    </insert>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 상세정보 -->
+    <select id="selectPlanReplyInfo" parameterType="HashMap" resultType="HashMap">
+        /* Event.selectPlanReplyInfo */
+        SELECT
+            PLN_RPL_IDX,
+            PLN_RPL_CTS,
+            PLN_RPL_NM,
+            PLN_RPL_PW
+        FROM T_PLN_RPL
+        WHERE PLN_MST_IDX = #{PLN_MST_IDX}
+            AND PLN_RPL_IDX = #{PLN_RPL_IDX}
+    </select>
+    <!-- 프론트 > 프로모션 > 기획전 > 상세 > 댓글 > 수정/삭제 -->
+    <update id="updatePlanReply" parameterType="HashMap">
+        /* Plan.updatePlanReply */
+        UPDATE T_PLN_RPL SET
+        <if test="method != null and method.equals('modify')">
+            PLN_RPL_NM = #{PLN_RPL_NM},
+            PLN_RPL_PW = NVL(#{PLN_RPL_PW}, PLN_RPL_PW),
+            PLN_RPL_CTS = #{PLN_RPL_CTS}
+        </if>
+        <if test="method != null and method.equals('remove')">
+            PLN_RPL_USE_YN = 'N'
+        </if>
+        WHERE PLN_MST_IDX = #{PLN_MST_IDX}
+            AND PLN_RPL_IDX = #{PLN_RPL_IDX}
+    </update>
+</mapper>

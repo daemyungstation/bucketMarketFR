@@ -1,0 +1,234 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <%@include file="/WEB-INF/jsp/pc/include/head.jsp" %>
+    <link rel="stylesheet" type="text/css" href="<spring:eval expression="@resource['css.ssl.domain']"/>/resources/pc/css/myplanner.css">
+</head>
+<body class="">
+
+<%@include file="/WEB-INF/jsp/pc/include/header.jsp" %>
+<%@include file="/WEB-INF/jsp/pc/include/gnb.jsp" %>
+
+<jsp:include page="/WEB-INF/jsp/pc/include/nav.jsp" flush="false">
+    <jsp:param name="oneDepth" value="My레디플래너"/>
+    <jsp:param name="oneDepthKey" value="myplanner.campaign.product.list"/>
+    <jsp:param name="twoDepth" value="캠페인 생성"/>
+    <jsp:param name="twoDepthKey" value="myplanner.campaign.product.list"/>
+</jsp:include>
+
+<!-- Body -->
+<div class="area-body">
+    <div class="area-inner">
+
+        <div class="wrap">
+        
+            <%-- 정지 상태 안내 --%>
+            <c:if test="${planner.RDP_MST_STATE eq Code.PLANNER_STATE_STOP or planner.RDP_MST_STATE eq Code.PLANNER_STATE_REQUEST_RELEASE }">
+            
+                <div class="box-rdmember-cancel">
+                    <div class="rdmember-cancel-inner">
+                        <span class="text-login">현재 회원님의 아이디는 이용이 제한되어 캠페인 생성 불가 및 생성된 캠페인에 실적 수익이 발생하지 않습니다.</span>
+                        <span class="text-point1">
+                            정지일시 : <ui:formatDate value="${planner.RDP_MST_UPD_DT }" pattern="yyyy-MM-dd" /><br />
+                            정지사유 : <c:out value="${planner.RDP_MST_STP_RSN }"/>
+                        </span>
+                    </div>  
+                    <span class="btn-type-text1"><button id="btnReleaseRequest">해제요청하기</button></span>
+                </div>
+                        
+            </c:if>
+            <%-- //정지 상태 안내 --%>
+
+            <%-- 좌측 메뉴 --%>
+            <jsp:include page="/WEB-INF/jsp/pc/include/aside.jsp" flush="false">
+                <jsp:param name="asideTitle" value="My 레디플래너"/>
+                <jsp:param name="asideGroup" value="myplanner_pc"/>
+            </jsp:include>
+            <%-- 정지 상태 안내 --%>
+
+            <div class="contain-body">
+                <div class="content-header">
+                    <h3 class="title">캠페인 생성</h3>
+                </div>
+                
+                <div class="contain-campaign">    
+                    <div class="box-campaign-search">
+                        <p class="title">상품검색</p>
+                        <div class="box-campaign-form">
+                            <span class="form-select">
+                                <select id="searchCategoryIdx">
+                                    <option value="">전체</option>
+                                    <c:forEach var="category" items="${categoryList }" varStatus="status">
+                                        <option value="<c:out value="${category.PRD_CTG_IDX }"/>" <c:if test="${commandMap.searchCategoryIdx eq category.PRD_CTG_IDX}">selected="selected"</c:if> >
+                                            <c:out value="${category.PRD_CTG_NM }"/>
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </span>
+                            <input type="text" id="searchPrdMstNm" placeholder="찾고 싶은 상품을 검색해 보세요" value="<c:out value="${commandMap.searchPrdMstNm }"/>" />
+                            <span class="btn-search"><button type="button" id="btnSearch">검색</button></span>
+                        </div>
+                    </div>
+            
+                    <div class="box-product-search type3">
+                        <span class="data-count"><c:out value="${totalCount }"/>개</span>
+                        <div class="box-category-more">
+                            <!-- 인기순(디폴트), 판매순, 최근등록순 -->
+                            <c:choose>
+                                <c:when test="${commandMap.searchOrderType eq 'bySales' }">
+                                    <button class="btn-category">판매순</button>
+                                    <div class="box-category-inner">
+                                        <span><label class="form-radio-category"><input type="radio" name="searchOrderType" value="byPopularity">인기순</label></span>
+                                        <span><label class="form-radio-category checked"><input type="radio" name="searchOrderType" value="bySales" checked="checked">판매순</label></span>
+                                        <span><label class="form-radio-category"><input type="radio" name="searchOrderType" value="byRecently">최근등록순</label></span>
+                                    </div>
+                                </c:when>
+                                <c:when test="${commandMap.searchOrderType eq 'byRecently' }">
+                                    <button class="btn-category">최근등록순</button>
+                                    <div class="box-category-inner">
+                                        <span><label class="form-radio-category"><input type="radio" name="searchOrderType" value="byPopularity">인기순</label></span>
+                                        <span><label class="form-radio-category"><input type="radio" name="searchOrderType" value="bySales">판매순</label></span>
+                                        <span><label class="form-radio-category checked"><input type="radio" name="searchOrderType" value="byRecently" checked="checked">최근등록순</label></span>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <button class="btn-category">인기순</button>
+                                    <div class="box-category-inner">
+                                        <span><label class="form-radio-category checked"><input type="radio" name="searchOrderType" value="byPopularity" checked="checked">인기순</label></span>
+                                        <span><label class="form-radio-category"><input type="radio" name="searchOrderType" value="bySales">판매순</label></span>
+                                        <span><label class="form-radio-category"><input type="radio" name="searchOrderType" value="byRecently">최근등록순</label></span>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </div>         
+                    </div>
+            
+                    <div class="box-store-list array4-small">
+                    
+                        <%-- 상품 목록 --%>
+                        <c:forEach var="item" items="${list }" varStatus="status">
+                        
+                            <a href="javascript:;" class="detail" data-prdMstNo="<c:out value="${item.PRD_MST_NO }"/>" >
+                                <dl class="detail-product-type1 type3">
+                                    <dd class="image">
+                                        <c:if test="${item.PRD_MST_DPL_YN eq 'S' }">
+                                            <span class="soldout"><span>SOLD OUT</span></span>
+                                        </c:if>
+                                        <img src="<spring:eval expression="@resource['cdn.ssl.domain']"/><spring:eval expression="@file['file.path.product']"/>/<c:out value="${item.PRD_MST_CD }"/>/m_750.png" 
+                                             onerror="this.src='<spring:eval expression="@resource['img.ssl.none.src.pc']"/>' "alt="">
+                                    </dd>
+                                    <dt>
+                                        <span class="catchphrase2"><c:out value="${item.PRD_MST_NM }"/></span>
+                                        <span class="reward">리워드 : <fmt:formatNumber value="${item.PRD_MST_RDP_CMS }" type="number"/>원</span>
+                                    </dt>
+                                    <%-- 자격 정지 일 때, 버튼 선택 불가 --%>
+                                    <dd class="btn-campaign <c:if test="${planner.RDP_MST_STATE ne Code.PLANNER_STATE_ACTIVE }">disabled</c:if>">
+                                        <button type="button" class="create" data-prdMstNo="<c:out value="${item.PRD_MST_NO }"/>">캠페인 생성</button>
+                                    </dd>
+                                </dl>
+                            </a>
+                            
+                        </c:forEach>
+                        
+                    </div>
+            
+                    <%--상품 없음 --%>
+                    <c:if test="${empty list }">
+                        <p class="text-empty-data">상품을 준비중입니다.</p>
+                    </c:if>
+            
+                    <!-- 페이징 -->
+                    <div class="paginate">
+                        <ui:paging paging="${paging }" jsFunction="paging"/>
+                    </div>
+                    <!-- //페이징 -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- //Body -->
+
+<%@include file="/WEB-INF/jsp/pc/include/footer.jsp" %>
+<%@include file="/WEB-INF/jsp/pc/include/script.jsp" %>
+<%@include file="/WEB-INF/jsp/pc/include/layer.jsp" %>
+
+<!-- 팝업 : HTML 배너 등록 가이드  -->
+<div class="layer-popup2 layer-url-guide" id="layerBannerGuide">
+    <div class="layer-inner" style="top: 165px;">
+        <div class="contain-head">
+            <p class="text-title-type2">HTML 배너 등록 가이드</p>
+        </div>
+        <hr class="divline-type1">
+        <div class="contain-body">            
+            <div class="box-url-guide">            
+                <img src="<spring:eval expression="@resource['img.ssl.domain']"/>/resources/pc/images/img_url_guide.png" alt="HTML 배너 등록 가이드" />
+            </div>
+        </div>
+        <span class="btn-close"><button>닫기</button></span>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        var $areaContent = $(".area-body");
+        // 해제 요청하기
+        $areaContent.on("click", "#btnReleaseRequest", function() {
+            $(".layer-popup1").requestLayer($.action.myplanner.release.request.form.layer());
+        });
+        // 목록 조회 - 페이징
+        paging = function (cPage) {
+            var params = {
+                cPage : cPage,
+                searchPrdMstNm : "<c:out value="${commandMap.searchPrdMstNm }"/>",
+                searchCategoryIdx : "<c:out value="${commandMap.searchCategoryIdx }"/>",
+                searchOrderType : "<c:out value="${commandMap.searchOrderType }"/>"
+            };
+            $.requestPage($.action.myplanner.campaign.product.list(), params);
+        };
+        // 조회
+        $areaContent.on("change", "#searchCategoryIdx", function() {
+            search();
+        });
+        $areaContent.on("click", "#btnSearch, input[name='searchOrderType']", function() {
+            search();
+        });
+        // 상세
+        $areaContent.on("click", "a.detail", function () {
+            $.requestPage($.action.product.basic.view(), { PRD_MST_NO : $(this).attr("data-prdMstNo") } );
+        });
+        // 캠페인 생성
+        $areaContent.on("click", "button.create", function (e) {
+            e.stopPropagation();
+            if ($(this).parent("dd.btn-campaign").hasClass("disabled") == false) {
+                $(".layer-popup1").requestLayer($.action.myplanner.campaign.create.view.layer(), { PRD_MST_NO : $(this).attr("data-prdMstNo") } );
+            }
+        });
+        // 검색
+        function search() {
+            var params = {
+                cPage : 1,
+                searchPrdMstNm : $areaContent.find("#searchPrdMstNm").val(),
+                searchCategoryIdx : $areaContent.find("#searchCategoryIdx").val(),
+                searchOrderType : $areaContent.find("input[name='searchOrderType']:checked").val()
+            };
+            $.requestPage($.action.myplanner.campaign.product.list(), params);
+        }
+        // 클립보드로 복사
+        new ClipboardJS(".btn-copy", {
+            text : function(trigger) {
+                return $($(trigger).attr("data-clipboard-target")).text();
+            }
+        }).on("success", function(e) {
+            alert("복사되었습니다. 홍보할 곳에 붙여넣기 해주세요.");
+        });
+        new ClipboardJS(".url-copy").on("success", function(e) {
+            alert("복사되었습니다. 홍보할 곳에 붙여넣기 해주세요.");
+        });
+    });
+</script>
+</body>
+</html>

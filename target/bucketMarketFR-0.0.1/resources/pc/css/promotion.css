@@ -1,0 +1,121 @@
+@charset "utf-8";
+.area-content > .area-inner {width:1280px;}
+
+/* 기획전/이벤트-list */
+.contain-event-box {padding: 60px 0;}
+.box-event {background-color: #F8F8F8; padding: 30px 30px 0px 30px; margin-bottom:40px; overflow: hidden;}
+.box-event a:nth-of-type(2n) {float:right;}
+.box-event-list {float:left; background: #fff; border-radius: 15px; padding: 30px; margin-bottom: 30px; text-align: left; width:600px; box-sizing: border-box;}
+.box-event-list dt {margin-top:16px;}
+.box-event-list dt .subject{display: block; font-size: 18px; font-weight: 500; line-height: 26px; height:50px; margin-bottom:16px; box-sizing: border-box; width:90%; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;}
+.box-event-list dd.data {font-size: 13px; color: #666;}
+.box-event-list dd.image {width: 540px; height:auto;}
+.box-event-list dd.image img {width:100%; height:100%;}
+.event {display: table; width:auto; min-width:120px; padding:0 35px; height: 35px; line-height:33px; text-align: center; font-size:18px; color: #fff; border-radius: 22px; margin:0 0 16px 0; box-sizing: border-box;}
+.e-plan,
+.e-ing {background-color: #fd5490;}
+.e-end {background-color: #d9d9d9; color: #999;}
+
+/* 기획전/이벤트-상세페이지(공통) */
+.box-detail-product1{height:58px; margin-bottom:16px;}
+
+/* Select */
+.box-event-select {margin: 0px; min-width: 250px; max-width:700px; float:left;}
+.box-event-select .form-select {height: 58px;}
+.box-event-select .form-select select {height: 58px; color:#666; padding: 0 58px 0 20px;}
+.box-event-select .form-select select option  {padding: 5px 0px;}
+.box-event-select .form-select:after {right: 0px; top: 0px; margin-top: 0px; width: 56px; height: 56px; background: url(../images/img_selectbox_event.png) no-repeat center 45%; background-size: 100%;}
+
+/* SNS */
+.box-sns {float:right; margin-top:4px;}
+.box-sns span {margin-left:12px; display: inline-block;}
+.box-sns button {font-size:0px; line-height: 0;}
+.box-sns button::before {margin:0px; width:50px; height:50px; background-size: 50px auto;}
+
+/* 동영상, 에디터 */
+.box-detail-product2 {text-align: center; padding-bottom:60px; margin-bottom:60px; border-bottom:1px solid #eaeaea; overflow: hidden;}
+.box-detail-product2 .video {position: relative; height:0; padding-bottom: 56.25%;}
+.box-detail-product2 .video iframe {position: absolute; left:0px; width:100%; height:100%;}
+.box-detail-product2 .content {float:left; display:block; text-align: left; font-size:16px; line-height:normal !important; /* line-height:26px; */ margin: 0px;}
+.box-detail-product2 .content img {/* float:left; */ max-width: 100%;}
+
+/* 댓글작성 */
+.box-detail-product5 {margin: 60px 0px;}
+.box-detail-product5 > .text-information-type2 {padding: 50px 0px; border-top:1px solid #eaeaea;}
+.box-detail-product5 .count {display: block; font-size: 22px; line-height: 32px; margin-bottom: 16px;}
+.box-commentlist {margin-bottom:40px; border-top:1px solid #eaeaea;}
+.box-commentlist > .text-information-type2 {margin: 70px 0; font-size:15px; color:#999;}
+.box-comment {padding:30px 0 0 0; position: relative; font-size:15px; line-height:27px; border-bottom:1px solid #eaeaea; z-index: 1;}
+/* .box-comment:first-of-type {border-top:1px solid #eaeaea;} */
+.box-comment .name {color:#999; margin-left:30px;}
+.box-comment .date {margin:0 0 0 6px; color:#999;}
+.box-comment .date::before {content:'';display:inline-block;margin:0 10px 2px 0;vertical-align:middle;width:1px;height:10px;background:rgb(194, 194, 194);}
+.box-comment .content {display:block; width:calc(100% - 80px); margin:15px 30px 30px 30px;}
+.box-comment img {max-width:100%; margin: 10px 0;}
+.box-comment > .form-comment {margin: -15px 30px 30px 30px;}
+
+.form-comment {margin-bottom:60px; overflow: hidden;}
+.form-comment .form-textarea {float:left; width:calc(100% - 180px); height:auto;}
+.form-comment .form-textarea textarea {height:108px;  padding:20px; font-size:15px;}
+.form-comment .form-textarea textarea+i {top: 80px;}
+.form-comment textarea::placeholder,
+.form-comment input::placeholder {font-size: 13px; color: #999; opacity: 1;}
+.form-comment textarea:-ms-input-placeholder {font-size: 13px; color: #999; opacity: 1;}
+.form-comment textarea::-ms-input-placeholder {font-size: 13px !important; color: #999;}
+.form-comment input:-ms-input-placeholder {font-size: 13px; color: #999;}
+.form-comment input::-ms-input-placeholder {font-size: 13px !important; color: #999;}
+.form-comment input {font-size:15px;}
+.form-comment span[class^='btn-'] {border-radius:0;}
+.form-comment .form-alert {color: #fd5490;}
+.form-comment .btn-type-text1 {float:right; width:148px; height:108px;}
+.form-comment .btn-type-text3 {float:right; width:148px; background: #fff; height:54px !important; margin-top:16px; text-decoration: underline;}
+.form-comment .box-form {margin:16px 0 0 0; float:left;}
+.form-comment .box-form span {float:left; width: 230px; margin: 0 16px 0 0;}
+.form-comment .box-form input {margin: 0; height:58px;}
+.form-comment .box-form .form-alert {display: inline-block; line-height:20px; margin:0 0 0 0px !important;}
+.form-comment .box-addphoto {margin:16px 0 0 0; float:left;}
+.form-comment .btn-addphoto {float:left; border-radius: 10px !important; width:120px; height:58px;}
+.form-comment .btn-addphoto button {height:58px;}
+.form-comment .box-photo {float:left; height:58px; line-height:58px; background: none; padding: 0 50px 0 0; margin-left:16px; border-radius: 0px; font-size:13px; color: #999;}
+.form-comment .box-photo .btn-delete-photo {right:0px; top: 17px;}
+
+/* 기획전 - 브랜드별 제품 */
+.box-detail-product4 {margin:0;}
+.box-detail-product4 .title {display: block; width:90%; margin-bottom: 60px; font-size:26px; line-height: 34px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle;}
+.box-product4-inner {margin : 0 0 60px 0; overflow: hidden; border-bottom:1px solid #eaeaea;}
+
+.box-store-list.array2 .soldout span {width:188px; height:188px; margin: -94px; font-size: 37px; padding: 50px 30px 0; line-height: 44px;}
+.box-store-list.array2 .image {margin-bottom: 24px;}
+.box-store-list.array2 .ribbon-type1 {font-size:28px; line-height: 33px; padding:12px 30px 15px;}
+
+.box-store-list.array3 .soldout span {width:160px; height:160px; margin: -80px; font-size: 30px; padding: 45px 30px 0; line-height: 38px;}
+.box-store-list.array3 .ribbon-type1 {font-size:26px; line-height: 31px; padding:11px 25px 14px;}
+
+.box-store-list.array4 .soldout span {width:140px; height:140px; margin: -70px; font-size: 21px; padding: 45px 35px 0; line-height: 28px;}
+.box-store-list.array4 .ribbon-type1 {font-size:20px; line-height: 24px; padding:8px 18px 9px;}
+
+.box-product4-inner .box-store-list .image {margin-bottom: 20px;}
+.box-product4-inner .box-store-list .brand {font-size: 24px; line-height:28px; margin-bottom:10px;}
+.box-product4-inner .box-store-list .detail {font-size:19px; line-height:26px; height: 55px; margin-bottom:20px;}
+.box-product4-inner .box-store-list .payment {display: inline-block; padding: 12px 11px; font-size:20px;}
+
+/* 이벤트-개인정보 수집 동의 */
+.box-agreement {border-bottom:1px solid #eaeaea; margin-bottom:60px;}
+.box-agreement .box-form {border-top:1px solid #eaeaea; padding-top:60px; margin-bottom: 60px;}
+.box-agreement dt {font-size:22px; margin-bottom:16px;}
+.box-agreement .agreement-inner {background: #f6f6f6; height:108px; margin-bottom:16px; padding:30px; box-sizing: border-box; overflow-y: auto; color:#999; font-size: 13px;}
+.box-agreement .agreement-checkbox > .form-alert {display: inline-block; position: absolute; left: 37px; bottom:0px;}
+.box-agreement .form-checkbox {float:left; font-size: 20px; margin: 15px 20px 0 0 !important; line-height:28px;}
+.box-agreement .form-w350 {width: 350px; display: inline-block;}
+.box-agreement .form-w350 input {height: 58px;}
+.box-agreement .form-w350 input::placeholder {font-size: 20px;}
+.box-agreement .form-w350 input::-webkit-input-placeholder {font-size: 20px;} /* Chrome */
+.box-agreement .form-w350 input:-mos-input-placeholder {font-size: 20px;} /* Firefox */
+.box-agreement .form-w350 input:-ms-input-placeholder {font-size: 20px;} /* IE */
+.box-agreement .form-w350 input::-ms-input-placeholder {cfont-size: 20px;} /* edge */
+.box-agreement .necessary::after {content:'*';display:inline-block;margin:0 0 0 4px;vertical-align:middle;color:#fd5490;}
+
+
+
+
+

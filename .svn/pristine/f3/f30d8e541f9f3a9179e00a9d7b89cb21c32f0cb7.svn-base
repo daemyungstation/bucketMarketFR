@@ -1,0 +1,101 @@
+package common.code;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import lombok.Getter;
+
+/**
+ * <pre>
+ * @PackageName: common.code
+ * @FileName : Product.java
+ * @Date : 2020. 3. 26.
+ * @프로그램 설명 : 상품 관련 상수 모음
+ * @author upleat
+ * </pre>
+ */
+public class Product {
+
+    @Getter
+    public static enum ERROR {
+        E498("E498", "필수 정보가 누락되었습니다.\\n확인 후 다시 시도해주세요.\\n[errorCode : E498]"),
+        E499("E499", "상품코드가 누락되었습니다.\\n확인 후 다시 시도해주세요.\\n[errorCode : E499]"),
+        E404("E404", "전시중인 상품정보가 존재하지 않습니다.\\n[errorCode : E404]"),
+        E500("E500", "알수없는 오류가 발생되었습니다.");
+        private String code;
+        private String message;
+        ERROR(String code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+    }
+    
+    /**************************************************************************
+     * 1. 상품 노출 상태
+     **************************************************************************/
+    static public final String DISPLAY_SHOW = "Y"; // 상품 노출상태 > 노출
+    static public final String DISPLAY_HIDE = "N"; // 상품 노출상태 > 미노출
+    static public final String DISPLAY_SOLDOUT = "S"; // 상품 노출상태 > 일시품절
+    static public final Map<String, String> DISPLAYS = new HashMap<String, String>() {
+        private static final long serialVersionUID = 8106068821874190948L;
+        {
+            put(DISPLAY_SHOW, "노출");
+            put(DISPLAY_HIDE, "미노출");
+            put(DISPLAY_SOLDOUT, "일시품절");
+        }
+    };
+    /**************************************************************************
+     * 2. 상품 승인 상태
+     **************************************************************************/
+    static public final String STATE_DISAPPROVAL = "N"; // 미승인
+    static public final String STATE_REJECT = "R"; // 승인거절
+    static public final String STATE_APPROVAL = "A"; // 승인
+    static public final String STATE_UNION = "U"; // 결합
+    static public final Map<String, String> STATES = new HashMap<String, String>() {
+        private static final long serialVersionUID = -1073238492600650069L;
+        {
+            put(STATE_DISAPPROVAL, "미승인");
+            put(STATE_REJECT, "승인거절");
+            put(STATE_APPROVAL, "승인");
+            put(STATE_UNION, "결합");
+        }
+    };
+    /**************************************************************************
+     * 3. 상품 이미지
+     **************************************************************************/
+    static public final String IMG_MAIN = "M";
+    static public final String IMG_SUB = "S";
+    static public final String IMG_PLANNER_BIG = "B";
+    static public final String IMG_PLANNER_CARD = "C";
+    static public final String IMG_PLANNER_LIST = "L";
+    static public final int IMG_PC_TUMBNAIL_SIZE = 158;
+    static public final int IMG_MB_TUMBNAIL_SIZE = 750;
+    /**************************************************************************
+     * 4. 상품 정렬
+     **************************************************************************/
+    static public final String ORDER_BY_HIT_CNT_DESC = "HCD"; // 상품 정렬 > 인기순(조회순)
+    static public final String ORDER_BY_REG_DT_DESC = "RDD"; // 상품 정렬 > 등록순
+    static public final String ORDER_BY_MON_REL_AMT_DESC = "MRAD"; // 상품정렬 > 지원금 높은 순
+    static public final String ORDER_BY_MON_REL_AMT_ASC = "MRAA"; // 상품정렬 > 지원금 낮은 순
+    
+    static public final String ORDER_BY_HIT_CNT_DESC_NM = "인기순(조회순)"; // 상품 정렬 > 인기순(조회순)
+    static public final String ORDER_BY_REG_DT_DESC_NM = "등록순"; // 상품 정렬 > 등록순
+    static public final String ORDER_BY_MON_REL_AMT_DESC_NM = "지원금 높은 순"; // 상품정렬 > 지원금 높은 순
+    static public final String ORDER_BY_MON_REL_AMT_ASC_NM = "지원금 낮은 순"; // 상품정렬 > 지원금 낮은 순
+    
+    static public final Map<String, String> ORDERS = new LinkedHashMap<String, String>() {
+        private static final long serialVersionUID = -4747020117978599937L;
+        {
+            put(ORDER_BY_HIT_CNT_DESC, ORDER_BY_HIT_CNT_DESC_NM);
+            put(ORDER_BY_REG_DT_DESC, ORDER_BY_REG_DT_DESC_NM);
+            put(ORDER_BY_MON_REL_AMT_DESC, ORDER_BY_MON_REL_AMT_DESC_NM);
+            put(ORDER_BY_MON_REL_AMT_ASC, ORDER_BY_MON_REL_AMT_ASC_NM);
+        }
+    };
+    
+    /**************************************************************************
+     * 5. 상조 상품명
+     **************************************************************************/
+    static public final String VDR_MST_DAEMYUNG_NM = "대명아임레디";
+}

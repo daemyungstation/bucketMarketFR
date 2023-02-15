@@ -1,0 +1,121 @@
+package web.fr.myplanner.service;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * <pre>
+ * &#64;PackageName: web.fr.myplanner.service
+ * &#64;FileName : MyPlannerCampaignService.java
+ * &#64;Date : 2020. 5. 18.
+ * &#64;프로그램 설명 : 캠페인 생성
+ * &#64;author upleat
+ * </pre>
+ */
+public interface MyPlannerCampaignService {
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductCategoryList
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 상품 카테고리 목록 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 18.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectProductCategoryList() throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductList
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 상품 목록 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 15.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String, Object>> selectProductList(Map<String, Object> commandMap) throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductListCount
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 상품 목록 개수
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 15.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public int selectProductListCount(Map<String, Object> commandMap) throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectProductInfo
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 상품 상세 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 15.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectProductInfo(Map<String, Object> commandMap) throws Exception;
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectProductMainInfo
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 메인 조회
+     * 4. 작성자       : inus
+     * 5. 작성일       : 2021. 5. 7.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectProductMainInfo(Map<String, Object> commandMap) throws Exception;
+    
+    /**
+     * <pre>
+     * 1. MethodName : selectProductIntroInfo
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 소개 조회
+     * 4. 작성자       : inus
+     * 5. 작성일       : 2021. 11. 26.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public Map<String, Object> selectProductIntroInfo(Map<String, Object> commandMap) throws Exception;
+
+    /**
+     * <pre>
+     * 1. MethodName : selectCampaignSellerShortUrlList
+     * 2. ClassName  : MyPlannerCampaignService.java
+     * 3. Comment    : 캠페인 판매자 단축 URL 조회
+     * 4. 작성자       : inus
+     * 5. 작성일       : 2022. 03. 04.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    public List<Map<String,Object>> selectCampaignSellerShortenUrlList(Map<String, Object> commandMap) throws Exception;;
+}

@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="IniPay">
+
+    <!-- PG 인증 요청 Key 생성 -->
+    <select id="selectIniPayReqKeyStr" resultType="String">
+        /* IniPay.selectIniPayReqKeyStr */
+        SELECT SEQ_APV_REQ_IDX.NEXTVAL AS APV_REQ_IDX FROM DUAL
+    </select>
+    
+    <!-- PG 인증 요청 정보 등록 -->
+    <insert id="insertIniPayReq" parameterType="HashMap">
+        /* IniPay.insertIniPayReq */
+        INSERT INTO P_APV_REQ (
+            APV_REQ_IDX,
+            P_INI_PAYMENT,
+            P_MID,
+            P_OID,
+            P_AMT,
+            P_UNAME,
+            P_MNAME,
+            P_NOTI,
+            P_GOODS,
+            P_MOBILE,
+            P_EMAIL,
+            P_QUOTABASE,
+            P_CHARSET,
+            VERSION,
+            CURRENCY,
+            TIMESTAMP,
+            SIGNATURE,
+            MKEY,
+            APV_REQ_AGT,
+            APV_REQ_REG_DT,
+            APV_REQ_REG_IP
+        ) VALUES (
+            #{APV_REQ_IDX},
+            #{P_INI_PAYMENT},
+            #{P_MID},
+            #{P_OID},
+            #{P_AMT},
+            #{P_UNAME},
+            #{P_MNAME},
+            #{P_NOTI},
+            #{P_GOODS},
+            #{P_MOBILE},
+            #{P_EMAIL},
+            #{P_QUOTABASE},
+            #{P_CHARSET},
+            #{VERSION},
+            #{CURRENCY},
+            #{TIMESTAMP},
+            #{SIGNATURE},
+            #{MKEY},
+            #{APV_REQ_AGT},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{APV_REQ_REG_IP}
+        )
+    </insert>
+    <!-- PG 인증 결과 정보 등록 -->
+    <insert id="insertIniPayReqResult" parameterType="HashMap">
+        /* IniPay.insertIniPayReqResult */
+        INSERT INTO P_APV_RET (
+            APV_REQ_IDX,
+            P_STATUS,
+            P_RMESG1,
+            P_OID,
+            P_TID,
+            P_REQ_URL,
+            P_NOTI,
+            P_AMT,
+            AUTHTOKEN,
+            AUTHURL,
+            NETCANCELURL,
+            APV_RET_REG_DT,
+            APV_RET_REG_IP
+        ) VALUES (
+            #{APV_REQ_IDX},
+            #{P_STATUS},
+            #{P_RMESG1},
+            #{P_OID},
+            #{P_TID},
+            #{P_REQ_URL},
+            #{P_NOTI},
+            NVL(#{P_AMT}, (SELECT P_AMT FROM P_APV_REQ WHERE APV_REQ_IDX = #{APV_REQ_IDX} AND P_OID = #{P_OID})),
+            #{AUTHTOKEN:CLOB},
+            #{AUTHURL},
+            #{NETCANCELURL},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{APV_RET_REG_IP}
+        )
+    </insert>
+    <!-- PG 인증 결과 정보 조회 -->
+    <resultMap id="resultIniPayReqResultInfo" type="HashMap">
+        <result property="APV_REQ_IDX" column="APV_REQ_IDX"/>
+        <result property="P_UNAME" column="P_UNAME"/>
+        <result property="P_MNAME" column="P_MNAME"/>
+        <result property="P_NOTI" column="P_NOTI"/>
+        <result property="P_STATUS" column="P_STATUS"/>
+        <result property="P_OID" column="P_OID"/>
+        <result property="P_TID" column="P_TID"/>
+        <result property="P_REQ_URL" column="P_REQ_URL"/>
+        <result property="P_NOTI" column="P_NOTI"/>
+        <result property="P_AMT" column="P_AMT"/>
+        <result property="AUTHTOKEN" column="AUTHTOKEN" jdbcType="CLOB" javaType="java.lang.String"/>
+        <result property="AUTHURL" column="AUTHURL"/>
+        <result property="NETCANCELURL" column="NETCANCELURL"/>
+    </resultMap>
+    <select id="selectIniPayReqResultInfo" parameterType="HashMap" resultMap="resultIniPayReqResultInfo">
+        /* IniPay.selectIniPayReqResultInfo */
+        SELECT
+            REQ.APV_REQ_IDX,
+            REQ.P_UNAME,
+            REQ.P_MNAME,
+            REQ.P_NOTI,
+            RET.P_STATUS,
+            RET.P_OID,
+            RET.P_TID,
+            RET.P_REQ_URL,
+            RET.P_NOTI,
+            RET.P_AMT,
+            RET.AUTHTOKEN,
+            RET.AUTHURL,
+            RET.NETCANCELURL
+        FROM P_APV_RET RET, P_APV_REQ REQ
+        WHERE RET.APV_REQ_IDX = REQ.APV_REQ_IDX
+            AND RET.APV_REQ_IDX = #{APV_REQ_IDX}
+            AND RET.P_OID = #{ORD_MST_IDX} 
+    </select>
+    
+    <!-- PG 결제승인 정보 등록 -->
+    <insert id="insertIniPayApv" parameterType="HashMap">
+        <selectKey keyProperty="PAY_MST_IDX" keyColumn="PAY_MST_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_PAY_MST_IDX.NEXTVAL AS PAY_MST_IDX FROM DUAL
+        </selectKey>
+        /* IniPay.insertIniPayApv */
+        INSERT INTO P_PAY_MST (
+            PAY_MST_IDX,
+            P_STATUS,
+            P_TID,
+            P_TYPE,
+            P_AUTH_DT,
+            P_MID,
+            P_OID,
+            P_AMT,
+            P_UNAME,
+            P_MNAME,
+            P_RMESG1,
+            P_NOTI,
+            P_NOTEURL,
+            P_NEXT_URL,
+            P_CARD_NUM,
+            P_CARD_ISSUER_CODE,
+            P_CARD_MEMBER_NUM,
+            P_CARD_PURCHASE_CODE,
+            P_CARD_PRTC_CODE,
+            P_CARD_INTEREST,
+            P_CARD_CHECKFLAG,
+            P_RMESG2,
+            P_FN_CD1,
+            P_AUTH_NO,
+            P_ISP_CARDCODE,
+            P_FN_NM,
+            P_SRC_CODE,
+            CURRENCY,
+            EVENTCODE,
+            BUYEREMAIL,
+            CUSTEMAIL,
+            BUYERTEL,
+            PAY_MST_AGT,
+            PAY_MST_REG_DT,
+            PAY_MST_REG_IP
+        ) VALUES (
+            #{PAY_MST_IDX},
+            #{P_STATUS},
+            #{P_TID},
+            #{P_TYPE},
+            #{P_AUTH_DT},
+            #{P_MID},
+            #{P_OID},
+            #{P_AMT},
+            #{P_UNAME},
+            #{P_MNAME},
+            #{P_RMESG1},
+            #{P_NOTI},
+            #{P_NOTEURL},
+            #{P_NEXT_URL},
+            #{P_CARD_NUM},
+            #{P_CARD_ISSUER_CODE},
+            #{P_CARD_MEMBER_NUM},
+            #{P_CARD_PURCHASE_CODE},
+            #{P_CARD_PRTC_CODE},
+            #{P_CARD_INTEREST},
+            #{P_CARD_CHECKFLAG},
+            #{P_RMESG2},
+            #{P_FN_CD1},
+            #{P_AUTH_NO},
+            #{P_ISP_CARDCODE},
+            NVL(#{P_FN_NM}, (SELECT CMN_COM_NM FROM T_CMM_COM WHERE CMN_COM_UP_IDX = ${@common.code.Code@PAY_TYPE_CARD} AND CMN_COM_ETC1 = #{P_FN_CD1})),
+            #{P_SRC_CODE},
+            #{CURRENCY},
+            #{EVENTCODE},
+            #{BUYEREMAIL},
+            #{CUSTEMAIL},
+            #{BUYERTEL},
+            #{PAY_MST_AGT},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{PAY_MST_REG_IP}
+        )
+    </insert>
+    
+    <!-- PG 결제 승인정보 조회 -->
+    <select id="selectIniPayApvInfo" parameterType="HashMap" resultType="HashMap">
+        /* IniPay.selectIniPayApvInfo */
+        SELECT
+            PAY_MST_IDX,
+            PAY_MST_AGT,
+            P_STATUS,
+            P_TID,
+            P_TYPE,
+            P_AUTH_DT,
+            TO_CHAR(TO_DATE(P_AUTH_DT, 'YYYYMMDDHH24MISS'), 'YYYY-MM-DD HH:MM:SS') AS P_AUTH_DT_STR,
+            P_MID,
+            P_OID,
+            P_AMT,
+            P_UNAME,
+            P_MNAME,
+            P_NOTI,
+            P_CARD_NUM,
+            P_CARD_ISSUER_CODE,
+            P_CARD_MEMBER_NUM,
+            P_CARD_PURCHASE_CODE,
+            P_RMESG2,
+            P_FN_CD1,
+            (SELECT CC.CMN_COM_NM FROM T_CMM_COM CC WHERE CC.CMN_COM_UP_IDX = ${@common.code.Code@PAY_TYPE_CARD} AND CC.CMN_COM_ETC1 = P_FN_CD1) AS P_FN_NM,
+            P_AUTH_NO,
+            P_ISP_CARDCODE,
+            P_FN_NM,
+            PAY_MST_REG_DT
+        FROM P_PAY_MST
+        <where>
+            <if test="PAY_MST_IDX != null and PAY_MST_IDX != ''">
+                AND PAY_MST_IDX = #{PAY_MST_IDX}
+            </if>
+            <if test="ORD_MST_IDX != null and ORD_MST_IDX != ''">
+                AND P_OID = #{ORD_MST_IDX}
+            </if>
+            <if test="P_TID != null and P_TID != ''">
+                AND P_TID = #{PAY_MST_IDX}
+            </if>
+        </where>
+    </select>
+    
+    <!-- PG 결제 마스터 정보 등록 -->
+    <insert id="insertIniPayMaster" parameterType="HashMap">
+        /* IniPay.insertIniPayMaster */
+        INSERT INTO T_PAY_MST (
+            ORD_MST_IDX,
+            PAY_MST_IDX,
+            PAY_MST_GBN,
+            PAY_MST_REG_DT
+        ) VALUES (
+            #{P_OID},
+            #{PAY_MST_IDX},
+            '${@common.code.PaymentGate@STATE_NORMAL}',
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+        )
+    </insert>
+    <!-- PG 결제 마스터 정보 수정 -->
+    <insert id="updateIniPayMaster" parameterType="HashMap">
+        /* IniPay.updateIniPayMaster */
+        UPDATE T_PAY_MST SET
+            PAY_MST_GBN = '${@common.code.PaymentGate@STATE_CANCEL}',
+            PAY_MST_UPD_DT = TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+        WHERE ORD_MST_IDX = #{oid}
+            AND PAY_MST_IDX = #{payMstIdx}
+    </insert>
+    
+    <!-- PG 결제 취소 요청 정보 등록 -->
+    <insert id="insertIniPayCnlReq" parameterType="HashMap">
+        <selectKey keyProperty="CNL_REQ_IDX" keyColumn="CNL_REQ_IDX" resultType="Integer" order="BEFORE">
+            SELECT SEQ_CNL_REQ_IDX.NEXTVAL AS CNL_REQ_IDX FROM DUAL
+        </selectKey>
+        /* IniPay.insertIniPayCnlReq */
+        INSERT INTO P_CNL_REQ (
+            CNL_REQ_IDX,
+            PAYMETHOD,
+            TIMESTAMP,
+            CLIENTIP,
+            MID,
+            TID,
+            MSG,
+            HASHDATA,
+            CNL_REQ_REG_DT,
+            CNL_REQ_REG_IP
+        ) VALUES (
+            #{CNL_REQ_IDX},
+            #{paymethod},
+            #{timestamp},
+            #{clientIp},
+            #{mid},
+            #{tid},
+            #{msg},
+            #{hashData},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{CNL_REQ_REG_IP}
+        )
+    </insert>
+    
+    <!-- PG 결제 취소 요청 결과 정보 등록 -->
+    <insert id="insertIniPayCnlReqResult" parameterType="HashMap">
+        /* IniPay.insertIniPayCnlReqResult */
+        INSERT INTO P_CNL_RET (
+            CNL_REQ_IDX,
+            RESULTCODE,
+            RESULTMSG,
+            CNL_RET_REG_DT,
+            CNL_RET_REG_IP
+        ) VALUES (
+            #{CNL_REQ_IDX},
+            #{resultCode},
+            #{resultMsg},
+            TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+            #{CNL_RET_REG_IP}
+        )
+    </insert>
+</mapper>

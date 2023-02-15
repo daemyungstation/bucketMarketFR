@@ -1,0 +1,150 @@
+package common.advices;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.ModelAndView;
+
+import common.model.Request;
+import common.util.DeviceUtil;
+import common.util.StringUtil;
+import lombok.extern.log4j.Log4j2;
+
+@Log4j2
+@Component
+public class DomainAdvice {
+
+    @Value("#{resource['front.ssl.domain']}")
+    private String frontSslDomain;
+    
+    @Value("#{resource['mobile.ssl.domain']}")
+    private String mobileSslDomain;
+    
+    @Value("${spring.profiles.active:prd}")
+    private String activeProfile;
+    
+    /**
+     * <pre>
+     * 1. MethodName : isAccessPage
+     * 2. ClassName  : DomainAdvice.java
+     * 3. Comment    : 페이지 여부를 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 7. 2.
+     * </pre>
+     *
+     * @param request
+     * @return
+     */
+    private boolean isAccessPage(HttpServletRequest request) {
+        boolean isAccessPage = true;
+        String[] exemptionPatterns = { "ajax", "layer", "logout", "pg", "info", "/contract", "oneself"};
+        String requestURI = request.getRequestURI().toLowerCase();
+        for (String exemptionPattern : exemptionPatterns) {
+            if (requestURI.contains(exemptionPattern)) {
+                isAccessPage = false;
+                break;
+            }
+        }
+        return isAccessPage;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : getQueryString
+     * 2. ClassName  : DomainAdvice.java
+     * 3. Comment    : Parameter QueryString을 반환한다.
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 7. 2.
+     * </pre>
+     *
+     * @param joinPoint
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    private String getQueryString (ProceedingJoinPoint joinPoint) throws Exception {
+        Map<String, Object> commandMap = new HashMap<>();
+        Object[] args = joinPoint.getArgs();
+        for (Object arg : args) {
+            if (arg instanceof Map) {
+                commandMap = (Map<String, Object>) arg;
+                break;
+            }
+        }
+        String queryString = "";
+        if (!commandMap.isEmpty()) {
+            int i = 0;
+            queryString = "?";
+            for (String key : commandMap.keySet()) {
+                Object object = commandMap.get(key);
+                if (object.getClass().isArray()) {
+                    queryString += (i > 0 ? "&" : "") ;
+                    for (String value : StringUtil.getArray(commandMap, key)) {
+                        queryString += (i > 0 ? "&" : "") ;
+                        queryString += key;
+                        queryString += "=";
+                        queryString += value;
+                        i++;
+                    }
+                } else {
+                    queryString += (i > 0 ? "&" : "") ;
+                    queryString += key;
+                    queryString += "=";
+                    queryString += StringUtil.getString(object, key);
+                }
+                i++;
+            }
+        }
+        return queryString;
+    }
+    
+    /**
+     * <pre>
+     * 1. MethodName : checkDomain
+     * 2. ClassName  : DomainAdvice.java
+     * 3. Comment    : 도메인 강제 치환
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 7. 2.
+     * </pre>
+     *
+     * @param joinPoint
+     * @return
+     * @throws Throwable
+     */
+    public Object checkDomain(ProceedingJoinPoint joinPoint) throws Throwable {
+        HttpServletRequest request = Request.getCurrentRequest();
+        log.info("profile : [{}]", activeProfile);
+        if (isAccessPage(request) && !"local".equals(activeProfile)) {
+            String serverName = request.getServerName();
+            String requestUrl = request.getRequestURL().toString();
+            log.info("============================== DOMAIN CHECK ==============================");
+            log.info("Request ServerName : [{}]", request.getServerName());
+            log.info("Current Device : [{}]", DeviceUtil.getDeviceChar());
+            log.info("RequestUrl : [{}]", requestUrl);
+            if (DeviceUtil.isNormal()) {
+                if (mobileSslDomain.contains(request.getServerName())) {
+                    ModelAndView mv = new ModelAndView();
+                    requestUrl = requestUrl.replace(serverName, frontSslDomain.replace("https://", "").replace("http://", "")) + this.getQueryString(joinPoint);
+                    log.info("Redirect To {}", requestUrl);
+                    mv.setViewName("redirect:" + requestUrl);
+                    return mv;
+                }
+            } else {
+                if (frontSslDomain.contains(request.getServerName())) {
+                    ModelAndView mv = new ModelAndView();
+                    requestUrl = requestUrl.replace(serverName, mobileSslDomain.replace("https://", "").replace("http://", "")) + this.getQueryString(joinPoint);
+                    log.info("Redirect To {}", requestUrl);
+                    mv.setViewName("redirect:" + requestUrl);
+                    return mv;
+                }
+            }
+            log.info("==========================================================================");
+        }
+        return joinPoint.proceed();
+    }
+}

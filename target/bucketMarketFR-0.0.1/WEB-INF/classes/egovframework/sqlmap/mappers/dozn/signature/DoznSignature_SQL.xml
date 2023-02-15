@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DoznSignature">
+    <!-- 프론트 > 카카오 전자서명 > 토큰 값 생성/조회 -->
+    <select id="selectDoznSignatureKeyStr" parameterType="HashMap" resultType="String">
+        /* DoznSignature.selectDoznSignatureKeyStr */
+        SELECT
+            KKO_SIGN_SEQ.NEXTVAL AS KKO_SIGN_IDX
+        FROM DUAL
+    </select>
+    <!-- 프론트 > 카카오 전자서명 > 접수번호 조회 -->
+    <select id="selectDoznSignatureTxIdStr" parameterType="HashMap" resultType="String">
+        /* DoznSignature.selectDoznSignatureTxIdStr */
+        SELECT
+            TX_ID
+        FROM I_KKO_SIGN
+        WHERE KKO_SIGN_IDX = #{kko_sign_idx}
+    </select>
+    <!-- 프론트 > 카카오 전자서명 > 등록 -->
+    <insert id="insertDoznSignature" parameterType="HashMap">
+        /* DoznSignature.insertDoznSignature */
+        INSERT INTO I_KKO_SIGN (
+            KKO_SIGN_IDX,
+            TX_ID,
+            CI_VAL
+        ) VALUES (
+            #{kko_sign_idx},
+            #{tx_id},
+            #{ci_val}
+        )
+    </insert>
+    <!-- 프론트 > 카카오 전자서명 > 수정 -->
+    <update id="updateDoznSignature" parameterType="HashMap">
+        /* DoznSignature.updateDoznSignature */
+        UPDATE I_KKO_SIGN SET
+            <if test="status != null and status != ''">
+            STATUS = #{status},
+            </if>
+            <if test="request_at != null and request_at != ''">
+            REQUEST_AT = #{request_at}
+            </if>
+            <if test="signed_data != null and signed_data != ''">
+            SIGNED_DATA = #{signed_data}
+            </if>
+        WHERE KKO_SIGN_IDX = #{kko_sign_idx}
+            AND TX_ID = #{tx_id}
+    </update>
+    <!-- 프론트 > 카카오 전자서명 > 인증 성공 개수 -->
+    <select id="selectDoznSignatureValidCount" resultType="Integer">
+        /* DoznSignature.selectDoznSignatureValidCount */
+        SELECT COUNT(TX_ID)
+        FROM I_KKO_SIGN
+        WHERE CI_VAL = '${@common.session.SessionsUser@getSessionValue('USER_CI')}' 
+            AND STATUS = 'COMPLETE'
+    </select>
+</mapper>

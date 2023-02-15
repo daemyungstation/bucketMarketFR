@@ -1,0 +1,398 @@
+package web.fr.planner.service.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
+import common.code.Const;
+import common.dao.CommonDefaultDAO;
+import common.util.StringUtil;
+import web.fr.common.service.CommonFileService;
+import web.fr.planner.service.PlannerJoinService;
+import web.message.MessageType;
+import web.message.service.MessageService;
+
+/**
+ * <pre>
+ * &#64;PackageName: web.fr.planner.service.impl
+ * &#64;FileName : PlannerJoinServiceImpl.java
+ * &#64;Date : 2020. 5. 4.
+ * &#64;프로그램 설명 : 플래너 가입
+ * &#64;author upleat
+ * </pre>
+ */
+@Service("plannerJoinService")
+public class PlannerJoinServiceImpl implements PlannerJoinService {
+
+    @Resource(name = "defaultDAO")
+    private CommonDefaultDAO defaultDAO;
+
+    @Resource(name = "commonFileService")
+    private CommonFileService commonFileService;
+
+    @Resource(name = "messageService")
+    private MessageService messageService;
+
+    /**
+     * <pre>
+     * 1. MethodName : checkDuplicateEmail
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 플래너 가입 > 이메일 중복 확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#checkDuplicateEmail(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int checkDuplicateId(Map<String, Object> commandMap) throws Exception {
+        return defaultDAO.selectCount("PlannerJoin.checkDuplicateId", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : checkDuplicateEmail
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 플래너 가입 > CI 중복 확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#checkDuplicateCi(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int checkDuplicateCi(Map<String, Object> commandMap) throws Exception {
+        return defaultDAO.selectCount("PlannerJoin.checkDuplicateCi", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : checkDuplicateEmail
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 플래너 가입 > 이메일 중복 확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#checkDuplicateEmail(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int checkDuplicateEmail(Map<String, Object> commandMap) throws Exception {
+        return defaultDAO.selectCount("PlannerJoin.checkDuplicateEmail", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : checkDuplicateSite
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 플래너 가입 > 사이트 중복 확인
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 7. 21.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#checkDuplicateSite(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int checkDuplicateSite(Map<String, Object> commandMap) throws Exception {
+        return defaultDAO.selectCount("PlannerJoin.checkDuplicateSite", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : insertApplyPlanner
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 플래너 가입 > 신청 플래너 등록
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#insertApplyPlanner(java.util.Map)
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int insertApplyPlanner(HttpServletRequest request, Map<String, Object> commandMap) throws Exception {
+        commandMap.put("RDP_MST_REG_IP", request.getLocalAddr());
+        commandMap.put("RDP_SIT_REG_IP", request.getLocalAddr());
+        commandMap.put("RDP_SUB_REG_IP", request.getLocalAddr());
+
+        // 플래너 번호 생성
+        String RDP_MST_IDX = defaultDAO.selectStr("PlannerJoin.selectPlannerIdx", null);
+        String RDP_MST_NO = defaultDAO.selectStr("PlannerJoin.selectNewPlannerNo", null);
+        commandMap.put("RDP_MST_IDX", RDP_MST_IDX); // 플래너 IDX
+        commandMap.put("RDP_MST_NO", RDP_MST_NO); // 플래너 번호
+
+        // 플래너 마스터 등록
+        int result = defaultDAO.insert("PlannerJoin.insertApplyPlanner", commandMap);
+
+        // 플래너 홍보사이트 등록
+        String[] RDP_SIT_ADRs = StringUtil.getArray(commandMap, "RDP_SIT_ADRs");
+        if (RDP_SIT_ADRs != null && RDP_SIT_ADRs.length > 0) {
+            for (String RDP_SIT_ADR : RDP_SIT_ADRs) {
+                commandMap.put("RDP_SIT_ADR", RDP_SIT_ADR);
+                defaultDAO.insert("PlannerJoin.insertApplyPlannerSite", commandMap);
+            }
+        }
+
+        // 플래너 주제 등록
+        String[] RDP_SUB_CDs = StringUtil.getArray(commandMap, "RDP_SUB_CDs");
+        if (RDP_SUB_CDs != null && RDP_SUB_CDs.length > 0) {
+            for (String RDP_SUB_CD : RDP_SUB_CDs) {
+                commandMap.put("RDP_SUB_CD", RDP_SUB_CD);
+                defaultDAO.insert("PlannerJoin.insertApplyPlannerSubject", commandMap);
+            }
+        }
+
+        // 알림톡 발송
+        if (result > 0) {
+            String RDP_MST_HP = StringUtil.getString(commandMap, "RDP_MST_HP1") + StringUtil.getString(commandMap, "RDP_MST_HP2") + StringUtil.getString(commandMap, "RDP_MST_HP3");
+            String RDP_MST_MEM_NM = StringUtil.getString(commandMap, "RDP_MST_MEM_NM");
+            this.messageService.sendAlimTalk(MessageType.PLANNER_APPLY_COMPLETE, RDP_MST_HP, RDP_MST_MEM_NM, RDP_MST_NO);
+        }
+
+        return result;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : updateReapplyPlanner
+     * 2. ClassName  : PlannerJoinService.java
+     * 3. Comment    : 플래너 가입 > 신청 플래너 수정 (재신청)
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int updateApplyPlanner(HttpServletRequest request, Map<String, Object> commandMap) throws Exception {
+        commandMap.put("RDP_SIT_REG_IP", request.getLocalAddr());
+        commandMap.put("RDP_SUB_REG_IP", request.getLocalAddr());
+
+        // 신청 플래너 정보 조회
+        Map<String, Object> oldInfo = defaultDAO.select("PlannerJoin.selectApplyPlannerInfo", commandMap);
+        // 신청한 플래너 정보가 없는 경우 실패 처리
+        String RDP_MST_IDX = StringUtil.getString(oldInfo, "RDP_MST_IDX", "");
+        if (StringUtils.isNotEmpty(RDP_MST_IDX)) {
+            commandMap.put("RDP_MST_IDX", RDP_MST_IDX); // 플래너 IDX
+        } else {
+            return 0;
+        }
+
+        // 플래너 상태 변경
+        commandMap.put("RDP_MST_RJT_RSN", ""); // 반려 사유
+
+        // 플래너 마스터 업데이트
+        int result = defaultDAO.update("PlannerJoin.updateApplyPlanner", commandMap);
+
+        // 플래너 홍보사이트 삭제
+        defaultDAO.delete("PlannerJoin.deleteApplyPlannerSiteInfo", commandMap);
+        // 플래너 홍보사이트 등록
+        String[] RDP_SIT_ADRs = StringUtil.getArray(commandMap, "RDP_SIT_ADRs");
+        if (RDP_SIT_ADRs != null && RDP_SIT_ADRs.length > 0) {
+            for (String RDP_SIT_ADR : RDP_SIT_ADRs) {
+                commandMap.put("RDP_SIT_ADR", RDP_SIT_ADR);
+                defaultDAO.insert("PlannerJoin.insertApplyPlannerSite", commandMap);
+            }
+        }
+
+        // 플래너 주제 삭제
+        defaultDAO.delete("PlannerJoin.deleteApplyPlannerSubInfo", commandMap);
+        // 플래너 주제 등록
+        String[] RDP_SUB_CDs = StringUtil.getArray(commandMap, "RDP_SUB_CDs");
+        if (RDP_SUB_CDs != null && RDP_SUB_CDs.length > 0) {
+            for (String RDP_SUB_CD : RDP_SUB_CDs) {
+                commandMap.put("RDP_SUB_CD", RDP_SUB_CD);
+                defaultDAO.insert("PlannerJoin.insertApplyPlannerSubject", commandMap);
+            }
+        }
+
+        // 알림톡 발송
+        if (result > 0) {
+            String RDP_MST_HP = StringUtil.getString(oldInfo, "RDP_MST_HP1") + StringUtil.getString(oldInfo, "RDP_MST_HP2") + StringUtil.getString(oldInfo, "RDP_MST_HP3");
+            String RDP_MST_MEM_NM = StringUtil.getString(oldInfo, "RDP_MST_MEM_NM");
+            String RDP_MST_NO = StringUtil.getString(oldInfo, "RDP_MST_NO");
+            this.messageService.sendAlimTalk(MessageType.PLANNER_APPLY_COMPLETE, RDP_MST_HP, RDP_MST_MEM_NM, RDP_MST_NO);
+        }
+
+        return result;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectApplyPlannerInfo
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 플래너 가입 > 신청 플래너 정보 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#selectApplyPlannerInfo(javax.servlet.http.HttpServletRequest,
+     *      java.util.Map)
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> selectApplyPlannerInfo(String plannerNo) throws Exception {
+        Map<String, Object> param = new HashMap<>();
+        param.put("RDP_MST_NO", plannerNo);
+        return defaultDAO.select("PlannerJoin.selectApplyPlannerInfo", param);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectPlannerReapplyInfoByPlannerNo
+     * 2. ClassName  : PlannerJoinService.java
+     * 3. Comment    : 플래너 가입 > 재신청을 위한 신청 플래너 정보 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public Map<String, Object> selectPlannerReapplyInfoByPlannerNo(Map<String, Object> commandMap) throws Exception {
+
+        // 기본정보
+        Map<String, Object> info = defaultDAO.select("PlannerJoin.selectApplyPlannerInfo", commandMap);
+        // 홍보사이트
+        info.put("RDP_SIT_ADRs", defaultDAO.selectList("PlannerJoin.selectApplyPlannerSiteInfo", info).toArray(new String[] {}));
+        // 주제
+        info.put("RDP_SUB_CDs", defaultDAO.selectList("PlannerJoin.selectApplyPlannerSubInfo", info).toArray(new String[] {}));
+
+        return info;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : updateApplyPlannerAdditionalInfo
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 추가정보 수정
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 8.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#updateApplyPlannerAdditionalInfo(javax.servlet.http.HttpServletRequest,
+     *      java.util.Map)
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int updateApplyPlannerAdditionalInfo(HttpServletRequest request, Map<String, Object> commandMap) throws Exception {
+
+        // 신청 플래너 정보 조회
+        Map<String, Object> oldInfo = defaultDAO.select("PlannerJoin.selectApplyPlannerInfo", commandMap);
+        // 신청한 플래너 정보가 없는 경우 실패 처리
+        String RDP_MST_IDX = StringUtil.getString(oldInfo, "RDP_MST_IDX", "");
+        if (StringUtils.isNotEmpty(RDP_MST_IDX)) {
+            commandMap.put("RDP_MST_IDX", RDP_MST_IDX); // 플래너 IDX
+        } else {
+            return 0;
+        }
+
+        // 추가정보 수정 및 상태 변경 - 활동대기, 교육이수 입력
+        return defaultDAO.update("PlannerJoin.updateApplyPlannerAdditionalInfo", commandMap);
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : selectPlannerQuiz
+     * 2. ClassName  : PlannerJoinService.java
+     * 3. Comment    : 플래너 가입 > 플래너 교육이수 목록 조회
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 6.
+     * </pre>
+     *
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Map<String, Object>> selectPlannerQuizGroupList() throws Exception {
+
+        // 교육이수 목록 조회
+        List<Map<String, Object>> list = (List<Map<String, Object>>) defaultDAO.selectList("PlannerJoin.selectPlannerQuizGroupList", null);
+
+        // 첨부파일 조회
+        for (Map<String, Object> quiz : list) {
+            Map<String, Object> param = new HashMap<>();
+            // 첨부파일 파라미터
+            param.put("CMM_FLE_TB_NM", "T_RDP_EDU");
+            param.put("CMM_FLE_TB_PK", StringUtil.getString(quiz, "RDP_EDU_IDX"));
+
+            // 비디오 
+            param.put("CMM_FLE_TB_TYPE", Const.PLANNER_QUIZ_VIDEO);
+            quiz.put("videoList", commonFileService.selectCommonFileList(param));
+            // PC 섬네일 이미지
+            param.put("CMM_FLE_TB_TYPE", Const.PLANNER_QUIZ_PC_THUMBNAIL);
+            quiz.put("pcThumbnailList", commonFileService.selectCommonFileList(param));
+            // MOBILE 섬네일 이미지
+            param.put("CMM_FLE_TB_TYPE", Const.PLANNER_QUIZ_MOBILE_THUMBNAIL);
+            quiz.put("mobileThumbnailList", commonFileService.selectCommonFileList(param));
+        }
+
+        return list;
+    }
+
+    /**
+     * <pre>
+     * 1. MethodName : updateApplyPlannerQuizComplete
+     * 2. ClassName  : PlannerJoinServiceImpl.java
+     * 3. Comment    : 교육이수 완료 및 상태 업데이트
+     * 4. 작성자       : upleat
+     * 5. 작성일       : 2020. 5. 11.
+     * </pre>
+     *
+     * @see web.fr.planner.service.PlannerJoinService#updateApplyPlannerQuizComplete(javax.servlet.http.HttpServletRequest,
+     *      java.util.Map)
+     * @param request
+     * @param commandMap
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public int updateApplyPlannerQuizComplete(HttpServletRequest request, Map<String, Object> commandMap) throws Exception {
+
+        // 신청 플래너 정보 조회
+        Map<String, Object> oldInfo = defaultDAO.select("PlannerJoin.selectApplyPlannerInfo", commandMap);
+        // 신청한 플래너 정보가 없는 경우 실패 처리
+        String RDP_MST_IDX = StringUtil.getString(oldInfo, "RDP_MST_IDX", "");
+        if (StringUtils.isNotEmpty(RDP_MST_IDX)) {
+            commandMap.put("RDP_MST_IDX", RDP_MST_IDX); // 플래너 IDX
+        } else {
+            return 0;
+        }
+
+        // 교육이수 완료 및 상태 변경 - 정상 플래너
+        return defaultDAO.update("updateApplyPlannerQuizComplete", commandMap);
+    }
+
+}

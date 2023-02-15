@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MyPlannerCampaign">
+
+    <!-- 마이플래너 > 캠페인  > 조건절 -->
+    <sql id="campaignProductWhere">
+        WHERE TPM.PRD_MST_CD = CPM.PRD_MST_CD
+            AND CPM.PROD_CD = VPM.PROD_CD
+            AND CPM.MODEL_CD = VPM.MODEL_CD
+            AND CPM.PROD_KIND = VPM.PROD_KIND
+            AND TPM.VDR_MST_IDX = VM.VDR_MST_IDX(+)
+            AND CPM.PRD_CTG_IDX = PC.PRD_CTG_IDX
+            AND (CPM.PRD_MST_PRP_YN = 'N'
+            <if test="PRD_PRODUCT_VIEW != null and PRD_PRODUCT_VIEW != ''">
+                OR #{PRD_PRODUCT_VIEW} = 'OK'
+            </if>
+            <if test="PRP_RDP_MST_NO != null and PRP_RDP_MST_NO != ''">
+                OR ( SELECT RDP_MST_IDX FROM T_PRD_PRP TPP WHERE TPP.PRD_MST_CD = CPM.PRD_MST_CD AND  RDP_MST_IDX IN (
+                SELECT RDP_MST_IDX FROM  T_RDP_MST_DAMO WHERE  RDP_MST_NO = #{PRP_RDP_MST_NO}
+                )  ) > 0
+            </if>
+            )
+            AND CPM.PRD_MST_DPL_YN <![CDATA[<>]]> '${@common.code.Product@DISPLAY_HIDE}'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDD') BETWEEN CPM.PRD_MST_ST_DT AND CPM.PRD_MST_ED_DT
+            AND TPM.PRD_MST_APV_STATE = '${@common.code.Product@STATE_APPROVAL}'
+            AND CPM.PRD_MST_DEL_YN = 'N'
+            AND (VM.VDR_MST_IDX IS NULL OR VM.VDR_MST_USE_YN = 'Y')
+            AND EXISTS (
+                SELECT PC.*
+                FROM T_PRD_CTG PC
+                WHERE PC.PRD_CTG_IDX = CPM.PRD_CTG_IDX
+                    AND PC.PRD_CTG_DSP_YN = 'Y'
+                    AND PC.PRD_CTG_USE_YN = 'Y'
+            )
+    </sql>
+    <sql id="campaignProductSearch">
+        <if test="searchPrdMstNm != null and searchPrdMstNm != ''">
+            AND CPM.PRD_MST_NM LIKE '%' || #{searchPrdMstNm} || '%'
+        </if>
+        <if test="searchCategoryIdx != null and searchCategoryIdx != ''">
+            AND PC.PRD_CTG_TOP_IDX = #{searchCategoryIdx}
+        </if>
+    </sql>
+    
+    <!-- 마이플래너 > 캠페인  > 카테고리 목록 -->
+    <select id="selectProductCategoryList" parameterType="HashMap" resultType="HashMap">
+        /* MyPlannerCampaign.selectProductCategoryList */
+        SELECT 
+            PRD_CTG_IDX,
+            PRD_CTG_NM
+        FROM 
+            T_PRD_CTG 
+        WHERE 
+            PRD_CTG_LEVEL = 0
+            AND PRD_CTG_USE_YN = 'Y'
+            AND PRD_CTG_DSP_YN = 'Y'
+        ORDER BY PRD_CTG_SORT ASC
+    </select>
+    
+    <!-- 마이플래너 > 캠페인  > 목록 개수 -->
+    <select id="selectProductListCount" parameterType="HashMap" resultType="Integer">
+        /* MyPlannerCampaign.selectProductListCount */
+        SELECT COUNT(CPM.PRD_MST_NO)
+        FROM T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM, T_PRD_CTG PC
+        <include refid="campaignProductWhere"/>
+        <include refid="campaignProductSearch"/>
+    </select>
+    <!-- 마이플래너 > 캠페인  > 목록 -->
+    <select id="selectProductList" parameterType="HashMap" resultType="HashMap">
+        /* MyPlannerCampaign.selectProductList */
+        SELECT S2.*
+        FROM (
+            SELECT S1.*,
+                ROWNUM AS RNUM
+            FROM (
+                SELECT
+                    CPM.PRD_MST_NO,
+                    CPM.PRD_MST_NM,
+                    CPM.PRD_MST_CD,
+                    CPM.PRD_MST_RDP_CMS,
+                    CPM.PRD_MST_DPL_YN,
+                    CPM.PRD_MST_PRP_YN
+                FROM 
+                    T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM, T_PRD_CTG PC
+                    <!-- 판매순 정렬 -->
+                    <if test="searchOrderType != '' and searchOrderType == 'bySales'">
+                        , (
+                            SELECT 
+                                TOM.PRD_MST_NO
+                                , COUNT(1) AS SELL_COUNT
+                            FROM 
+                                T_ORD_MST TOM
+                            GROUP BY 
+                                TOM.PRD_MST_NO 
+                        ) SELL
+                    </if>
+                <include refid="campaignProductWhere"/>
+                <include refid="campaignProductSearch"/>
+                <if test="searchOrderType == null or searchOrderType == '' or searchOrderType == 'bySuggest'">
+                    ORDER BY CPM.PRD_MST_SUGGEST ASC, CPM.PRD_MST_HITS ASC
+                </if>
+                <if test="searchOrderType != '' and searchOrderType == 'byPopularity'">
+                    ORDER BY CPM.PRD_MST_HITS ASC
+                </if>
+                <if test="searchOrderType != '' and searchOrderType == 'bySales'">
+                    AND CPM.PRD_MST_NO = SELL.PRD_MST_NO (+)
+                    ORDER BY SELL.SELL_COUNT DESC
+                </if>
+                <if test="searchOrderType != '' and searchOrderType == 'byRecently'">
+                    ORDER BY CPM.PRD_MST_REG_DT DESC
+                </if>
+            ) S1
+        <if test="endNum != null and endNum != ''">
+            WHERE ROWNUM <![CDATA[<=]]> #{endNum}
+        </if>
+        ) S2
+        <if test="startNum != null and startNum != ''">
+            WHERE S2.RNUM <![CDATA[>=]]> #{startNum}
+        </if>
+    </select>
+    
+    <!-- 마이플래너 > 캠페인  > 상세정보 -->
+    <select id="selectProductInfo" parameterType="String" resultType="HashMap">
+        /* MyPlannerCampaign.selectProductInfo */
+        SELECT
+            *
+        FROM 
+            T_PRD_MST TPM, C_PRD_MST CPM, V_PRD_MST VPM, T_VDR_MST VM, T_PRD_CTG PC
+        <include refid="campaignProductWhere"/>
+            AND CPM.PRD_MST_NO = #{PRD_MST_NO}
+    </select>
+
+    <insert id="newSellerShortenUrl" parameterType="HashMap" >
+        INSERT INTO T_SELLER_SHORT_URL ( RDP_MST_NO, PRD_MST_NO, SELLER_NAME, ORIGIN_URL, SHORTEN_URL, REG_DT )
+        VALUES (#{RDP_MST_NO}, #{PRD_MST_NO}, #{SELLER_NAME}, #{SELLER_ORIGIN_URL}, #{SELLER_SHORTEN_URL}, TO_CHAR(SYSDATE,'YYYYMMDD') )
+    </insert>
+
+    <select id="selectSellerShortenUrlList" parameterType="HashMap" resultType="HashMap" >
+        SELECT REG_DT, RDP_MST_NO, PRD_MST_NO, SELLER_NAME, ORIGIN_URL, SHORTEN_URL
+        FROM T_SELLER_SHORT_URL
+        WHERE RDP_MST_NO = #{RDP_MST_NO} AND PRD_MST_NO = #{PRD_MST_NO}
+    </select>
+    
+</mapper> 

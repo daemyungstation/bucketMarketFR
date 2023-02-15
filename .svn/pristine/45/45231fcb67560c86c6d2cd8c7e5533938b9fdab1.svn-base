@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BannerDisplay">
+    <!-- 프론트 > 전시 > 배너 > 목록 -->
+    <select id="selectBannerDisplayList" parameterType="HashMap" resultType="HashMap">
+        /* BannerDisplay.selectBannerDisplayList */
+        SELECT
+            BM.BNR_MST_TITLE,
+            BM.BNR_MST_TGT,
+            BM.BNR_MST_URL,
+            CF.CMM_FLE_ATT_PATH || CF.CMM_FLE_SYS_NM AS CMM_FLE_WEB_PATH
+        FROM T_BNR_MST BM, T_CMM_FLE CF
+        WHERE BM.BNR_MST_IDX = CF.CMM_FLE_TB_PK
+            AND CF.CMM_FLE_TB_NM = 'T_BNR_MST'
+            AND CF.CMM_FLE_USE_YN = 'Y'
+            AND BM.BNR_MST_USE_YN = 'Y'
+            AND TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS') BETWEEN BM.BNR_MST_ST_DT || BM.BNR_MST_ST_HH || BM.BNR_MST_ST_MM || '00' AND
+                BM.BNR_MST_ED_DT || BM.BNR_MST_ED_HH || BM.BNR_MST_ED_MM || '59'
+            AND BM.CMN_COM_IDX = #{CMN_COM_IDX}
+            AND CF.CMM_FLE_TB_TYPE = #{CMM_FLE_TB_TYPE}
+        ORDER BY BM.BNR_MST_SRT ASC
+    </select>
+</mapper>

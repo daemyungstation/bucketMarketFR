@@ -1,0 +1,49 @@
+package bucketMarketFR;
+
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import web.message.MessageType;
+import web.message.model.MessageButton;
+import web.message.model.MessageButtonType;
+import web.message.model.MessageTemplate;
+import web.message.service.MessageService;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "classpath*:egovframework/spring/context-*.xml" })
+public class KakaoAlimTalkTest {
+
+    @Resource(name = "messageService")
+    MessageService messageService;
+
+    @Autowired
+    Map<String, MessageTemplate> templates;
+
+//    @Test
+    public void test2() throws Exception {
+
+        this.messageService.sendAlimTalk(MessageType.PLANNER_APPLY_COMPLETE, "01020630874", "김혁", "P01203123213");
+//        this.messageService.sendAlimTalk(AlimTalkType.BM006, "01020630874", "김혁", System.currentTimeMillis(), "너 정지 ㅋㅋ");
+    }
+
+    //    @Test
+    public void test1() throws JsonProcessingException {
+
+        MessageButton button = new MessageButton();
+        button.setType(MessageButtonType.WEB_LINK);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(button);
+
+        System.out.println(json);
+    }
+}
